@@ -1,84 +1,135 @@
 import DashboardLayout from "@/components/dashboard/DashboardLayout";
 import StatCard from "@/components/dashboard/StatCard";
-import ShipmentStatusBadge from "@/components/dashboard/ShipmentStatusBadge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { DollarSign, Truck, Package, Users, Check, X } from "lucide-react";
+import { DollarSign, Truck, Package, Users, Loader2, BarChart3 } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/lib/supabase";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 
-const pendingCarriers = [
-  { id: 1, name: "BlueRoute Logistics", email: "ops@blueroute.com", trucks: 5, date: "Feb 14, 2026" },
-  { id: 2, name: "SwiftHaul Co.", email: "admin@swifthaul.com", trucks: 3, date: "Feb 15, 2026" },
-  { id: 3, name: "PrimeFreight", email: "info@primefreight.com", trucks: 12, date: "Feb 16, 2026" },
-];
+const AdminDashboard = () => {
+  const { data: stats, isLoading } = useQuery({
+    queryKey: ["admin-stats"],
+    queryFn: async () => {
+      const [shipmentsRes, profilesRes] = await Promise.all([
+        supabase.from("shipments").select("*"),
+        supabase.from("profiles").select("*")
+      ]);
 
-const AdminDashboard = () => (
-  <DashboardLayout role="admin">
-    <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-foreground">Vista General de la Plataforma</h1>
+      if (shipmentsRes.error) throw shipmentsRes.error;
+      if (profilesRes.error) throw profilesRes.error;
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard icon={DollarSign} label="Ingresos Totales" value="$284,500" change="+22% este mes" changeType="positive" />
-        <StatCard icon={Truck} label="Transportistas Activos" value="48" change="3 pendientes de aprobación" changeType="neutral" />
-        <StatCard icon={Package} label="Envíos (Mes)" value="1,247" change="+15% vs mes anterior" changeType="positive" />
-        <StatCard icon={Users} label="Total Clientes" value="312" change="28 nuevos este mes" changeType="positive" />
-      </div>
+      const shipments = shipmentsRes.data;
+      const profiles = profilesRes.data;
 
-      <div className="grid lg:grid-cols-2 gap-6">
-        {/* Approval queue */}
-        <Card className="border-border/50">
-          <CardHeader className="pb-3">
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-base font-semibold">Cola de Aprobación de Transportistas</CardTitle>
-              <Badge variant="secondary" className="text-xs">{pendingCarriers.length} pendientes</Badge>
+      const totalRevenue = shipments.reduce((acc, s) => acc + (Number(s.price) || 0), 0);
+      const platformsEarnings = totalRevenue * 0.08;
+      const carriers = profiles.filter(p => p.role === "carrier");
+      const clients = profiles.filter(p => p.role === "client");
+
+      // Group shipments by date for chart
+      const last7Days = [...Array(7)].map((_, i) => {
+        const d = new Date();
+        d.setDate(d.getDate() - (6 - i));
+        return d.toISOString().split('T')[0];
+      });
+
+      const chartData = last7Days.map(date => ({
+        name: new Date(date).toLocaleDateString('es-ES', { weekday: 'short' }),
+        envíos: shipments.filter(s => s.created_at.startsWith(date)).length,
+      }));
+
+      return {
+        totalRevenue,
+        platformsEarnings,
+        carrierCount: carriers.length,
+        clientCount: clients.length,
+        shipmentCount: shipments.length,
+        chartData
+      };
+    },
+  });
+
+  return (
+    <DashboardLayout role="admin">
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <h1 className="text-2xl font-bold text-foreground">Control de Mando Global</h1>
+          <div className="flex gap-2">
+            <Badge variant="outline" className="border-teal/20 text-teal">Modo Escalabilidad Activo</Badge>
+          </div>
+        </div>
+
+        {isLoading ? (
+          <div className="flex items-center justify-center p-12">
+            <Loader2 className="w-12 h-12 animate-spin text-teal" />
+          </div>
+        ) : (
+          <>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              <StatCard icon={DollarSign} label="Volumen Total" value={`$${stats?.totalRevenue.toLocaleString()}`} change="Volumen de transacciones" changeType="neutral" />
+              <StatCard icon={BarChart3} label="Ingresos Plataforma" value={`$${stats?.platformsEarnings.toLocaleString()}`} change="8% de comisión" changeType="positive" />
+              <StatCard icon={Truck} label="Transportistas" value={stats?.carrierCount.toString() || "0"} change="Flota disponible" changeType="neutral" />
+              <StatCard icon={Package} label="Envíos Totales" value={stats?.shipmentCount.toString() || "0"} change="Procesados históricamente" changeType="neutral" />
             </div>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {pendingCarriers.map((c) => (
-              <div key={c.id} className="flex items-center justify-between p-3 rounded-lg bg-muted/40 border border-border/50">
-                <div>
-                  <p className="text-sm font-medium text-foreground">{c.name}</p>
-                  <p className="text-xs text-muted-foreground">{c.email} · {c.trucks} camiones · Solicitado el {c.date}</p>
-                </div>
-                <div className="flex gap-2">
-                  <Button size="sm" className="bg-teal-gradient hover:opacity-90 h-8">
-                    <Check className="w-4 h-4" />
-                  </Button>
-                  <Button size="sm" variant="outline" className="h-8 text-destructive hover:bg-destructive/10">
-                    <X className="w-4 h-4" />
-                  </Button>
-                </div>
-              </div>
-            ))}
-          </CardContent>
-        </Card>
 
-        {/* Recent activity */}
-        <Card className="border-border/50">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-base font-semibold">Configuración de la Plataforma</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {[
-              { label: "Tasa de Comisión por Defecto", value: "8%", desc: "Aplicada a todos los envíos nuevos" },
-              { label: "Aprobación de Transportistas", value: "Manual", desc: "Requiere revisión del administrador" },
-              { label: "Requisito de Seguro", value: "Opcional", desc: "Por envío individual" },
-              { label: "Suscripciones Activas", value: "48", desc: "Básico: 28 · Pro: 16 · Enterprise: 4" },
-            ].map((s) => (
-              <div key={s.label} className="flex items-center justify-between p-3 rounded-lg border border-border/50">
-                <div>
-                  <p className="text-sm font-medium text-foreground">{s.label}</p>
-                  <p className="text-xs text-muted-foreground">{s.desc}</p>
-                </div>
-                <span className="text-sm font-semibold text-foreground">{s.value}</span>
-              </div>
-            ))}
-          </CardContent>
-        </Card>
+            <div className="grid lg:grid-cols-3 gap-6">
+              {/* Activity Chart */}
+              <Card className="lg:col-span-2 border-border/50 bg-card/50 backdrop-blur-sm">
+                <CardHeader>
+                  <CardTitle className="text-base font-semibold flex items-center gap-2">
+                    <BarChart3 className="w-4 h-4 text-teal" />
+                    Actividad de los Últimos 7 Días
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="h-[300px] w-full pt-4">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={stats?.chartData}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#333" />
+                      <XAxis dataKey="name" stroke="#888" fontSize={12} tickLine={false} axisLine={false} />
+                      <YAxis stroke="#888" fontSize={12} tickLine={false} axisLine={false} />
+                      <Tooltip
+                        contentStyle={{ backgroundColor: '#1f2937', border: 'none', borderRadius: '8px', color: '#fff' }}
+                        itemStyle={{ color: '#2dd4bf' }}
+                      />
+                      <Bar dataKey="envíos" fill="#2dd4bf" radius={[4, 4, 0, 0]}>
+                        {stats?.chartData.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fillOpacity={0.8 + (index * 0.03)} />
+                        ))}
+                      </Bar>
+                    </BarChart>
+                  </ResponsiveContainer>
+                </CardContent>
+              </Card>
+
+              {/* Platform Config */}
+              <Card className="border-border/50">
+                <CardHeader>
+                  <CardTitle className="text-base font-semibold">Métricas de Crecimiento</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {[
+                    { label: "Usuarios Totales", value: stats?.clientCount + stats?.carrierCount, desc: "Crecimiento del ecosistema" },
+                    { label: "Tasa de Retención", value: "94%", desc: "Usuarios activos recurrentes" },
+                    { label: "Ticket Promedio", value: `$${(stats?.totalRevenue / (stats?.shipmentCount || 1)).toFixed(2)}`, desc: "Valor por envío" },
+                    { label: "Configuración SaaS", value: "Activa", desc: "Plan Enterprise habilitado" },
+                  ].map((s) => (
+                    <div key={s.label} className="flex items-center justify-between p-3 rounded-lg border border-border/50 bg-black/20">
+                      <div>
+                        <p className="text-sm font-medium text-foreground">{s.label}</p>
+                        <p className="text-xs text-muted-foreground">{s.desc}</p>
+                      </div>
+                      <span className="text-sm font-semibold text-teal">{s.value}</span>
+                    </div>
+                  ))}
+                </CardContent>
+              </Card>
+            </div>
+          </>
+        )}
       </div>
-    </div>
-  </DashboardLayout>
-);
+    </DashboardLayout>
+  );
+};
 
 export default AdminDashboard;
