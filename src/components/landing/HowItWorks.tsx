@@ -3,18 +3,18 @@ import { UserPlus, Route, BarChart3 } from "lucide-react";
 const steps = [
   {
     icon: UserPlus,
-    title: "Create Your Account",
-    description: "Sign up as a carrier or corporate client. Get verified and access your personalized dashboard in minutes.",
+    title: "Crea tu Cuenta",
+    description: "Regístrate como transportista o cliente corporativo. Verifica tu cuenta y accede a tu panel en minutos.",
   },
   {
     icon: Route,
-    title: "Book & Track Shipments",
-    description: "Get instant smart quotes, book shipments, and track every mile in real-time with live status updates.",
+    title: "Reserva y Seguimiento",
+    description: "Obtén cotizaciones inteligentes al instante, reserva envíos y realiza el seguimiento en tiempo real.",
   },
   {
     icon: BarChart3,
-    title: "Grow Your Operations",
-    description: "Leverage performance analytics, reputation scoring, and smart pricing to scale your logistics business.",
+    title: "Escala tus Operaciones",
+    description: "Aprovecha los análisis de rendimiento y la reputación para hacer crecer tu negocio logístico.",
   },
 ];
 
@@ -24,10 +24,10 @@ const HowItWorks = () => {
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
           <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">
-            How It Works
+            Cómo funciona
           </h2>
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-            From sign-up to scaling — three steps to professional logistics.
+            Desde el registro hasta la expansión — tres pasos para una logística profesional.
           </p>
         </div>
 

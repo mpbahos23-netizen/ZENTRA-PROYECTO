@@ -4,33 +4,33 @@ import { Card, CardContent } from "@/components/ui/card";
 const features = [
   {
     icon: MapPin,
-    title: "Real-Time Tracking",
-    description: "GPS tracking with live map visualization, geo-fencing alerts, and delivery ETAs.",
+    title: "Seguimiento en Tiempo Real",
+    description: "Rastreo GPS con visualización en mapa, alertas de geovallas y tiempos estimados de llegada.",
   },
   {
     icon: Shield,
-    title: "Trust Infrastructure",
-    description: "Verified carriers, insurance coverage options, and digital signature confirmation.",
+    title: "Infraestructura de Confianza",
+    description: "Transportistas verificados, opciones de cobertura de seguro y firma digital de confirmación.",
   },
   {
     icon: Calculator,
-    title: "Smart Pricing Engine",
-    description: "Transparent, instant quotes with full price breakdown — distance, weight, cargo type, urgency.",
+    title: "Motor de Precios Inteligente",
+    description: "Cotizaciones instantáneas y transparentes con desglose completo — distancia, peso y urgencia.",
   },
   {
     icon: Star,
-    title: "Reputation System",
-    description: "On-time delivery rates, customer ratings, and professional performance badges.",
+    title: "Sistema de Reputación",
+    description: "Tasas de entrega a tiempo, calificaciones de clientes e insignias de rendimiento profesional.",
   },
   {
     icon: TrendingUp,
-    title: "Analytics Dashboard",
-    description: "Revenue tracking, performance metrics, and operational insights at a glance.",
+    title: "Panel de Análisis",
+    description: "Seguimiento de ingresos, métricas de rendimiento y perspectivas operativas de un vistazo.",
   },
   {
     icon: Bell,
-    title: "Smart Notifications",
-    description: "Real-time status updates, delay alerts, and delivery confirmations.",
+    title: "Notificaciones Inteligentes",
+    description: "Actualizaciones de estado en tiempo real, alertas de retrasos y confirmaciones de entrega.",
   },
 ];
 
@@ -40,11 +40,11 @@ const FeaturesSection = () => {
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
           <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">
-            Everything You Need to{" "}
-            <span className="text-gradient-teal">Move Forward</span>
+            Todo lo que necesitas para{" "}
+            <span className="text-gradient-teal">avanzar</span>
           </h2>
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-            Professional tools for carriers and shippers — built for reliability.
+            Herramientas profesionales para transportistas y expedidores — diseñadas para la confiabilidad.
           </p>
         </div>
 

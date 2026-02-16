@@ -5,27 +5,27 @@ import { Link } from "react-router-dom";
 
 const tiers = [
   {
-    name: "Basic",
+    name: "Básico",
     price: "$49",
-    description: "For independent carriers getting started.",
-    features: ["Basic shipment tracking", "Standard smart quotes", "Performance metrics", "Email support"],
-    cta: "Start Basic",
+    description: "Para transportistas independientes que están comenzando.",
+    features: ["Seguimiento básico de envíos", "Cotizaciones inteligentes estándar", "Métricas de rendimiento", "Soporte por correo electrónico"],
+    cta: "Comenzar Básico",
     highlighted: false,
   },
   {
     name: "Pro",
     price: "$149",
-    description: "For growing operations that need more power.",
-    features: ["Advanced analytics", "Insurance tools", "AI operations assistant", "Priority support", "Multi-truck overview"],
-    cta: "Start Pro",
+    description: "Para operaciones en crecimiento que necesitan más potencia.",
+    features: ["Análisis avanzados", "Herramientas de seguros", "Asistente de operaciones IA", "Soporte prioritario", "Vista multi-camiones"],
+    cta: "Comenzar Pro",
     highlighted: true,
   },
   {
     name: "Enterprise",
-    price: "Custom",
-    description: "For fleets and large-scale logistics.",
-    features: ["Multi-truck management", "API access", "Custom commission rates", "Dedicated account manager", "SLA guarantee"],
-    cta: "Contact Sales",
+    price: "Personalizado",
+    description: "Para flotas y logística de gran escala.",
+    features: ["Gestión multi-camiones", "Acceso a API", "Tasas de comisión personalizadas", "Gestor de cuenta dedicado", "Garantía de SLA"],
+    cta: "Contactar Ventas",
     highlighted: false,
   },
 ];
@@ -36,10 +36,10 @@ const PricingSection = () => {
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
           <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">
-            Simple, Transparent Pricing
+            Precios Simples y Trasparentes
           </h2>
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-            Scale your operations with a plan that fits. No hidden fees.
+            Escala tus operaciones con un plan que se ajuste a ti. Sin tarifas ocultas.
           </p>
         </div>
 
@@ -47,22 +47,21 @@ const PricingSection = () => {
           {tiers.map((tier) => (
             <Card
               key={tier.name}
-              className={`relative transition-all duration-300 ${
-                tier.highlighted
-                  ? "border-teal shadow-glow-teal scale-[1.02]"
-                  : "border-border/50 hover:border-teal/30"
-              }`}
+              className={`relative transition-all duration-300 ${tier.highlighted
+                ? "border-teal shadow-glow-teal scale-[1.02]"
+                : "border-border/50 hover:border-teal/30"
+                }`}
             >
               {tier.highlighted && (
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 bg-teal-gradient rounded-full text-xs font-semibold text-accent-foreground">
-                  Most Popular
+                  Más Popular
                 </div>
               )}
               <CardHeader className="pb-4 pt-8">
                 <h3 className="text-xl font-bold text-foreground">{tier.name}</h3>
                 <div className="mt-2">
                   <span className="text-4xl font-bold text-foreground">{tier.price}</span>
-                  {tier.price !== "Custom" && <span className="text-muted-foreground">/month</span>}
+                  {tier.price !== "Personalizado" && <span className="text-muted-foreground">/mes</span>}
                 </div>
                 <p className="text-sm text-muted-foreground mt-2">{tier.description}</p>
               </CardHeader>

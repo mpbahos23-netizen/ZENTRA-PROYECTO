@@ -11,10 +11,10 @@ import { Link } from "react-router-dom";
 import Navbar from "@/components/landing/Navbar";
 
 const cargoTypes = [
-  { value: "standard", label: "Standard", multiplier: 1 },
-  { value: "fragile", label: "Fragile", multiplier: 1.3 },
-  { value: "perishable", label: "Perishable", multiplier: 1.5 },
-  { value: "hazardous", label: "Hazardous", multiplier: 1.8 },
+  { value: "standard", label: "Estándar", multiplier: 1 },
+  { value: "fragile", label: "Frágil", multiplier: 1.3 },
+  { value: "perishable", label: "Perecedero", multiplier: 1.5 },
+  { value: "hazardous", label: "Peligroso", multiplier: 1.8 },
 ];
 
 const QuoteCalculator = () => {
@@ -51,49 +51,49 @@ const QuoteCalculator = () => {
           <div className="text-center mb-10">
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-teal/20 bg-teal/5 mb-4">
               <Calculator className="w-4 h-4 text-teal" />
-              <span className="text-sm font-medium text-teal">Smart Quotation Engine</span>
+              <span className="text-sm font-medium text-teal">Motor de Cotización Inteligente</span>
             </div>
-            <h1 className="text-3xl font-bold text-foreground mb-2">Get an Instant Quote</h1>
-            <p className="text-muted-foreground">Transparent pricing with full cost breakdown.</p>
+            <h1 className="text-3xl font-bold text-foreground mb-2">Obtén una Cotización Instantánea</h1>
+            <p className="text-muted-foreground">Precios transparentes con desglose completo de costos.</p>
           </div>
 
           <div className="grid lg:grid-cols-5 gap-8">
             {/* Input form */}
             <Card className="lg:col-span-3 border-border/50">
               <CardHeader>
-                <CardTitle className="text-lg">Shipment Details</CardTitle>
+                <CardTitle className="text-lg">Detalles del Envío</CardTitle>
               </CardHeader>
               <CardContent className="space-y-5">
                 <div className="grid sm:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label>Origin</Label>
+                    <Label>Origen</Label>
                     <div className="relative">
                       <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                      <Input placeholder="e.g. Houston, TX" className="pl-10" value={origin} onChange={e => setOrigin(e.target.value)} />
+                      <Input placeholder="ej. Houston, TX" className="pl-10" value={origin} onChange={e => setOrigin(e.target.value)} />
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <Label>Destination</Label>
+                    <Label>Destino</Label>
                     <div className="relative">
                       <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                      <Input placeholder="e.g. Dallas, TX" className="pl-10" value={destination} onChange={e => setDestination(e.target.value)} />
+                      <Input placeholder="ej. Dallas, TX" className="pl-10" value={destination} onChange={e => setDestination(e.target.value)} />
                     </div>
                   </div>
                 </div>
 
                 <div className="grid sm:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label>Distance (km)</Label>
-                    <Input type="number" placeholder="e.g. 400" value={distance} onChange={e => setDistance(e.target.value)} />
+                    <Label>Distancia (km)</Label>
+                    <Input type="number" placeholder="ej. 400" value={distance} onChange={e => setDistance(e.target.value)} />
                   </div>
                   <div className="space-y-2">
-                    <Label>Weight (kg)</Label>
-                    <Input type="number" placeholder="e.g. 2000" value={weight} onChange={e => setWeight(e.target.value)} />
+                    <Label>Peso (kg)</Label>
+                    <Input type="number" placeholder="ej. 2000" value={weight} onChange={e => setWeight(e.target.value)} />
                   </div>
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Cargo Type</Label>
+                  <Label>Tipo de Carga</Label>
                   <Select value={cargoType} onValueChange={setCargoType}>
                     <SelectTrigger><SelectValue /></SelectTrigger>
                     <SelectContent>
@@ -107,11 +107,11 @@ const QuoteCalculator = () => {
                 <div className="flex flex-col gap-3">
                   <div className="flex items-center gap-2">
                     <Checkbox id="express" checked={isExpress} onCheckedChange={(v) => setIsExpress(v === true)} />
-                    <Label htmlFor="express" className="text-sm font-normal cursor-pointer">2-Hour Express (+50%)</Label>
+                    <Label htmlFor="express" className="text-sm font-normal cursor-pointer">Express 2 Horas (+50%)</Label>
                   </div>
                   <div className="flex items-center gap-2">
                     <Checkbox id="insurance" checked={hasInsurance} onCheckedChange={(v) => setHasInsurance(v === true)} />
-                    <Label htmlFor="insurance" className="text-sm font-normal cursor-pointer">Cargo Insurance</Label>
+                    <Label htmlFor="insurance" className="text-sm font-normal cursor-pointer">Seguro de Carga</Label>
                   </div>
                 </div>
 
@@ -120,7 +120,7 @@ const QuoteCalculator = () => {
                   disabled={!canCalculate}
                   onClick={() => setShowQuote(true)}
                 >
-                  Calculate Quote
+                  Calcular Cotización
                   <ArrowRight className="w-4 h-4 ml-2" />
                 </Button>
               </CardContent>
@@ -131,17 +131,17 @@ const QuoteCalculator = () => {
               <CardHeader>
                 <CardTitle className="text-lg flex items-center gap-2">
                   <Truck className="w-5 h-5 text-teal" />
-                  Quote Breakdown
+                  Desglose de Cotización
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
                 {[
-                  { label: "Base Fee", value: baseFee },
-                  { label: "Distance Fee", value: distanceFee },
-                  { label: "Weight Fee", value: weightFee },
-                  ...(cargoFee > 0 ? [{ label: `${cargoType.charAt(0).toUpperCase() + cargoType.slice(1)} Surcharge`, value: cargoFee }] : []),
-                  ...(expressFee > 0 ? [{ label: "Express Premium", value: expressFee }] : []),
-                  ...(insuranceFee > 0 ? [{ label: "Insurance", value: insuranceFee }] : []),
+                  { label: "Tarifa Base", value: baseFee },
+                  { label: "Tarifa por Distancia", value: distanceFee },
+                  { label: "Tarifa por Peso", value: weightFee },
+                  ...(cargoFee > 0 ? [{ label: `Recargo por ${cargoTypes.find(c => c.value === cargoType)?.label}`, value: cargoFee }] : []),
+                  ...(expressFee > 0 ? [{ label: "Premium Express", value: expressFee }] : []),
+                  ...(insuranceFee > 0 ? [{ label: "Seguro", value: insuranceFee }] : []),
                 ].map(item => (
                   <div key={item.label} className="flex items-center justify-between text-sm">
                     <span className="text-muted-foreground">{item.label}</span>
@@ -151,7 +151,7 @@ const QuoteCalculator = () => {
 
                 <Separator />
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-muted-foreground">Platform Fee (8%)</span>
+                  <span className="text-muted-foreground">Comisión Plataforma (8%)</span>
                   <span className="font-medium text-foreground">${platformFee.toFixed(2)}</span>
                 </div>
                 <Separator />
@@ -162,7 +162,7 @@ const QuoteCalculator = () => {
                 </div>
 
                 <Button asChild className="w-full mt-4 bg-teal-gradient hover:opacity-90" disabled={!showQuote}>
-                  <Link to="/client/book">Book Now</Link>
+                  <Link to="/client/book">Reservar Ahora</Link>
                 </Button>
               </CardContent>
             </Card>

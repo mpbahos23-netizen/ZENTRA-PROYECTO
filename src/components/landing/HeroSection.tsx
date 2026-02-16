@@ -16,27 +16,27 @@ const HeroSection = () => {
         <div className="max-w-3xl mx-auto text-center mb-12">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-teal/20 bg-teal/5 mb-6 animate-fade-in">
             <Shield className="w-4 h-4 text-teal" />
-            <span className="text-sm font-medium text-teal-light">Enterprise-Grade Logistics Infrastructure</span>
+            <span className="text-sm font-medium text-teal-light">Infraestructura Logística de Corredores Profesionales</span>
           </div>
 
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-primary-foreground mb-6 leading-tight animate-fade-in" style={{ animationDelay: '0.1s' }}>
-            Run Your Truck Like a{" "}
-            <span className="text-gradient-teal">Logistics Company</span>
+            Gestiona tu Flota como una{" "}
+            <span className="text-gradient-teal">Empresa Logística</span>
           </h1>
 
           <p className="text-lg sm:text-xl text-primary-foreground/70 mb-8 max-w-2xl mx-auto leading-relaxed animate-fade-in" style={{ animationDelay: '0.2s' }}>
-            Professional logistics infrastructure for modern carriers. Smart quoting, real-time tracking, and performance analytics — all in one platform.
+            Infraestructura profesional para transportistas modernos. Cotización inteligente, seguimiento en tiempo real y análisis de rendimiento — todo en una plataforma.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-in" style={{ animationDelay: '0.3s' }}>
             <Button size="lg" asChild className="bg-teal-gradient hover:opacity-90 transition-opacity text-base px-8 py-6 shadow-glow-teal">
               <Link to="/signup">
-                Start as Carrier
+                Soy Transportista
                 <ArrowRight className="w-5 h-5 ml-2" />
               </Link>
             </Button>
             <Button size="lg" variant="outline" asChild className="border-primary-foreground/30 text-primary-foreground bg-primary-foreground/5 hover:bg-primary-foreground/15 text-base px-8 py-6">
-              <Link to="/signup?role=client">Ship with Confidence</Link>
+              <Link to="/signup?role=client">Quiero realizar un envío</Link>
             </Button>
           </div>
         </div>
@@ -46,7 +46,7 @@ const HeroSection = () => {
           <div className="relative rounded-xl overflow-hidden border border-teal/10 shadow-2xl">
             <img
               src={heroDashboard}
-              alt="LogiCore logistics dashboard showing fleet tracking and route optimization"
+              alt="Panel de control de Route Nexus mostrando seguimiento de flota y optimización de rutas"
               className="w-full h-auto"
               loading="lazy"
             />
