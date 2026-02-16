@@ -19,25 +19,25 @@ const Login = () => {
               <Truck className="w-6 h-6 text-accent-foreground" />
             </div>
           </Link>
-          <h1 className="text-2xl font-bold text-foreground">Welcome back</h1>
-          <p className="text-sm text-muted-foreground">Sign in to your LogiCore account</p>
+          <h1 className="text-2xl font-bold text-foreground">Bienvenido de nuevo</h1>
+          <p className="text-sm text-muted-foreground">Inicia sesión en tu cuenta de Route Nexus</p>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
-            <Input id="email" type="email" placeholder="you@company.com" value={email} onChange={e => setEmail(e.target.value)} />
+            <Label htmlFor="email">Correo electrónico</Label>
+            <Input id="email" type="email" placeholder="tu@empresa.com" value={email} onChange={e => setEmail(e.target.value)} />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="password">Password</Label>
+            <Label htmlFor="password">Contraseña</Label>
             <Input id="password" type="password" placeholder="••••••••" value={password} onChange={e => setPassword(e.target.value)} />
           </div>
           <Button className="w-full bg-teal-gradient hover:opacity-90">
-            Sign In
+            Iniciar Sesión
             <ArrowRight className="w-4 h-4 ml-2" />
           </Button>
           <p className="text-center text-sm text-muted-foreground">
-            Don't have an account?{" "}
-            <Link to="/signup" className="font-medium text-teal hover:underline">Sign up</Link>
+            ¿No tienes una cuenta?{" "}
+            <Link to="/signup" className="font-medium text-teal hover:underline">Regístrate</Link>
           </p>
         </CardContent>
       </Card>

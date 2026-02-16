@@ -19,43 +19,43 @@ const ClientDashboard = () => (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">Welcome back</h1>
-          <p className="text-muted-foreground">Here's an overview of your shipments.</p>
+          <h1 className="text-2xl font-bold text-foreground">Bienvenido de nuevo</h1>
+          <p className="text-muted-foreground">Aquí tienes un resumen de tus envíos.</p>
         </div>
         <div className="flex gap-3">
           <Button variant="outline" asChild>
-            <Link to="/quote">Get Quote</Link>
+            <Link to="/quote">Cotizar</Link>
           </Button>
           <Button asChild className="bg-teal-gradient hover:opacity-90">
             <Link to="/client/book">
               <Plus className="w-4 h-4 mr-2" />
-              New Shipment
+              Nuevo Envío
             </Link>
           </Button>
         </div>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard icon={Package} label="Active Shipments" value="3" change="1 in transit" changeType="neutral" />
-        <StatCard icon={DollarSign} label="This Month" value="$5,200" change="+8% vs last month" changeType="positive" />
-        <StatCard icon={Clock} label="Avg. Delivery Time" value="2.4 days" change="-0.3 days improvement" changeType="positive" />
-        <StatCard icon={TrendingUp} label="Total Shipments" value="47" change="This year" changeType="neutral" />
+        <StatCard icon={Package} label="Envíos Activos" value="3" change="1 en tránsito" changeType="neutral" />
+        <StatCard icon={DollarSign} label="Este Mes" value="$5,200" change="+8% vs mes anterior" changeType="positive" />
+        <StatCard icon={Clock} label="Tiempo Prom. de Entrega" value="2.4 días" change="-0.3 días de mejora" changeType="positive" />
+        <StatCard icon={TrendingUp} label="Envíos Totales" value="47" change="Este año" changeType="neutral" />
       </div>
 
       <Card className="border-border/50">
         <CardHeader className="pb-3">
-          <CardTitle className="text-base font-semibold">Recent Shipments</CardTitle>
+          <CardTitle className="text-base font-semibold">Envíos Recientes</CardTitle>
         </CardHeader>
         <CardContent className="p-0">
           <Table>
             <TableHeader>
               <TableRow>
                 <TableHead>ID</TableHead>
-                <TableHead>Carrier</TableHead>
-                <TableHead>Destination</TableHead>
-                <TableHead>ETA</TableHead>
-                <TableHead>Price</TableHead>
-                <TableHead>Status</TableHead>
+                <TableHead>Transportista</TableHead>
+                <TableHead>Destino</TableHead>
+                <TableHead>Llegada Estimada</TableHead>
+                <TableHead>Precio</TableHead>
+                <TableHead>Estado</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>

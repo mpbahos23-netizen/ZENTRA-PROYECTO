@@ -18,27 +18,27 @@ const CarrierDashboard = () => (
     <div className="space-y-6">
       {/* Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard icon={DollarSign} label="Monthly Earnings" value="$12,480" change="+12% vs last month" changeType="positive" />
-        <StatCard icon={Package} label="Active Shipments" value="8" change="3 in transit" changeType="neutral" />
-        <StatCard icon={Clock} label="On-Time Rate" value="96.4%" change="+2.1% improvement" changeType="positive" />
-        <StatCard icon={Star} label="Rating" value="4.8 ★" change="Based on 142 reviews" changeType="neutral" />
+        <StatCard icon={DollarSign} label="Ganancias Mensuales" value="$12,480" change="+12% vs mes anterior" changeType="positive" />
+        <StatCard icon={Package} label="Envíos Activos" value="8" change="3 en tránsito" changeType="neutral" />
+        <StatCard icon={Clock} label="Tasa de Puntualidad" value="96.4%" change="+2.1% de mejora" changeType="positive" />
+        <StatCard icon={Star} label="Calificación" value="4.8 ★" change="Basado en 142 reseñas" changeType="neutral" />
       </div>
 
       <div className="grid lg:grid-cols-3 gap-6">
         {/* Shipments table */}
         <Card className="lg:col-span-2 border-border/50">
           <CardHeader className="pb-3">
-            <CardTitle className="text-base font-semibold">Recent Shipments</CardTitle>
+            <CardTitle className="text-base font-semibold">Envíos Recientes</CardTitle>
           </CardHeader>
           <CardContent className="p-0">
             <Table>
               <TableHeader>
                 <TableRow>
                   <TableHead>ID</TableHead>
-                  <TableHead>Route</TableHead>
-                  <TableHead>Weight</TableHead>
-                  <TableHead>Price</TableHead>
-                  <TableHead>Status</TableHead>
+                  <TableHead>Ruta</TableHead>
+                  <TableHead>Peso</TableHead>
+                  <TableHead>Precio</TableHead>
+                  <TableHead>Estado</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -63,15 +63,15 @@ const CarrierDashboard = () => (
         {/* Performance */}
         <Card className="border-border/50">
           <CardHeader className="pb-3">
-            <CardTitle className="text-base font-semibold">Performance</CardTitle>
+            <CardTitle className="text-base font-semibold">Rendimiento</CardTitle>
           </CardHeader>
           <CardContent className="space-y-5">
             {[
-              { icon: Clock, label: "On-Time Delivery", value: "96.4%", color: "text-success" },
-              { icon: Package, label: "Total Completed", value: "142", color: "text-foreground" },
-              { icon: Star, label: "Avg. Rating", value: "4.8 / 5.0", color: "text-warning" },
-              { icon: AlertTriangle, label: "Incidents", value: "2", color: "text-destructive" },
-              { icon: TrendingUp, label: "Revenue Trend", value: "+18%", color: "text-success" },
+              { icon: Clock, label: "Entrega a Tiempo", value: "96.4%", color: "text-success" },
+              { icon: Package, label: "Total Completados", value: "142", color: "text-foreground" },
+              { icon: Star, label: "Calificación Promedio", value: "4.8 / 5.0", color: "text-warning" },
+              { icon: AlertTriangle, label: "Incidentes", value: "2", color: "text-destructive" },
+              { icon: TrendingUp, label: "Tendencia de Ingresos", value: "+18%", color: "text-success" },
             ].map((m) => (
               <div key={m.label} className="flex items-center justify-between">
                 <div className="flex items-center gap-3">

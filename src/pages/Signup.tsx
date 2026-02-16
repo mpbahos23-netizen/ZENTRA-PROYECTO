@@ -22,39 +22,39 @@ const Signup = () => {
               <Truck className="w-6 h-6 text-accent-foreground" />
             </div>
           </Link>
-          <h1 className="text-2xl font-bold text-foreground">Create your account</h1>
-          <p className="text-sm text-muted-foreground">Join the LogiCore platform</p>
+          <h1 className="text-2xl font-bold text-foreground">Crea tu cuenta</h1>
+          <p className="text-sm text-muted-foreground">Únete a la plataforma Route Nexus</p>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="name">Full Name</Label>
-            <Input id="name" placeholder="John Doe" value={name} onChange={e => setName(e.target.value)} />
+            <Label htmlFor="name">Nombre Completo</Label>
+            <Input id="name" placeholder="Juan Pérez" value={name} onChange={e => setName(e.target.value)} />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
-            <Input id="email" type="email" placeholder="you@company.com" value={email} onChange={e => setEmail(e.target.value)} />
+            <Label htmlFor="email">Correo electrónico</Label>
+            <Input id="email" type="email" placeholder="tu@empresa.com" value={email} onChange={e => setEmail(e.target.value)} />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="password">Password</Label>
+            <Label htmlFor="password">Contraseña</Label>
             <Input id="password" type="password" placeholder="••••••••" value={password} onChange={e => setPassword(e.target.value)} />
           </div>
           <div className="space-y-2">
-            <Label>Account Type</Label>
+            <Label>Tipo de Cuenta</Label>
             <Select value={role} onValueChange={setRole}>
               <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>
-                <SelectItem value="carrier">Carrier (Truck Owner)</SelectItem>
-                <SelectItem value="client">Corporate Client</SelectItem>
+                <SelectItem value="carrier">Transportista (Dueño de Camión)</SelectItem>
+                <SelectItem value="client">Cliente Corporativo</SelectItem>
               </SelectContent>
             </Select>
           </div>
           <Button className="w-full bg-teal-gradient hover:opacity-90">
-            Create Account
-            <ArrowRight className="w-4 h-4 ml-2" />
+            Crear Cuenta
+            <ArrowRight className="w-4 h-4 ml-1.5" />
           </Button>
           <p className="text-center text-sm text-muted-foreground">
-            Already have an account?{" "}
-            <Link to="/login" className="font-medium text-teal hover:underline">Sign in</Link>
+            ¿Ya tienes una cuenta?{" "}
+            <Link to="/login" className="font-medium text-teal hover:underline">Inicia sesión</Link>
           </p>
         </CardContent>
       </Card>
