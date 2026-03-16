@@ -69,7 +69,7 @@ const Login = () => {
             </div>
           </Link>
           <h1 className="text-2xl font-bold text-foreground">Bienvenido de nuevo</h1>
-          <p className="text-sm text-muted-foreground">Inicia sesión en tu cuenta de Route Nexus</p>
+          <p className="text-sm text-muted-foreground">Inicia sesión en tu cuenta de Movix</p>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleLogin} className="space-y-4">
@@ -78,7 +78,12 @@ const Login = () => {
               <Input id="email" type="email" placeholder="tu@empresa.com" value={email} onChange={e => setEmail(e.target.value)} required />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password">Contraseña</Label>
+              <div className="flex items-center justify-between">
+                <Label htmlFor="password">Contraseña</Label>
+                <Link to="/forgot-password" className="text-xs font-medium text-teal hover:underline">
+                  ¿Olvidaste tu contraseña?
+                </Link>
+              </div>
               <Input id="password" type="password" placeholder="••••••••" value={password} onChange={e => setPassword(e.target.value)} required />
             </div>
             <Button type="submit" className="w-full bg-teal-gradient hover:opacity-90" disabled={loading}>

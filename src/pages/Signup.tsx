@@ -69,7 +69,7 @@ const Signup = () => {
             </div>
           </Link>
           <h1 className="text-2xl font-bold text-foreground">Crea tu cuenta</h1>
-          <p className="text-sm text-muted-foreground">Únete a la plataforma Route Nexus</p>
+          <p className="text-sm text-muted-foreground">Únete a la plataforma Movix</p>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSignup} className="space-y-4">

@@ -46,7 +46,7 @@ const HeroSection = () => {
           <div className="relative rounded-xl overflow-hidden border border-teal/10 shadow-2xl">
             <img
               src={heroDashboard}
-              alt="Panel de control de Route Nexus mostrando seguimiento de flota y optimización de rutas"
+              alt="Panel de control de Movix mostrando seguimiento de flota y optimización de rutas"
               className="w-full h-auto"
               loading="lazy"
             />
