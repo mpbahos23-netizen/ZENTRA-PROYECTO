@@ -161,6 +161,33 @@ export default function AdminOperations() {
     }
   };
 
+  const handleExportCSV = () => {
+    if (shipments.length === 0) return toast.error("No hay datos para exportar");
+    
+    const headers = ["ID", "Cliente", "Origen", "Destino", "Estado", "Precio", "Fecha"];
+    const rows = shipments.map(s => [
+      s.id,
+      s.client?.full_name || "N/A",
+      s.origin,
+      s.destination,
+      s.status,
+      s.price,
+      new Date(s.created_at).toLocaleDateString()
+    ]);
+
+    const csvContent = [headers, ...rows].map(e => e.join(",")).join("\n");
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement("a");
+    const url = URL.createObjectURL(blob);
+    link.setAttribute("href", url);
+    link.setAttribute("download", `ZENTRA_REPORT_${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    toast.success("Reporte CSV generado correctamente");
+  };
+
   const statCards = [
     { label: 'Viajes del Día', value: shipments.filter(s => new Date(s.created_at) >= new Date(new Date().setHours(0,0,0,0))).length, icon: Package, color: 'text-[#00e5ff]', bgColor: 'bg-[#00e5ff]/10' },
     { label: 'Ingresos Hoy', value: `$${stats.dailyRevenue.toLocaleString()}`, icon: DollarSign, color: 'text-emerald-400', bgColor: 'bg-emerald-500/10' },
@@ -297,7 +324,12 @@ export default function AdminOperations() {
             <Card className="bg-[#0a0a0a] border-white/5 rounded-[40px] overflow-hidden shadow-3xl">
               <div className="p-10 border-b border-white/5 flex justify-between items-center bg-[#0d0d0d]">
                 <h3 className="text-xl font-black text-white uppercase italic">Consola de Despachos</h3>
-                <Badge className="bg-[#00e5ff]/10 text-[#00e5ff] border-[#00e5ff]/20 px-4 py-2 rounded-xl text-[10px] font-black">{shipments.length} REGISTROS</Badge>
+                <div className="flex gap-4">
+                  <Button onClick={handleExportCSV} variant="outline" className="border-white/10 bg-white/5 text-[9px] font-black uppercase tracking-widest h-10 px-6 rounded-xl hover:bg-white hover:text-black transition-all">
+                    Exportar Data (CSV)
+                  </Button>
+                  <Badge className="bg-[#00e5ff]/10 text-[#00e5ff] border-[#00e5ff]/20 px-4 py-2 rounded-xl text-[10px] font-black">{shipments.length} REGISTROS</Badge>
+                </div>
               </div>
               <Table>
                 <TableHeader className="bg-white/2">
