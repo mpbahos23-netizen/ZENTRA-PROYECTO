@@ -100,6 +100,9 @@ export default function AdminOperations() {
     const allPayments = paymentsRes.data || [];
     const allDrivers = driversRes.data || [];
 
+    if (shipmentsRes.error) toast.error("Error al cargar envíos");
+    if (driversRes.error) toast.error("Error al cargar conductores");
+
     const activeShipmentsCount = allShipments.filter(s => ['searching', 'accepted', 'in_transit'].includes(s.status)).length;
     const totalRevenue = allPayments.reduce((sum, p) => sum + Number(p.amount), 0);
     const dailyRevenue = allPayments.filter(p => new Date(p.created_at) >= today).reduce((sum, p) => sum + Number(p.amount), 0);
@@ -107,6 +110,7 @@ export default function AdminOperations() {
     // Process Demand Heatmap Data
     const zoneCounts: Record<string, number> = {};
     allShipments.forEach(s => {
+      if (!s.origin) return; // Guard for null origins
       const matchedZone = Object.keys(ZONE_COORDS).find(z => s.origin.toLowerCase().includes(z.toLowerCase())) || 'Ciudad de México';
       zoneCounts[matchedZone] = (zoneCounts[matchedZone] || 0) + 1;
     });
@@ -540,6 +544,7 @@ export default function AdminOperations() {
 
                 <Card className="lg:col-span-3 bg-[#0a0a0a] border-white/5 rounded-[48px] overflow-hidden shadow-3xl relative h-[650px] border border-white/5">
                     <MapContainer 
+                        key={activeTab} // Force remount to fix Leaflet initialization issues
                         center={[19.4326, -99.1332]} 
                         zoom={6} 
                         style={{ height: '100%', width: '100%' }}
