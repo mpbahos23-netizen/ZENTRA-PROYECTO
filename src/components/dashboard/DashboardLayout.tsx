@@ -1,7 +1,7 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   Truck, LayoutDashboard, PackagePlus, FileSignature, FileText,
-  Settings, LogOut, Search, Zap, Radio, Menu, X as CloseIcon, Loader2
+  Settings, LogOut, Search, Zap, Radio, Menu, X as CloseIcon, Loader2, DollarSign
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -59,6 +59,7 @@ const DashboardLayout = ({ children, role: initialRole }: DashboardLayoutProps) 
       ? [
           { label: "Panel Principal", href: "/carrier", icon: LayoutDashboard },
           { label: "Solicitudes", href: "/carrier/jobs", icon: Radio },
+          { label: "Ganancias", href: "/carrier/earnings", icon: DollarSign },
           { label: "Nuevo Envío", href: "/client/book", icon: PackagePlus },
           { label: "Presupuesto", href: "/quote", icon: FileSignature },
           { label: "Facturas", href: "/client/invoices", icon: FileText },
@@ -94,7 +95,7 @@ const DashboardLayout = ({ children, role: initialRole }: DashboardLayoutProps) 
               <div className="w-10 h-10 rounded-xl bg-[#00e5ff] flex items-center justify-center">
                  <Truck className="w-6 h-6 text-black" fill="currentColor" />
               </div>
-              <span className="text-xl font-bold tracking-tight">MOVIX</span>
+              <span className="text-xl font-bold tracking-tight">ZENTRA</span>
             </Link>
             <button onClick={() => setMobileMenuOpen(false)} className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center">
               <CloseIcon className="w-6 h-6 text-zinc-400" />
@@ -141,8 +142,8 @@ const DashboardLayout = ({ children, role: initialRole }: DashboardLayoutProps) 
               <Truck className="w-6 h-6 text-black" fill="currentColor" />
             </div>
             <div className="flex flex-col">
-              <span className="text-xl font-bold leading-tight text-white tracking-wide">MOVIX</span>
-              <span className="text-[10px] font-bold text-[#00e5ff] tracking-wider">LOGISTICS PRO</span>
+              <span className="text-xl font-bold leading-tight text-white tracking-wide">ZENTRA</span>
+              <span className="text-[10px] font-bold text-[#00e5ff] tracking-wider">LOGISTICS OS</span>
             </div>
           </Link>
         </div>

@@ -1,6 +1,7 @@
 import DashboardLayout from '@/components/dashboard/DashboardLayout';
 import CarrierJobAlert from '@/components/realtime/CarrierJobAlert';
 import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { useCarrierJobRequests } from '@/hooks/useJobRequests';
 import { Loader2, Truck, Box, MapPin, Gauge, ShieldAlert, CheckCircle2, Clock } from 'lucide-react';
 import { cn } from "@/lib/utils";
@@ -116,7 +117,7 @@ export default function CarrierJobs() {
                               <p className="text-[8px] text-zinc-500 font-black uppercase tracking-widest flex items-center gap-1">
                                 <Box className="w-2.5 h-2.5" /> Volumen
                               </p>
-                              <p className="text-xs font-black text-white">{job.shipment?.volumen || '4.2 m³'}</p>
+                              <p className="text-xs font-black text-white">{(job.shipment as any)?.volumen || '4.2 m³'}</p>
                            </div>
                            <div className="space-y-1">
                               <p className="text-[8px] text-zinc-500 font-black uppercase tracking-widest flex items-center gap-1">
@@ -130,9 +131,9 @@ export default function CarrierJobs() {
                               </p>
                               <p className={cn(
                                 "text-xs font-black",
-                                job.shipment?.prioridad === 'ALTA' ? 'text-orange-500' : 'text-blue-400'
+                                (job.shipment as any)?.prioridad === 'ALTA' ? 'text-orange-500' : 'text-blue-400'
                               )}>
-                                {job.shipment?.prioridad || 'NORMAL'}
+                                {(job.shipment as any)?.prioridad || 'NORMAL'}
                               </p>
                            </div>
                         </div>

@@ -20,6 +20,7 @@ import ShipmentTracking from "./pages/ShipmentTracking";
 import AdminOperations from "./pages/AdminOperations";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
+import CarrierEarnings from "./pages/CarrierEarnings";
 
 const queryClient = new QueryClient();
 
@@ -37,6 +38,7 @@ const App = () => (
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/carrier" element={<CarrierDashboard />} />
           <Route path="/carrier/jobs" element={<CarrierJobs />} />
+          <Route path="/carrier/earnings" element={<CarrierEarnings />} />
           <Route path="/client" element={<ClientDashboard />} />
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/admin/operations" element={<AdminOperations />} />
