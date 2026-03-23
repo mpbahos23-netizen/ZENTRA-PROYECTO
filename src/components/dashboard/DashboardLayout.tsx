@@ -1,7 +1,7 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   Truck, LayoutDashboard, PackagePlus, FileSignature, FileText,
-  Settings, LogOut, Search, Zap, Radio, Menu, X as CloseIcon
+  Settings, LogOut, Search, Zap, Radio, Menu, X as CloseIcon, Loader2
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { supabase } from "@/lib/supabase";
 import { toast } from "sonner";
 import NotificationsPanel from "@/components/notifications/NotificationsPanel";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 type NavItem = { label: string; href: string; icon: React.ElementType };
 
@@ -18,10 +18,36 @@ interface DashboardLayoutProps {
   role?: string;
 }
 
-const DashboardLayout = ({ children, role }: DashboardLayoutProps) => {
+const DashboardLayout = ({ children, role: initialRole }: DashboardLayoutProps) => {
   const location = useLocation();
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [role, setRole] = useState<string | undefined>(initialRole);
+  const [loading, setLoading] = useState(!initialRole);
+
+  useEffect(() => {
+    const fetchRole = async () => {
+      if (!initialRole) {
+        setLoading(true);
+        const { data: { user } } = await supabase.auth.getUser();
+        console.log("DashboardLayout - Fetching role for user:", user?.id);
+        if (user) {
+          const { data: profile } = await supabase
+            .from("profiles")
+            .select("role")
+            .eq("id", user.id)
+            .single();
+          console.log("DashboardLayout - Profile fetched:", profile);
+          if (profile) setRole(profile.role);
+        }
+        setLoading(false);
+      } else {
+        setRole(initialRole);
+        setLoading(false);
+      }
+    };
+    fetchRole();
+  }, [initialRole]);
 
   const navItems: NavItem[] = role === 'admin' 
     ? [
@@ -29,13 +55,15 @@ const DashboardLayout = ({ children, role }: DashboardLayoutProps) => {
         { label: "Operaciones", href: "/admin/operations", icon: Radio },
         { label: "Facturación", href: "/client/invoices", icon: FileText },
       ]
-    : [
-        { label: "Panel Principal", href: "/carrier", icon: LayoutDashboard },
-        { label: "Solicitudes", href: "/carrier/jobs", icon: Radio },
-        { label: "Nuevo Envío", href: "/client/book", icon: PackagePlus },
-        { label: "Presupuesto", href: "/quote", icon: FileSignature },
-        { label: "Facturas", href: "/client/invoices", icon: FileText },
-      ];
+    : role === 'carrier' || role === 'client'
+      ? [
+          { label: "Panel Principal", href: "/carrier", icon: LayoutDashboard },
+          { label: "Solicitudes", href: "/carrier/jobs", icon: Radio },
+          { label: "Nuevo Envío", href: "/client/book", icon: PackagePlus },
+          { label: "Presupuesto", href: "/quote", icon: FileSignature },
+          { label: "Facturas", href: "/client/invoices", icon: FileText },
+        ]
+      : []; // Don't show items while loading or if no role is found
 
   const handleLogout = async () => {
     try {
@@ -47,6 +75,14 @@ const DashboardLayout = ({ children, role }: DashboardLayoutProps) => {
       toast.error(error.message || "Error al cerrar sesión");
     }
   };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-screen bg-black">
+        <Loader2 className="w-8 h-8 animate-spin text-[#00e5ff]" />
+      </div>
+    );
+  }
 
   return (
     <div className="flex h-screen bg-black text-white font-sans overflow-hidden">

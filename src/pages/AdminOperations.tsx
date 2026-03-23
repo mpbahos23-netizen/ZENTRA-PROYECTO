@@ -14,7 +14,7 @@ import {
   ResponsiveContainer, LineChart, Line, XAxis, YAxis, 
   CartesianGrid, Tooltip, PieChart, Pie, Cell, BarChart, Bar
 } from 'recharts';
-import { MapContainer, TileLayer, Circle, Popup } from 'react-leaflet';
+import { MapContainer, TileLayer, Circle, Popup, LayerGroup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import { toast } from 'sonner';
 import {
@@ -51,13 +51,14 @@ interface DemandPoint {
 }
 
 const ZONE_COORDS: Record<string, [number, number]> = {
+  'Lima': [-12.0464, -77.0428],
+  'Ica': [-14.0678, -75.7286],
+  'Arequipa': [-16.4090, -71.5375],
+  'Trujillo': [-8.1091, -79.0269],
+  'Piura': [-5.1945, -80.6328],
+  'Cusco': [-13.5319, -71.9675],
   'Ciudad de México': [19.4326, -99.1332],
   'Monterrey': [25.6866, -100.3161],
-  'Guadalajara': [20.6597, -103.3496],
-  'Puebla': [19.0413, -98.2062],
-  'Tijuana': [32.5149, -117.0382],
-  'Cancún': [21.1619, -86.8515],
-  'Querétaro': [20.5888, -100.3899],
 };
 
 export default function AdminOperations() {
@@ -111,7 +112,7 @@ export default function AdminOperations() {
     const zoneCounts: Record<string, number> = {};
     allShipments.forEach(s => {
       if (!s.origin) return; // Guard for null origins
-      const matchedZone = Object.keys(ZONE_COORDS).find(z => s.origin.toLowerCase().includes(z.toLowerCase())) || 'Ciudad de México';
+      const matchedZone = Object.keys(ZONE_COORDS).find(z => s.origin.toLowerCase().includes(z.toLowerCase())) || 'Lima';
       zoneCounts[matchedZone] = (zoneCounts[matchedZone] || 0) + 1;
     });
 
@@ -545,28 +546,35 @@ export default function AdminOperations() {
                 <Card className="lg:col-span-3 bg-[#0a0a0a] border-white/5 rounded-[48px] overflow-hidden shadow-3xl relative h-[650px] border border-white/5">
                     <MapContainer 
                         key={activeTab} // Force remount to fix Leaflet initialization issues
-                        center={[19.4326, -99.1332]} 
+                        center={[-12.0464, -77.0428]} 
                         zoom={6} 
                         style={{ height: '100%', width: '100%' }}
                         scrollWheelZoom={false}
                     >
                         <TileLayer url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png" />
-                        {demandData.map((point) => (
-                            <Circle 
-                                key={point.zone} center={[point.lat, point.lng]} radius={40000 + (point.intensity * 60000)}
-                                pathOptions={{
-                                    fillColor: point.intensity > 0.7 ? '#ef4444' : point.intensity > 0.4 ? '#f59e0b' : '#00e5ff',
-                                    color: 'transparent', fillOpacity: 0.4 + (point.intensity * 0.4)
-                                }}
-                            >
-                                <Popup>
-                                    <div className="p-2">
-                                        <p className="font-black uppercase text-xs">{point.zone}</p>
-                                        <p className="text-[10px] font-bold text-zinc-500 mt-1">Actividad: {point.count} despachos</p>
-                                    </div>
-                                </Popup>
-                            </Circle>
-                        ))}
+                        <LayerGroup>
+                            {demandData.filter(p => p.lat && p.lng).map((point) => (
+                                <Circle 
+                                    key={point.zone} 
+                                    center={[point.lat, point.lng]} 
+                                    radius={40000 + (point.intensity * 60000)}
+                                    pathOptions={{
+                                        fillColor: point.intensity > 0.7 ? '#ef4444' : point.intensity > 0.4 ? '#f59e0b' : '#00e5ff',
+                                        color: 'transparent', 
+                                        fillOpacity: 0.4 + (point.intensity * 0.4)
+                                    }}
+                                >
+                                    <Popup>
+                                        <div className="p-2 min-w-[120px]">
+                                            <p className="font-black uppercase text-[10px] text-zinc-900 leading-tight mb-1">{point.zone}</p>
+                                            <p className="text-[9px] font-bold text-zinc-500 uppercase tracking-widest">
+                                                Actividad: <span className="text-black">{point.count} despachos</span>
+                                            </p>
+                                        </div>
+                                    </Popup>
+                                </Circle>
+                            ))}
+                        </LayerGroup>
                     </MapContainer>
                 </Card>
             </div>
