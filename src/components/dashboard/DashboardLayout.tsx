@@ -10,6 +10,8 @@ import { supabase } from "@/lib/supabase";
 import { toast } from "sonner";
 import NotificationsPanel from "@/components/notifications/NotificationsPanel";
 import { useState, useEffect } from "react";
+import InstallPWA from "@/components/pwa/InstallPWA";
+import { Download } from "lucide-react";
 
 type NavItem = { label: string; href: string; icon: React.ElementType };
 
@@ -217,13 +219,20 @@ const DashboardLayout = ({ children, role: initialRole }: DashboardLayoutProps) 
             />
           </div>
           <div className="flex items-center gap-2 md:gap-4">
+            <button 
+              onClick={() => window.dispatchEvent(new Event('beforeinstallprompt'))}
+              className="w-10 h-10 rounded-full bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 hover:text-blue-300 transition-colors sm:hidden"
+              title="Descargar App"
+            >
+              <Download className="w-5 h-5" />
+            </button>
             <div className="hidden sm:block">
               <NotificationsPanel />
             </div>
             <button className="w-10 h-10 rounded-full bg-[#111111] border border-white/5 flex items-center justify-center text-zinc-400 hover:text-white transition-colors">
               <Settings className="w-5 h-5" />
             </button>
-            <Button asChild className="hidden sm:flex bg-[#00e5ff] hover:bg-[#00cce6] text-black font-semibold rounded-full px-6 h-10 ml-2 cursor-pointer shadow-lg shadow-[#00e5ff]/20">
+            <Button asChild className="hidden sm:flex bg-white text-black hover:bg-zinc-200 font-bold rounded-full px-6 h-10 ml-2 cursor-pointer shadow-lg">
               <Link to="/client/book">+ Envío</Link>
             </Button>
           </div>
@@ -233,6 +242,9 @@ const DashboardLayout = ({ children, role: initialRole }: DashboardLayoutProps) 
           {children}
         </main>
       </div>
+
+      {/* ZENTRA: PWA Installer UI */}
+      <InstallPWA />
     </div>
   );
 };
