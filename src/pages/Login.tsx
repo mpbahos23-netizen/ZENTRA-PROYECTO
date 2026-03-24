@@ -3,10 +3,16 @@ import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Truck, ArrowRight, Loader2 } from "lucide-react";
+import { Card } from "@/components/ui/card";
+import { Truck, ArrowRight, Loader2, Key, Sparkles, Shield } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { toast } from "sonner";
+import { cn } from "@/lib/utils";
+
+// ============================================
+// ZENTRA OBSIDIAN: Access Terminal
+// Ultra-Minimalist Entry Protocol
+// ============================================
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -27,7 +33,6 @@ const Login = () => {
       if (error) throw error;
 
       if (data.user) {
-        // Fetch profile to know role
         const { data: profile, error: profileError } = await supabase
           .from("profiles")
           .select("role")
@@ -35,71 +40,87 @@ const Login = () => {
           .single();
 
         if (profileError) throw profileError;
-
-        toast.success("¡Bienvenido de nuevo!");
+        toast.success("Protocolo de Acceso Completado");
 
         switch (profile.role) {
-          case "admin":
-            navigate("/admin");
-            break;
-          case "carrier":
-            navigate("/carrier");
-            break;
-          case "client":
-            navigate("/client");
-            break;
-          default:
-            navigate("/");
+          case "admin": navigate("/admin"); break;
+          case "carrier": navigate("/carrier"); break;
+          case "client": navigate("/client"); break;
+          default: navigate("/");
         }
       }
     } catch (error: any) {
-      toast.error(error.message || "Error al iniciar sesión");
+      toast.error(error.message || "Error ZENTRA-AUTH-002");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-hero-gradient flex items-center justify-center p-4">
-      <Card className="w-full max-w-md border-border/50">
-        <CardHeader className="text-center pb-2">
-          <Link to="/" className="inline-flex items-center gap-2 justify-center mb-4">
-            <div className="w-10 h-10 rounded-xl bg-teal-gradient flex items-center justify-center">
-              <Truck className="w-6 h-6 text-accent-foreground" />
+    <div className="min-h-screen bg-[#060E20] flex items-center justify-center p-6 font-inter relative overflow-hidden">
+       {/* Background Ambience */}
+      <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-blue-500/5 blur-[120px] rounded-full -mr-32 -mt-32" />
+      <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-blue-500/5 blur-[120px] rounded-full -ml-32 -mb-32" />
+
+      <Card className="w-full max-w-md bg-white/[0.02] border-white/5 backdrop-blur-3xl rounded-[48px] p-12 shadow-2xl relative z-10">
+        <div className="text-center space-y-4 mb-12">
+          <div className="inline-flex items-center gap-3 bg-blue-500/10 border border-blue-500/20 px-4 py-1.5 rounded-full mb-4">
+             <Key className="w-3.5 h-3.5 text-blue-500" />
+             <span className="text-[10px] font-black text-blue-400 uppercase tracking-widest italic">ZENTRA SECURE LOGIN</span>
+          </div>
+          <h1 className="text-4xl font-black text-white italic tracking-tighter uppercase leading-none">
+             Bienvenido de <span className="text-blue-500">Nuevo</span>
+          </h1>
+          <p className="text-[10px] font-black text-zinc-600 uppercase tracking-[0.3em]">Acceso al Sistema Logístico</p>
+        </div>
+
+        <form onSubmit={handleLogin} className="space-y-8">
+          <div className="space-y-1.5 px-2">
+            <Label className="text-[10px] text-zinc-500 font-black uppercase tracking-widest">Identificación</Label>
+            <Input 
+              className="bg-white/5 border-white/5 h-16 rounded-[24px] focus:ring-blue-500 text-white font-bold placeholder:text-zinc-800 transition-all focus:bg-white/[0.05]" 
+              type="email" placeholder="tu@empresa.com" 
+              value={email} onChange={e => setEmail(e.target.value)} required 
+            />
+          </div>
+          <div className="space-y-1.5 px-2">
+            <div className="flex items-center justify-between mb-1">
+               <Label className="text-[10px] text-zinc-500 font-black uppercase tracking-widest">Protocolo de Seguridad</Label>
+               <Link to="/forgot-password" size="sm" className="text-[9px] font-black text-blue-500 uppercase tracking-widest hover:underline">
+                  Recuperar
+               </Link>
             </div>
-          </Link>
-          <h1 className="text-2xl font-bold text-foreground">Bienvenido de nuevo</h1>
-          <p className="text-sm text-muted-foreground">Inicia sesión en tu cuenta de Movix</p>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleLogin} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="email">Correo electrónico</Label>
-              <Input id="email" type="email" placeholder="tu@empresa.com" value={email} onChange={e => setEmail(e.target.value)} required />
-            </div>
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <Label htmlFor="password">Contraseña</Label>
-                <Link to="/forgot-password" className="text-xs font-medium text-teal hover:underline">
-                  ¿Olvidaste tu contraseña?
-                </Link>
-              </div>
-              <Input id="password" type="password" placeholder="••••••••" value={password} onChange={e => setPassword(e.target.value)} required />
-            </div>
-            <Button type="submit" className="w-full bg-teal-gradient hover:opacity-90" disabled={loading}>
-              {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : (
+            <Input 
+              className="bg-white/5 border-white/5 h-16 rounded-[24px] focus:ring-blue-500 text-white font-bold placeholder:text-zinc-800 transition-all focus:bg-white/[0.05]" 
+              type="password" placeholder="••••••••" 
+              value={password} onChange={e => setPassword(e.target.value)} required 
+            />
+          </div>
+
+          <div className="pt-6">
+            <Button type="submit" className="w-full h-18 bg-white text-black font-black uppercase tracking-[0.3em] rounded-[32px] shadow-[0_20px_40px_rgba(255,255,255,0.05)] hover:bg-zinc-200 transition-all flex items-center justify-center gap-3 text-sm relative group overflow-hidden" disabled={loading}>
+              <div className="absolute inset-0 bg-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+              {loading ? <Loader2 className="w-6 h-6 animate-spin" /> : (
                 <>
-                  Iniciar Sesión
-                  <ArrowRight className="w-4 h-4 ml-2" />
+                  Entrar al Sistema
+                  <ArrowRight className="w-4 h-4" />
                 </>
               )}
             </Button>
-            <p className="text-center text-sm text-muted-foreground">
-              ¿No tienes una cuenta?{" "}
-              <Link to="/signup" className="font-medium text-teal hover:underline">Regístrate</Link>
+          </div>
+
+          <div className="text-center pt-4">
+            <p className="text-[10px] font-black text-zinc-600 uppercase tracking-widest">
+              ¿Sin credenciales?{" "}
+              <Link to="/signup" className="text-blue-500 hover:text-white transition-colors">Solicitar Acceso</Link>
             </p>
-          </form>
-        </CardContent>
+          </div>
+        </form>
+
+        <div className="mt-12 pt-8 border-t border-white/5 flex items-center justify-center gap-2 opacity-30">
+           <Shield className="w-3 h-3 text-zinc-500" />
+           <span className="text-[8px] font-black text-zinc-500 uppercase tracking-widest italic tracking-widest">Zentra OS Terminal v3.0.1</span>
+        </div>
       </Card>
     </div>
   );
