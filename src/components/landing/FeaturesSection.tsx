@@ -1,66 +1,104 @@
-import { MapPin, Shield, Calculator, Star, TrendingUp, Bell } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
+import { 
+  MapPin, 
+  Shield, 
+  Calculator, 
+  Star, 
+  TrendingUp, 
+  Bell, 
+  Zap, 
+  Scan, 
+  Cpu, 
+  Navigation,
+  ShieldCheck,
+  Activity
+} from "lucide-react";
+import { Card } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
+
+// ============================================
+// ZENTRA OBSIDIAN: Core Capabilities
+// High-Octane Logistics Infrastructure
+// ============================================
 
 const features = [
   {
-    icon: MapPin,
-    title: "Seguimiento en Tiempo Real",
-    description: "Rastreo GPS con visualización en mapa, alertas de geovallas y tiempos estimados de llegada.",
+    icon: Activity,
+    title: "Seguimiento Cinético",
+    description: "Monitor de posición sub-métrica con telemetría en tiempo real y geovallas dinámicas.",
+    tag: "LRT-01"
   },
   {
-    icon: Shield,
-    title: "Infraestructura de Confianza",
-    description: "Transportistas verificados, opciones de cobertura de seguro y firma digital de confirmación.",
+    icon: ShieldCheck,
+    title: "Seguridad Militar",
+    description: "Identificación de pilotos verificada y encriptación end-to-end de manifiestos digitales.",
+    tag: "SEC-X"
   },
   {
-    icon: Calculator,
-    title: "Motor de Precios Inteligente",
-    description: "Cotizaciones instantáneas y transparentes con desglose completo — distancia, peso y urgencia.",
+    icon: Cpu,
+    title: "Motor Quántico",
+    description: "Algoritmos de IA que optimizan rutas y cargas reduciendo costos en un 25%.",
+    tag: "AI-V4"
+  },
+  {
+    icon: Scan,
+    title: "Visión Artificial",
+    description: "Escaneo de carga por foto para cálculo exacto de volumen y optimización de espacio.",
+    tag: "VIS-OS"
   },
   {
     icon: Star,
-    title: "Sistema de Reputación",
-    description: "Tasas de entrega a tiempo, calificaciones de clientes e insignias de rendimiento profesional.",
-  },
-  {
-    icon: TrendingUp,
-    title: "Panel de Análisis",
-    description: "Seguimiento de ingresos, métricas de rendimiento y perspectivas operativas de un vistazo.",
+    title: "Reputación Pro",
+    description: "Sistema de bindeo basado en performance, puntualidad y métricas corporativas.",
+    tag: "REP-PRO"
   },
   {
     icon: Bell,
-    title: "Notificaciones Inteligentes",
-    description: "Actualizaciones de estado en tiempo real, alertas de retrasos y confirmaciones de entrega.",
+    title: "Alertas Activas",
+    description: "Notificaciones push críticas para cada cambio de estado, retraso o confirmación.",
+    tag: "NTF-SM"
   },
 ];
 
 const FeaturesSection = () => {
   return (
-    <section id="features" className="py-24 bg-muted/30">
-      <div className="container mx-auto px-4">
-        <div className="text-center mb-16">
-          <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">
-            Todo lo que necesitas para{" "}
-            <span className="text-gradient-teal">avanzar</span>
-          </h2>
-          <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-            Herramientas profesionales para transportistas y expedidores — diseñadas para la confiabilidad.
-          </p>
+    <section id="features" className="py-32 bg-[#060E20] relative font-inter overflow-hidden">
+      {/* Background Orbs */}
+      <div className="absolute top-1/2 left-0 -translate-y-1/2 w-[400px] h-[400px] bg-blue-500/5 blur-[120px] rounded-full -ml-[200px]" />
+      <div className="absolute bottom-0 right-0 w-[400px] h-[400px] bg-emerald-500/5 blur-[120px] rounded-full -mr-[200px]" />
+
+      <div className="container mx-auto px-6">
+        <div className="text-center mb-24 space-y-4">
+           <h2 className="text-[10px] font-black text-blue-500 uppercase tracking-[0.4em]">Core Capabilities</h2>
+           <h1 className="text-4xl sm:text-6xl font-black text-white italic tracking-tighter uppercase italic leading-none">
+              Todo lo que necesitas <br /> <span className="text-zinc-700">para avanzar</span>
+           </h1>
+           <p className="text-[10px] text-zinc-600 font-black uppercase tracking-widest max-w-xl mx-auto leading-relaxed mt-4">
+              Herramientas tácticas diseñadas para la confiabilidad extrema en operaciones logísticas.
+           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
-          {features.map((feature) => (
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+          {features.map((feature, i) => (
             <Card
               key={feature.title}
-              className="group border-border/50 hover:border-teal/30 transition-all duration-300 hover:shadow-card-hover"
+              className="bg-white/[0.02] border-white/5 rounded-[40px] p-10 hover:border-blue-500/20 transition-all duration-500 group relative overflow-hidden shadow-2xl hover:scale-[1.02]"
             >
-              <CardContent className="p-6">
-                <div className="w-12 h-12 rounded-xl bg-teal/10 flex items-center justify-center mb-4 group-hover:bg-teal/15 transition-colors">
-                  <feature.icon className="w-6 h-6 text-teal" />
-                </div>
-                <h3 className="text-lg font-semibold text-foreground mb-2">{feature.title}</h3>
-                <p className="text-muted-foreground text-sm leading-relaxed">{feature.description}</p>
-              </CardContent>
+              <div className="absolute top-0 right-0 p-8 opacity-0 group-hover:opacity-100 transition-opacity">
+                 <p className="text-[10px] font-black text-blue-500 uppercase tracking-widest leading-none">{feature.tag}</p>
+              </div>
+              
+              <div className="w-16 h-16 rounded-[22px] bg-white/5 flex items-center justify-center mb-8 border border-white/5 group-hover:bg-blue-600 group-hover:border-blue-500 transition-all duration-500">
+                <feature.icon className="w-8 h-8 text-zinc-500 group-hover:text-white transition-colors duration-500" />
+              </div>
+              
+              <div className="space-y-4">
+                 <h3 className="text-2xl font-black text-white italic tracking-tighter uppercase leading-none">{feature.title}</h3>
+                 <p className="text-[11px] text-zinc-600 font-black uppercase tracking-[0.1em] leading-relaxed group-hover:text-white/60 transition-colors">
+                   {feature.description}
+                 </p>
+              </div>
+              
+              <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-blue-600 to-transparent scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-700" />
             </Card>
           ))}
         </div>

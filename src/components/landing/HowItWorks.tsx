@@ -1,53 +1,74 @@
-import { UserPlus, Route, BarChart3 } from "lucide-react";
+import { UserPlus, Route, BarChart3, Fingerprint, Zap, Globe } from "lucide-react";
+import { cn } from "@/lib/utils";
+
+// ============================================
+// ZENTRA OBSIDIAN: Protocol Workflow
+// Strategic Three-Phase Architecture
+// ============================================
 
 const steps = [
   {
-    icon: UserPlus,
-    title: "Crea tu Cuenta",
-    description: "Regístrate como transportista o cliente corporativo. Verifica tu cuenta y accede a tu panel en minutos.",
+    icon: Fingerprint,
+    title: "Identificación Biométrica",
+    description: "Acceso instantáneo para transportistas y empresas bajo estándares de seguridad Z-Security.",
+    tag: "Protocolo 01"
   },
   {
-    icon: Route,
-    title: "Reserva y Seguimiento",
-    description: "Obtén cotizaciones inteligentes al instante, reserva envíos y realiza el seguimiento en tiempo real.",
+    icon: Zap,
+    title: "Matching Cinético",
+    description: "IA de alta velocidad que conecta la carga con la unidad más eficiente en tiempo real.",
+    tag: "Protocolo 02"
   },
   {
-    icon: BarChart3,
-    title: "Escala tus Operaciones",
-    description: "Aprovecha los análisis de rendimiento y la reputación para hacer crecer tu negocio logístico.",
+    icon: Globe,
+    title: "Distribución Global",
+    description: "Seguimiento satelital y optimización de rutas para expandir tu alcance logístico.",
+    tag: "Protocolo 03"
   },
 ];
 
 const HowItWorks = () => {
   return (
-    <section id="how-it-works" className="py-24 bg-background">
-      <div className="container mx-auto px-4">
-        <div className="text-center mb-16">
-          <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">
-            Cómo funciona
-          </h2>
-          <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-            Desde el registro hasta la expansión — tres pasos para una logística profesional.
-          </p>
+    <section id="how-it-works" className="py-32 bg-[#060E20] font-inter relative overflow-hidden">
+      <div className="absolute top-0 left-0 w-full h-px bg-white/5" />
+      
+      <div className="container mx-auto px-6">
+        <div className="text-center mb-24 space-y-4">
+           <h2 className="text-[10px] font-black text-blue-500 uppercase tracking-[0.4em]">Arquitectura Operativa</h2>
+           <h1 className="text-4xl sm:text-6xl font-black text-white italic tracking-tighter uppercase italic leading-none">
+              Cómo <span className="text-zinc-700">funciona</span> Zentra
+           </h1>
+           <p className="text-[10px] text-zinc-600 font-black uppercase tracking-widest max-w-xl mx-auto leading-relaxed mt-4">
+              Desde la identificación hasta la rentabilidad — tres fases estratégicas para una logística de alto rendimiento.
+           </p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+        <div className="grid md:grid-cols-3 gap-12 max-w-6xl mx-auto relative">
+          {/* Connector Line */}
+          <div className="hidden md:block absolute top-[140px] left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/5 to-transparent z-0" />
+
           {steps.map((step, i) => (
             <div
               key={step.title}
-              className="relative text-center group"
+              className="relative text-center group z-10 space-y-8"
             >
-              {i < steps.length - 1 && (
-                <div className="hidden md:block absolute top-12 left-[60%] w-[80%] h-px bg-border" />
-              )}
-              <div className="w-24 h-24 mx-auto mb-6 rounded-2xl bg-teal/10 flex items-center justify-center group-hover:shadow-glow-teal transition-shadow duration-300">
-                <step.icon className="w-10 h-10 text-teal" />
+              <div className="relative w-32 h-32 mx-auto mb-10">
+                 <div className="absolute inset-0 bg-blue-500/10 blur-[40px] rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+                 <div className="relative w-32 h-32 rounded-[40px] bg-white/[0.04] border border-white/5 flex items-center justify-center group-hover:bg-blue-600 transition-all duration-500 shadow-2xl overflow-hidden">
+                    <step.icon className="w-12 h-12 text-zinc-500 group-hover:text-white transition-colors duration-500" />
+                    <div className="absolute bottom-0 right-0 p-4 opacity-10 group-hover:opacity-30 transition-opacity">
+                       <p className="text-4xl font-black italic text-white leading-none">{i + 1}</p>
+                    </div>
+                 </div>
               </div>
-              <div className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-primary text-primary-foreground text-sm font-bold mb-4">
-                {i + 1}
+
+              <div className="space-y-4 px-6 scale-90 group-hover:scale-100 transition-transform duration-500">
+                <p className="text-[9px] font-black text-blue-500 uppercase tracking-[0.2em]">{step.tag}</p>
+                <h3 className="text-2xl font-black text-white italic tracking-tighter uppercase">{step.title}</h3>
+                <p className="text-[11px] text-zinc-600 font-black uppercase tracking-widest leading-relaxed max-w-[240px] mx-auto py-2 group-hover:text-zinc-400 transition-colors">
+                  {step.description}
+                </p>
               </div>
-              <h3 className="text-xl font-semibold text-foreground mb-3">{step.title}</h3>
-              <p className="text-muted-foreground leading-relaxed">{step.description}</p>
             </div>
           ))}
         </div>

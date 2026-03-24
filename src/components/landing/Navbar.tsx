@@ -1,49 +1,61 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Menu, X, Truck } from "lucide-react";
+import { Menu, X, Truck, Zap } from "lucide-react";
+
+// ============================================
+// ZENTRA OBSIDIAN: Stealth Navbar
+// Minimalist Overlay Navigation
+// ============================================
 
 const Navbar = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-card/80 backdrop-blur-lg border-b border-border">
-      <div className="container mx-auto flex items-center justify-between h-16 px-4">
-        <Link to="/" className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-teal-gradient flex items-center justify-center">
-            <Truck className="w-5 h-5 text-accent-foreground" />
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-[#060E20]/80 backdrop-blur-2xl border-b border-white/5 font-inter">
+      <div className="container mx-auto flex items-center justify-between h-20 px-6">
+        <Link to="/" className="flex items-center gap-3 group">
+          <div className="w-10 h-10 rounded-2xl bg-blue-600 flex items-center justify-center shadow-[0_0_20px_rgba(37,99,235,0.3)] transition-all group-hover:scale-110">
+            <Zap className="w-5 h-5 text-white fill-white" />
           </div>
-          <span className="text-xl font-bold text-foreground">Movix</span>
+          <span className="text-2xl font-black text-white italic tracking-tighter uppercase">Zentra</span>
         </Link>
 
-        <div className="hidden md:flex items-center gap-8">
-          <a href="#how-it-works" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">Cómo funciona</a>
-          <a href="#features" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">Características</a>
-          <a href="#pricing" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">Precios</a>
+        {/* Desktop Links */}
+        <div className="hidden md:flex items-center gap-10">
+          <a href="#how-it-works" className="text-[10px] font-black text-zinc-500 hover:text-white uppercase tracking-[0.2em] transition-all">Sistemas</a>
+          <a href="#features" className="text-[10px] font-black text-zinc-500 hover:text-white uppercase tracking-[0.2em] transition-all">Tecnología</a>
+          <a href="#pricing" className="text-[10px] font-black text-zinc-500 hover:text-white uppercase tracking-[0.2em] transition-all">Red</a>
         </div>
 
-        <div className="hidden md:flex items-center gap-3">
-          <Button variant="ghost" asChild>
-            <Link to="/login">Iniciar Sesión</Link>
-          </Button>
-          <Button asChild className="bg-teal-gradient hover:opacity-90 transition-opacity">
+        {/* Auth Actions */}
+        <div className="hidden md:flex items-center gap-6">
+          <Link to="/login" className="text-[10px] font-black text-zinc-400 hover:text-white uppercase tracking-[0.2em] transition-all">
+            Identificación
+          </Link>
+          <Button asChild className="h-12 bg-white text-black font-black uppercase tracking-[0.2em] rounded-full px-8 hover:bg-zinc-200 shadow-xl text-[10px]">
             <Link to="/signup">Comenzar</Link>
           </Button>
         </div>
 
-        <button className="md:hidden" onClick={() => setMobileOpen(!mobileOpen)} aria-label="Toggle menu">
+        <button className="md:hidden w-10 h-10 flex items-center justify-center text-white" onClick={() => setMobileOpen(!mobileOpen)} aria-label="Toggle menu">
           {mobileOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
         </button>
       </div>
 
+      {/* Mobile Menu */}
       {mobileOpen && (
-        <div className="md:hidden bg-card border-b border-border p-4 space-y-3">
-          <a href="#how-it-works" className="block text-sm font-medium text-muted-foreground py-2">Cómo funciona</a>
-          <a href="#features" className="block text-sm font-medium text-muted-foreground py-2">Características</a>
-          <a href="#pricing" className="block text-sm font-medium text-muted-foreground py-2">Precios</a>
-          <div className="flex gap-3 pt-2">
-            <Button variant="ghost" asChild className="flex-1"><Link to="/login">Iniciar Sesión</Link></Button>
-            <Button asChild className="flex-1 bg-teal-gradient"><Link to="/signup">Comenzar</Link></Button>
+        <div className="md:hidden bg-[#060E20] border-b border-white/5 p-8 space-y-6 animate-in fade-in slide-in-from-top-10 duration-500">
+          <a href="#how-it-works" className="block text-sm font-black text-zinc-500 hover:text-white uppercase tracking-widest py-2" onClick={() => setMobileOpen(false)}>Sistemas</a>
+          <a href="#features" className="block text-sm font-black text-zinc-500 hover:text-white uppercase tracking-widest py-2" onClick={() => setMobileOpen(false)}>Tecnología</a>
+          <a href="#pricing" className="block text-sm font-black text-zinc-500 hover:text-white uppercase tracking-widest py-2" onClick={() => setMobileOpen(false)}>Red</a>
+          <div className="flex flex-col gap-4 pt-4">
+            <Button variant="ghost" asChild className="h-14 bg-white/5 text-white font-black uppercase tracking-widest rounded-2xl border border-white/5">
+               <Link to="/login" onClick={() => setMobileOpen(false)}>Iniciar Sesión</Link>
+            </Button>
+            <Button asChild className="h-14 bg-blue-600 text-white font-black uppercase tracking-widest rounded-2xl shadow-xl shadow-blue-600/20">
+               <Link to="/signup" onClick={() => setMobileOpen(false)}>Crear Cuenta</Link>
+            </Button>
           </div>
         </div>
       )}

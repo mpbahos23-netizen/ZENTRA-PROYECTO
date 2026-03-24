@@ -1,89 +1,123 @@
-import { Check } from "lucide-react";
+import { Check, Shield, Star, Zap, Cpu, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { Link } from "react-router-dom";
+import { cn } from "@/lib/utils";
+
+// ============================================
+// ZENTRA OBSIDIAN: Scale & Growth Plans
+// Performance Tiers for Modern Logistics
+// ============================================
 
 const tiers = [
   {
-    name: "Básico",
+    name: "Z-Standard",
     price: "$49",
-    description: "Para transportistas independientes que están comenzando.",
-    features: ["Seguimiento básico de envíos", "Cotizaciones inteligentes estándar", "Métricas de rendimiento", "Soporte por correo electrónico"],
-    cta: "Comenzar Básico",
+    description: "Protocolo inicial para transportistas independientes.",
+    features: ["Seguimiento LRT-01", "AI Matching Básico", "Dashboard de Métricas", "Soporte Standard"],
+    cta: "Iniciar Protocolo",
     highlighted: false,
+    icon: Zap
   },
   {
-    name: "Pro",
+    name: "Z-Elite",
     price: "$149",
-    description: "Para operaciones en crecimiento que necesitan más potencia.",
-    features: ["Análisis avanzados", "Herramientas de seguros", "Asistente de operaciones IA", "Soporte prioritario", "Vista multi-camiones"],
-    cta: "Comenzar Pro",
+    description: "Para operaciones de alto rendimiento y flotas en expansión.",
+    features: ["Analítica Quántica Advanced", "AI Vision (Scan Carga)", "Soporte Prioritario 24/7", "Protocolo de Seguros Z-X", "Acceso Multi-Unidad"],
+    cta: "Escalar a Elite",
     highlighted: true,
+    icon: Star
   },
   {
-    name: "Enterprise",
-    price: "Personalizado",
-    description: "Para flotas y logística de gran escala.",
-    features: ["Gestión multi-camiones", "Acceso a API", "Tasas de comisión personalizadas", "Gestor de cuenta dedicado", "Garantía de SLA"],
-    cta: "Contactar Ventas",
+    name: "Z-Universe",
+    price: "Custom",
+    description: "Infraestructura total para corporaciones globales.",
+    features: ["Integración API Full", "Matching de Carga LTL/FTL", "Gestor de Cuenta Elite", "SLA del 99.9%", "Personalización de Interfaz"],
+    cta: "Solicitar Consulta",
     highlighted: false,
+    icon: Shield
   },
 ];
 
 const PricingSection = () => {
   return (
-    <section id="pricing" className="py-24 bg-background">
-      <div className="container mx-auto px-4">
-        <div className="text-center mb-16">
-          <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">
-            Precios Simples y Trasparentes
-          </h2>
-          <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-            Escala tus operaciones con un plan que se ajuste a ti. Sin tarifas ocultas.
-          </p>
+    <section id="pricing" className="py-32 bg-[#060E20] relative font-inter overflow-hidden">
+      {/* Background Ambience */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[600px] bg-blue-500/5 blur-[150px] rounded-full -mt-96" />
+      
+      <div className="container mx-auto px-6">
+        <div className="text-center mb-20 space-y-4">
+           <h2 className="text-[10px] font-black text-blue-500 uppercase tracking-[0.4em]">Optimización de Costos</h2>
+           <h1 className="text-4xl sm:text-6xl font-black text-white italic tracking-tighter uppercase italic leading-none">
+              Inversión <span className="text-zinc-700">Inteligente</span>
+           </h1>
+           <p className="text-[10px] text-zinc-600 font-black uppercase tracking-widest max-w-xl mx-auto leading-relaxed mt-4 px-10">
+              Escala tus operaciones con infraestructura logística de grado empresarial. Sin comisiones ocultas.
+           </p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto items-start">
+        <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto items-start">
           {tiers.map((tier) => (
             <Card
               key={tier.name}
-              className={`relative transition-all duration-300 ${tier.highlighted
-                ? "border-teal shadow-glow-teal scale-[1.02]"
-                : "border-border/50 hover:border-teal/30"
-                }`}
+              className={cn(
+                "relative bg-white/[0.02] border-white/5 rounded-[48px] p-10 transition-all duration-700 group hover:scale-[1.03] shadow-2xl overflow-hidden",
+                tier.highlighted && "border-blue-500/30 bg-blue-500/[0.03] shadow-[0_0_80px_rgba(59,130,246,0.1)]"
+              )}
             >
               {tier.highlighted && (
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 bg-teal-gradient rounded-full text-xs font-semibold text-accent-foreground">
-                  Más Popular
+                <div className="absolute top-0 right-0 p-10 opacity-10 group-hover:opacity-30 transition-opacity">
+                   <Sparkles className="w-10 h-10 text-blue-500" />
                 </div>
               )}
-              <CardHeader className="pb-4 pt-8">
-                <h3 className="text-xl font-bold text-foreground">{tier.name}</h3>
-                <div className="mt-2">
-                  <span className="text-4xl font-bold text-foreground">{tier.price}</span>
-                  {tier.price !== "Personalizado" && <span className="text-muted-foreground">/mes</span>}
+              
+              <div className="space-y-8">
+                <div className="space-y-2">
+                  <div className="flex items-center gap-3">
+                     <tier.icon className={cn("w-5 h-5", tier.highlighted ? "text-blue-500" : "text-zinc-600")} />
+                     <h3 className="text-2xl font-black text-white italic tracking-tighter uppercase leading-none">{tier.name}</h3>
+                  </div>
+                  <p className="text-[10px] text-zinc-400 font-black uppercase tracking-[0.1em]">{tier.description}</p>
                 </div>
-                <p className="text-sm text-muted-foreground mt-2">{tier.description}</p>
-              </CardHeader>
-              <CardContent className="pt-0">
-                <ul className="space-y-3 mb-8">
+
+                <div className="flex items-baseline gap-2 py-4 border-y border-white/5">
+                  <span className="text-5xl font-black text-white italic tracking-tighter uppercase font-inter">{tier.price}</span>
+                  {tier.price !== "Custom" && <span className="text-[10px] font-black text-zinc-600 uppercase tracking-widest">/ Mes</span>}
+                </div>
+
+                <ul className="space-y-4">
                   {tier.features.map((f) => (
-                    <li key={f} className="flex items-start gap-3 text-sm">
-                      <Check className="w-4 h-4 text-teal mt-0.5 shrink-0" />
-                      <span className="text-foreground">{f}</span>
+                    <li key={f} className="flex items-center gap-4 group/item">
+                      <div className="w-5 h-5 rounded-full bg-blue-600/10 flex items-center justify-center border border-blue-600/20">
+                         <Check className="w-3 h-3 text-blue-500" />
+                      </div>
+                      <span className="text-[11px] font-black text-zinc-600 uppercase tracking-widest group-hover/item:text-white transition-colors">{f}</span>
                     </li>
                   ))}
                 </ul>
+
                 <Button
                   asChild
-                  className={`w-full ${tier.highlighted ? "bg-teal-gradient hover:opacity-90" : ""}`}
-                  variant={tier.highlighted ? "default" : "outline"}
+                  className={cn(
+                    "w-full h-18 rounded-[32px] font-black uppercase tracking-[0.3em] transition-all text-[10px] shadow-2xl group",
+                    tier.highlighted 
+                      ? "bg-blue-600 text-white hover:bg-blue-500 shadow-blue-600/20" 
+                      : "bg-white/5 border border-white/5 text-white hover:bg-white/10"
+                  )}
                 >
-                  <Link to="/signup">{tier.cta}</Link>
+                  <Link to="/signup">
+                    {tier.cta}
+                    <Zap className={cn("w-3.5 h-3.5 ml-3 transition-transform group-hover:scale-110", tier.highlighted ? "fill-white" : "fill-zinc-400")} />
+                  </Link>
                 </Button>
-              </CardContent>
+              </div>
             </Card>
           ))}
+        </div>
+
+        {/* Tactical Note */}
+        <div className="text-center mt-20 opacity-30">
+           <p className="text-[8px] font-black uppercase tracking-[0.5em] text-white">Zentra Global Infrastructure v3.1</p>
         </div>
       </div>
     </section>
