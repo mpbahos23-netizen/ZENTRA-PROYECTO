@@ -92,7 +92,7 @@ const ClientDashboard = () => {
           <div className="space-y-4">
             <div className="flex justify-between items-center px-2">
                <p className="text-xs font-black text-zinc-500 uppercase tracking-widest">Rastreo en Tiempo Real</p>
-               <Link to={`/carrier/tracking/${activeShipment.id}`} className="text-[10px] font-black text-blue-500 uppercase tracking-widest hover:underline">Ver Mapa</p>
+               <Link to={`/carrier/tracking/${activeShipment.id}`} className="text-[10px] font-black text-blue-500 uppercase tracking-widest hover:underline">Ver Mapa</Link>
             </div>
             
             <Card className="bg-[#060E20] border-white/5 rounded-[40px] p-8 shadow-2xl relative overflow-hidden group border-l-4 border-l-blue-500">

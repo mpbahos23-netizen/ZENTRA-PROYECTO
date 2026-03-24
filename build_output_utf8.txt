@@ -1,0 +1,128 @@
+﻿
+> vite_react_shadcn_ts@0.0.0 build
+> vite build
+
+[36mvite v5.4.19 [32mbuilding for production...[36m[39m
+transforming...
+node.exe : Browserslist: 
+browsers data (caniuse-lite) 
+is 9 months old. Please run:
+En línea: 1 Carácter: 1
++ & "C:\Program 
+Files\nodejs/node.exe" 
+"C:\Program 
+Files\nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~
+    + CategoryInfo           
+   : NotSpecified: (Browser  
+  slist: b...ld. Please ru   
+ n::String) [], RemoteExc    
+eption
+    + FullyQualifiedErrorId  
+   : NativeCommandError
+ 
+  npx 
+update-browserslist-db@latest
+  Why you should do it 
+regularly: https://github.com
+/browserslist/update-db#readm
+e
+[33m[vite:css] @import must 
+precede all other statements 
+(besides @charset or empty 
+@layer)
+3  |  @tailwind utilities;
+4  |  
+5  |  @import url('https://fo
+nts.googleapis.com/css2?famil
+y=Inter:wght@300;400;500;600;
+700;800;900&display=swap');
+   |  ^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+6  |  
+7  |  @layer base {[39m
+[32mÔ£ô[39m 21 modules transformed.
+[31mx[39m Build failed in 
+1.14s
+[31merror during build:
+[31m[vite:esbuild] 
+Transform failed with 1 
+error:
+C:/Users/Bryce/Paula proyecto
+/src/pages/ClientDashboard.ts
+x:95:168: ERROR: Unexpected 
+closing "p" tag does not 
+match opening "Link" tag[31m
+file: 
+[36mC:/Users/Bryce/Paula pro
+yecto/src/pages/ClientDashboa
+rd.tsx:95:168[31m
+[33m
+[33mUnexpected closing "p" 
+tag does not match opening 
+"Link" tag[33m
+93 |              <div 
+className="flex 
+justify-between items-center 
+px-2">
+94 |                 <p 
+className="text-xs 
+font-black text-zinc-500 
+uppercase 
+tracking-widest">Rastreo en 
+Tiempo Real</p>
+95 |                 <Link to
+={`/carrier/tracking/${active
+Shipment.id}`} 
+className="text-[10px] 
+font-black text-blue-500 
+uppercase tracking-widest 
+hover:underline">Ver Mapa</p>
+   |                         
+                             
+                             
+                             
+                             
+                             
+^
+96 |              </div>
+97 |              
+[31m
+    at failureErrorWithLog 
+(C:\Users\Bryce\Paula proyect
+o\node_modules\esbuild\lib\ma
+in.js:1472:15)
+    at C:\Users\Bryce\Paula p
+royecto\node_modules\esbuild\
+lib\main.js:755:50
+    at 
+responseCallbacks.<computed> 
+(C:\Users\Bryce\Paula proyect
+o\node_modules\esbuild\lib\ma
+in.js:622:9)
+    at handleIncomingPacket 
+(C:\Users\Bryce\Paula proyect
+o\node_modules\esbuild\lib\ma
+in.js:677:12)
+    at Socket.readFromStdout 
+(C:\Users\Bryce\Paula proyect
+o\node_modules\esbuild\lib\ma
+in.js:600:7)
+    at Socket.emit 
+(node:events:508:28)
+    at addChunk (node:interna
+l/streams/readable:559:12)
+    at 
+readableAddChunkPushByteMode 
+(node:internal/streams/readab
+le:510:3)
+    at Readable.push (node:in
+ternal/streams/readable:390:5
+)
+    at Pipe.onStreamRead (nod
+e:internal/stream_base_common
+s:189:23)[39m
