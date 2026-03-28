@@ -9,6 +9,7 @@ import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import { cn } from '@/lib/utils';
 import { Card } from '@/components/ui/card';
+import DigitalManifest from '@/components/tracking/DigitalManifest';
 
 // ============================================
 // ZENTRA OBSIDIAN: Kinetic Tracking Terminal
@@ -89,7 +90,7 @@ export default function ShipmentTracking() {
             carrierName={carrierProfile?.full_name}
             carrierRating={carrierProfile?.rating}
             carrierPhoto={shipment?.carrier_id ? `https://i.pravatar.cc/150?u=${shipment.carrier_id}` : undefined}
-            eta="18:30"
+            eta={shipment?.estimated_arrival_time ? new Date(shipment.estimated_arrival_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : "Calculando..."}
           />
         </div>
 

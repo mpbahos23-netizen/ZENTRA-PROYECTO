@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { 
   DollarSign, Truck, Package, Users, Loader2, 
   BarChart3, TrendingUp, Zap, ArrowUpRight, 
-  Map as MapIcon, ShieldCheck, Activity
+  Map as MapIcon, ShieldCheck, Activity, Radio
 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
@@ -148,7 +148,7 @@ const AdminDashboard = () => {
                  </h3>
                  <div className="grid gap-4">
                     <Button asChild variant="outline" className="h-16 rounded-3xl border-white/5 bg-white/5 text-[10px] font-black uppercase tracking-widest hover:bg-[#00e5ff] hover:text-black transition-all">
-                       <Link to="/admin/operations"><MapIcon className="w-4 h-4 mr-3" /> Ver Mapa de Flota</Link>
+                       <Link to="/admin/operations"><Radio className="w-4 h-4 mr-3 animate-pulse" /> Radar de Flota Activo</Link>
                     </Button>
                     <Button asChild variant="outline" className="h-16 rounded-3xl border-white/5 bg-white/5 text-[10px] font-black uppercase tracking-widest hover:bg-white hover:text-black transition-all">
                        <Link to="/client/invoices"><BarChart3 className="w-4 h-4 mr-3" /> Reportes de Pago</Link>

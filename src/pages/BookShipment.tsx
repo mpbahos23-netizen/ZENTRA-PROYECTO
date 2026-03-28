@@ -7,12 +7,13 @@ import { Input } from '@/components/ui/input';
 import { 
   Loader2, Truck, Camera, Scan, Sparkles, 
   CheckCircle2, X, AlertCircle, Users, Activity, Shield,
-  ChevronLeft, MapPin, Navigation, Info, CreditCard
+  ChevronLeft, MapPin, Navigation, Info, CreditCard, ListChecks
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { useCreateJobBroadcast } from '@/hooks/useJobRequests';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
+import DigitalManifest from '@/components/tracking/DigitalManifest';
 
 // ============================================
 // ZENTRA OBSIDIAN: Booking & Reservation
@@ -26,6 +27,7 @@ export default function BookShipment() {
   const [cargoType, setCargoType] = useState('standard');
   const [isShared, setIsShared] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [items, setItems] = useState<any[]>([]);
   
   // AI Scanning state
   const [isScanning, setIsScanning] = useState(false);
@@ -75,7 +77,8 @@ export default function BookShipment() {
         status: 'pending',
         price: total,
         delivery_pin: Math.floor(1000 + Math.random() * 9000).toString(),
-        load_optimization_data: scanResult
+        load_optimization_data: scanResult,
+        items
       }).select().single();
 
       if (error) throw error;
@@ -192,6 +195,17 @@ export default function BookShipment() {
                 </div>
             )}
             <input type="file" ref={fileInputRef} onChange={handleFileChange} className="hidden" accept="image/*" />
+        </div>
+
+        {/* DIGITAL MANIFEST: Aurex Reference */}
+        <div className="space-y-4">
+            <p className="text-[10px] font-black text-zinc-500 uppercase tracking-widest flex items-center gap-2">
+               <ListChecks className="w-3.5 h-3.5 text-blue-500" /> Inventario de Carga (Manifiesto)
+            </p>
+            <DigitalManifest 
+                items={items} 
+                onUpdate={setItems} 
+            />
         </div>
 
         {/* FINAL PRICING & PAYMENT */}

@@ -29,6 +29,7 @@ import {
 import { supabase } from '@/lib/supabase';
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { useCarrierGPS } from '@/hooks/useLocationTracking';
 
 // ============================================
 // ZENTRA OBSIDIAN: Carrier Dashboard
@@ -54,6 +55,9 @@ export default function CarrierDashboard() {
   const [hotZones, setHotZones] = useState<{zone: string, count: number}[]>([]);
   const [isOnline, setIsOnline] = useState(false);
   const [loading, setLoading] = useState(true);
+
+  // Activate Global GPS Tracking when Online
+  const { currentPosition, sending } = useCarrierGPS(null, isOnline);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -91,12 +95,13 @@ export default function CarrierDashboard() {
   const toggleStatus = () => {
     setIsOnline(!isOnline);
     if (!isOnline) {
-      toast.success("ESTADO: EN LÍNEA. Buscando servicios cercanos...", {
+      toast.success("ESTADO: EN LÍNEA. Transmitiendo ubicación GPS...", {
         icon: <Zap className="w-4 h-4 text-blue-500" />,
+        description: "Ahora eres visible para los despachadores.",
         className: "bg-[#060E20] border-blue-500/30 text-white font-bold rounded-2xl"
       });
     } else {
-      toast.info("ESTADO: DESCONECTADO.");
+      toast.info("ESTADO: DESCONECTADO. Transmisión detenida.");
     }
   };
 

@@ -2,8 +2,8 @@ import { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Play, MapPin, Package, CheckCircle2, Loader2, Navigation, ShieldCheck } from 'lucide-react';
-import { useCarrierGPS, useUpdateShipmentStatus } from '@/hooks/useLocationTracking';
+import { Play, MapPin, Package, CheckCircle2, Loader2, Navigation, ShieldCheck, Clock } from 'lucide-react';
+import { useCarrierGPS, useUpdateShipmentStatus, useUpdateShipmentETA } from '@/hooks/useLocationTracking';
 import { toast } from 'sonner';
 
 // ============================================
@@ -41,7 +41,9 @@ export default function CarrierTripControls({
   const [phase, setPhase] = useState<TripPhase>('ready');
   const [showPinInput, setShowPinInput] = useState(false);
   const [enteredPin, setEnteredPin] = useState('');
+  const [etaTime, setEtaTime] = useState('');
   const { updateStatus, updating } = useUpdateShipmentStatus();
+  const { updateETA, updating: updatingETA } = useUpdateShipmentETA();
 
   const isGpsActive = phase !== 'ready' && phase !== 'delivered';
   const { currentPosition, sending } = useCarrierGPS(shipmentId, isGpsActive);
@@ -84,6 +86,22 @@ export default function CarrierTripControls({
       setPhase('delivered');
       setShowPinInput(false);
       onDelivered?.();
+    }
+  };
+
+  const handleSetETA = async () => {
+    if (!etaTime) return;
+    const now = new Date();
+    const [hours, minutes] = etaTime.split(':');
+    const arrival = new Date(now.getFullYear(), now.getMonth(), now.getDate(), parseInt(hours), parseInt(minutes));
+    
+    // If arrival is before now, assume it's for tomorrow
+    if (arrival < now) arrival.setDate(arrival.getDate() + 1);
+
+    const success = await updateETA(shipmentId, arrival.toISOString());
+    if (success) {
+      toast.success('⌛ ETA actualizado', { description: 'El cliente ha sido notificado.' });
+      setEtaTime('');
     }
   };
 
@@ -181,6 +199,29 @@ export default function CarrierTripControls({
               </>
             )}
           </Button>
+        )}
+
+        {(phase === 'picked_up' || phase === 'in_transit') && (
+          <div className="mt-4 p-4 bg-white/5 border border-white/5 rounded-xl border-dashed">
+             <p className="text-[10px] text-zinc-500 font-black uppercase tracking-widest mb-3 flex items-center gap-2">
+                <Clock className="w-3.5 h-3.5 text-blue-500" /> Estimar tiempo de arribo
+             </p>
+             <div className="flex gap-2">
+                <Input 
+                  type="time" 
+                  value={etaTime}
+                  onChange={(e) => setEtaTime(e.target.value)}
+                  className="bg-black border-white/10 text-white h-12 rounded-xl text-sm"
+                />
+                <Button 
+                  onClick={handleSetETA}
+                  disabled={updatingETA || !etaTime}
+                  className="bg-blue-600/20 border border-blue-500/30 text-blue-400 text-[10px] font-black uppercase tracking-widest px-4 h-12 rounded-xl hover:bg-blue-500 hover:text-white transition-all"
+                >
+                   Definir
+                </Button>
+             </div>
+          </div>
         )}
 
         {phase === 'in_transit' && !showPinInput && (

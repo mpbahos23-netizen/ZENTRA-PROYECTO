@@ -47,9 +47,12 @@ export interface Shipment {
   status: ShipmentStatus;
   price: number;
   eta: string | null;
+  estimated_arrival_time: string | null;
+  items: any[] | null;
   delivery_pin?: string | null;
   cargo_photo_url?: string | null;
   is_shared?: boolean;
+  load_optimization_data?: any;
   created_at: string;
   updated_at: string;
 }

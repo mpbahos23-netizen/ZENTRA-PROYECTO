@@ -14,8 +14,10 @@ import {
   ResponsiveContainer, LineChart, Line, XAxis, YAxis, 
   CartesianGrid, Tooltip, PieChart, Pie, Cell, BarChart, Bar
 } from 'recharts';
-import { MapContainer, TileLayer, Circle, Popup, LayerGroup } from 'react-leaflet';
+import { MapContainer, TileLayer, Circle, Popup, LayerGroup, Marker } from 'react-leaflet';
+import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import { useFleetTracking } from '@/hooks/useLocationTracking';
 import { toast } from 'sonner';
 import {
   Table,
@@ -61,6 +63,13 @@ const ZONE_COORDS: Record<string, [number, number]> = {
   'Monterrey': [25.6866, -100.3161],
 };
 
+const TRUCK_ICON = new L.Icon({
+  iconUrl: 'https://cdn-icons-png.flaticon.com/512/3774/3774270.png',
+  iconSize: [32, 32],
+  iconAnchor: [16, 32],
+  popupAnchor: [0, -32],
+});
+
 export default function AdminOperations() {
   const [stats, setStats] = useState<AdminStats>({
     totalShipments: 0,
@@ -73,7 +82,10 @@ export default function AdminOperations() {
   });
   const [demandData, setDemandData] = useState<DemandPoint[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'overview' | 'carriers' | 'shipments' | 'demand' | 'payments'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'carriers' | 'shipments' | 'demand' | 'payments' | 'live_fleet'>('overview');
+  
+  // Real-time Fleet Data
+  const { carriers, loading: fleetLoading } = useFleetTracking();
   
   // Data lists
   const [shipments, setShipments] = useState<any[]>([]);
@@ -242,6 +254,7 @@ export default function AdminOperations() {
           {[
             { key: 'overview', label: 'Dashboard', icon: Activity },
             { key: 'shipments', label: 'Gestión Viajes', icon: Package },
+            { key: 'live_fleet', label: 'Flota en Vivo', icon: Radio },
             { key: 'carriers', label: 'Conductores', icon: Truck },
             { key: 'payments', label: 'Precios y Pagos', icon: DollarSign },
             { key: 'demand', label: 'Zonas Activas', icon: Flame },
@@ -575,6 +588,52 @@ export default function AdminOperations() {
                                 </Circle>
                             ))}
                         </LayerGroup>
+                    </MapContainer>
+                </Card>
+            </div>
+          )}
+          {activeTab === 'live_fleet' && (
+            <div className="space-y-6">
+                <div className="flex items-center justify-between mb-2">
+                    <h3 className="text-xl font-black text-white uppercase italic">Radar de Flota en Tiempo Real</h3>
+                    <div className="flex gap-4">
+                        <Badge className="bg-blue-500/10 text-blue-400 border-blue-500/20 px-4 py-2 rounded-xl text-[10px] font-black uppercase animate-pulse">
+                            {Object.keys(carriers).length} CONDUCTORES EN LÍNEA
+                        </Badge>
+                    </div>
+                </div>
+                
+                <Card className="bg-[#0a0a0a] border-white/5 rounded-[48px] overflow-hidden shadow-3xl relative h-[700px] border border-white/5">
+                    <MapContainer 
+                        center={[-12.0464, -77.0428]} 
+                        zoom={6} 
+                        style={{ height: '100%', width: '100%' }}
+                    >
+                        <TileLayer url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png" />
+                        {Object.entries(carriers).map(([id, data]) => (
+                            <Marker 
+                                key={id} 
+                                position={[data.lat, data.lng]}
+                                icon={TRUCK_ICON}
+                            >
+                                <Popup>
+                                    <div className="p-3 min-w-[180px] font-inter">
+                                        <p className="text-[10px] text-zinc-500 font-black uppercase tracking-widest mb-1">Piloto Activo</p>
+                                        <p className="font-black text-zinc-900 text-sm uppercase mb-3">{data.carrier_name}</p>
+                                        <div className="flex flex-col gap-1.5 pt-2 border-t border-zinc-100">
+                                            <div className="flex justify-between items-center text-[9px] font-bold">
+                                                <span className="text-zinc-400 uppercase">Última Señal:</span>
+                                                <span className="text-zinc-800">{new Date(data.timestamp).toLocaleTimeString()}</span>
+                                            </div>
+                                            <div className="flex justify-between items-center text-[9px] font-bold">
+                                                <span className="text-zinc-400 uppercase">Coordenadas:</span>
+                                                <span className="text-zinc-800">{data.lat.toFixed(4)}, {data.lng.toFixed(4)}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </Popup>
+                            </Marker>
+                        ))}
                     </MapContainer>
                 </Card>
             </div>

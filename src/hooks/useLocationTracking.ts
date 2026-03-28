@@ -19,7 +19,7 @@ export function useCarrierGPS(shipmentId: string | null, isActive: boolean) {
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
-    if (!shipmentId || !isActive) return;
+    if (!isActive) return;
 
     let lastPosition: GeolocationPosition | null = null;
 
@@ -36,9 +36,13 @@ export function useCarrierGPS(shipmentId: string | null, isActive: boolean) {
         },
         (error) => {
           console.error('GPS error:', error);
-          toast.error('No se pudo acceder a la ubicación GPS');
+          if (error.code === 1) {
+            toast.error('Permiso de GPS denegado. Actívalo en la configuración de tu navegador.');
+          } else {
+            toast.error('No se pudo acceder a la ubicación GPS');
+          }
         },
-        { enableHighAccuracy: true, maximumAge: 3000 }
+        { enableHighAccuracy: true, maximumAge: 3000, timeout: 5000 }
       );
 
       // Send position to Supabase every 5 seconds
@@ -50,12 +54,17 @@ export function useCarrierGPS(shipmentId: string | null, isActive: boolean) {
           const { data: { user } } = await supabase.auth.getUser();
           if (!user) return;
 
-          await supabase.from('location_updates').insert({
-            shipment_id: shipmentId,
+          const payload: any = {
             carrier_id: user.id,
             lat: lastPosition.coords.latitude,
             lng: lastPosition.coords.longitude,
-          });
+          };
+          
+          if (shipmentId) {
+            payload.shipment_id = shipmentId;
+          }
+
+          await supabase.from('location_updates').insert(payload);
         } catch (err) {
           console.error('Error sending location:', err);
         } finally {
@@ -75,6 +84,79 @@ export function useCarrierGPS(shipmentId: string | null, isActive: boolean) {
   }, [shipmentId, isActive]);
 
   return { currentPosition, sending };
+}
+
+// ============================================
+// Hook: Subscribe to LIVE FLEET updates (Admin side)
+// Merges multiple carrier updates
+// ============================================
+export function useFleetTracking() {
+  const [carriers, setCarriers] = useState<Record<string, LocationPoint & { carrier_name?: string }>>({});
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // Initial fetch of latest position for each carrier
+    const fetchLatestPositions = async () => {
+      // Step 1: Get profiles for carrier names
+      const { data: profiles } = await supabase.from('profiles').select('id, full_name').eq('role', 'carrier');
+      const profileMap: Record<string, string> = {};
+      profiles?.forEach(p => profileMap[p.id] = p.full_name || 'Carrier Desconocido');
+
+      // Step 2: Get absolute latest points
+      // In a real app, you'd use a view for "latest_carrier_locations"
+      // Simplification: just get the last 50 updates for now
+      const { data, error } = await supabase
+        .from('location_updates')
+        .select('*')
+        .order('timestamp', { ascending: false })
+        .limit(100);
+
+      if (!error && data) {
+        const latest: Record<string, any> = {};
+        data.forEach(update => {
+          if (!latest[update.carrier_id]) {
+            latest[update.carrier_id] = {
+              lat: update.lat,
+              lng: update.lng,
+              timestamp: update.timestamp,
+              carrier_name: profileMap[update.carrier_id]
+            };
+          }
+        });
+        setCarriers(latest);
+      }
+      setLoading(false);
+    };
+
+    fetchLatestPositions();
+
+    // Subscribe to all location updates
+    const channel = supabase
+      .channel('fleet-live-tracking')
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'location_updates' },
+        (payload) => {
+          const newLoc = payload.new as any;
+          setCarriers(prev => ({
+            ...prev,
+            [newLoc.carrier_id]: {
+              lat: newLoc.lat,
+              lng: newLoc.lng,
+              timestamp: newLoc.timestamp,
+              carrier_name: prev[newLoc.carrier_id]?.carrier_name || 'Cargando...'
+            }
+          }));
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, []);
+
+  return { carriers, loading };
 }
 
 // ============================================
@@ -184,4 +266,37 @@ export function useUpdateShipmentStatus() {
   }, []);
 
   return { updateStatus, updating };
+}
+
+// ============================================
+// Hook: Update shipment ETA (Carrier side)
+// ============================================
+export function useUpdateShipmentETA() {
+  const [updating, setUpdating] = useState(false);
+
+  const updateETA = useCallback(async (
+    shipmentId: string,
+    estimatedArrivalTime: string
+  ) => {
+    setUpdating(true);
+    try {
+      const { error } = await supabase
+        .from('shipments')
+        .update({ 
+          estimated_arrival_time: estimatedArrivalTime, 
+          updated_at: new Date().toISOString() 
+        })
+        .eq('id', shipmentId);
+
+      if (error) throw error;
+      return true;
+    } catch (error: any) {
+      toast.error('Error al actualizar ETA');
+      return false;
+    } finally {
+      setUpdating(false);
+    }
+  }, []);
+
+  return { updateETA, updating };
 }
