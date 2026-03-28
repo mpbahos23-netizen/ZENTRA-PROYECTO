@@ -9,6 +9,7 @@ import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import { cn } from '@/lib/utils';
 import { Card } from '@/components/ui/card';
+import DigitalManifest from '@/components/tracking/DigitalManifest';
 
 // ============================================
 // ZENTRA OBSIDIAN: Kinetic Tracking Terminal
@@ -144,6 +145,14 @@ export default function ShipmentTracking() {
                  </div>
               </Card>
             </div>
+          )}
+
+          {/* DIGITAL MANIFEST: Aurex Vital Control Reference */}
+          {shipment?.items && (
+            <DigitalManifest 
+              items={shipment.items as any[]} 
+              readOnly={true} 
+            />
           )}
 
           {/* SHIPMENT DETAILS TICKET */}
