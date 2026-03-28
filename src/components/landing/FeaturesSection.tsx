@@ -68,11 +68,11 @@ const FeaturesSection = () => {
 
       <div className="container mx-auto px-6">
         <div className="text-center mb-24 space-y-4">
-           <h2 className="text-[10px] font-black text-blue-500 uppercase tracking-[0.4em]">Core Capabilities</h2>
-           <h1 className="text-4xl sm:text-6xl font-black text-white italic tracking-tighter uppercase italic leading-none">
+           <h2 className="text-xs font-bold text-blue-500 uppercase tracking-[0.2em]">Core Capabilities</h2>
+           <h1 className="text-4xl sm:text-6xl font-black text-white italic tracking-tighter uppercase leading-none">
               Todo lo que necesitas <br /> <span className="text-zinc-700">para avanzar</span>
            </h1>
-           <p className="text-[10px] text-zinc-600 font-black uppercase tracking-widest max-w-xl mx-auto leading-relaxed mt-4">
+           <p className="text-sm text-zinc-400 font-medium max-w-xl mx-auto leading-relaxed mt-4">
               Herramientas tácticas diseñadas para la confiabilidad extrema en operaciones logísticas.
            </p>
         </div>
@@ -84,7 +84,7 @@ const FeaturesSection = () => {
               className="bg-white/[0.02] border-white/5 rounded-[40px] p-10 hover:border-blue-500/20 transition-all duration-500 group relative overflow-hidden shadow-2xl hover:scale-[1.02]"
             >
               <div className="absolute top-0 right-0 p-8 opacity-0 group-hover:opacity-100 transition-opacity">
-                 <p className="text-[10px] font-black text-blue-500 uppercase tracking-widest leading-none">{feature.tag}</p>
+                 <p className="text-xs font-bold text-blue-500 uppercase tracking-widest leading-none">{feature.tag}</p>
               </div>
               
               <div className="w-16 h-16 rounded-[22px] bg-white/5 flex items-center justify-center mb-8 border border-white/5 group-hover:bg-blue-600 group-hover:border-blue-500 transition-all duration-500">
@@ -93,7 +93,7 @@ const FeaturesSection = () => {
               
               <div className="space-y-4">
                  <h3 className="text-2xl font-black text-white italic tracking-tighter uppercase leading-none">{feature.title}</h3>
-                 <p className="text-[11px] text-zinc-600 font-black uppercase tracking-[0.1em] leading-relaxed group-hover:text-white/60 transition-colors">
+                 <p className="text-sm text-zinc-400 font-medium leading-relaxed group-hover:text-white transition-colors">
                    {feature.description}
                  </p>
               </div>

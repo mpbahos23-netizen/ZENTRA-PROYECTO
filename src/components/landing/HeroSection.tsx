@@ -22,32 +22,38 @@ const HeroSection = () => {
       <div className="container mx-auto px-6 pt-32 pb-24 relative z-10">
         <div className="max-w-4xl mx-auto text-center space-y-10">
           
-          <div className="inline-flex items-center gap-3 px-6 py-2 rounded-full border border-white/5 bg-white/[0.02] backdrop-blur-md animate-in fade-in slide-in-from-top-4 duration-700">
+          <div className="inline-flex items-center gap-3 px-6 py-2 rounded-full border border-white/10 bg-white/[0.04] backdrop-blur-md animate-in fade-in slide-in-from-top-4 duration-700">
             <Globe className="w-4 h-4 text-blue-500 animate-pulse" />
-            <span className="text-[10px] font-black text-zinc-400 uppercase tracking-[0.3em]">The Global Logistics Operating System</span>
+            <span className="text-xs font-semibold text-zinc-400 uppercase tracking-[0.2em]">The Global Logistics Operating System</span>
           </div>
 
           <div className="space-y-6">
             <h1 className="text-5xl sm:text-7xl lg:text-9xl font-black text-white italic tracking-tighter uppercase leading-[0.85] animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-200">
                Logistics <br /> <span className="text-blue-600">Reinvented</span>
             </h1>
-            <p className="text-sm sm:text-base text-zinc-500 max-w-2xl mx-auto font-black uppercase tracking-[0.2em] leading-relaxed animate-in fade-in slide-in-from-bottom-4 duration-1000 delay-500">
+            <p className="text-base sm:text-lg text-zinc-400 max-w-2xl mx-auto font-medium leading-relaxed animate-in fade-in slide-in-from-bottom-4 duration-1000 delay-500">
                Infraestructura profesional para transportistas modernos. <br className="hidden sm:block" /> 
                IA de ruta, seguimiento cinético y optimización de carga en una terminal única.
             </p>
           </div>
 
           <div className="flex flex-col sm:flex-row gap-6 justify-center animate-in fade-in zoom-in duration-1000 delay-700">
-            <Button size="lg" asChild className="h-20 bg-white text-black font-black uppercase tracking-[0.3em] rounded-full px-12 hover:bg-zinc-200 shadow-[0_20px_50px_rgba(255,255,255,0.05)] transition-all text-xs border border-white/10 group">
+            <Button size="lg" asChild className="h-20 bg-white text-black font-bold uppercase tracking-[0.15em] rounded-full px-12 hover:bg-zinc-200 shadow-[0_20px_50px_rgba(255,255,255,0.05)] transition-all text-sm border border-white/10 group">
               <Link to="/signup" className="flex items-center gap-3">
-                Z-Carrier Access
+                Soy transportista
                 <Zap className="w-4 h-4 fill-black group-hover:scale-110 transition-transform" />
               </Link>
             </Button>
-            <Button size="lg" variant="outline" asChild className="h-20 bg-white/5 border-white/10 text-white font-black uppercase tracking-[0.3em] rounded-full px-12 hover:bg-white/10 transition-all text-xs backdrop-blur-md">
+            <Button size="lg" variant="outline" asChild className="h-20 bg-white/5 border-white/10 text-white font-bold uppercase tracking-[0.15em] rounded-full px-12 hover:bg-white/10 transition-all text-sm backdrop-blur-md">
               <Link to="/signup?role=client" className="flex items-center gap-3">
-                 Quiero Enviar
+                 Quiero realizar un envío
                  <ArrowRight className="w-4 h-4" />
+              </Link>
+            </Button>
+            <Button size="lg" variant="ghost" asChild className="h-20 bg-transparent border border-white/5 text-zinc-500 font-bold uppercase tracking-[0.15em] rounded-full px-12 hover:bg-white/5 hover:text-white transition-all text-sm backdrop-blur-md">
+              <Link to="/login" className="flex items-center gap-3">
+                 Soy administrador
+                 <Shield className="w-4 h-4" />
               </Link>
             </Button>
           </div>
@@ -77,7 +83,7 @@ const HeroSection = () => {
         {/* Strategic Proof */}
         <div className="container mx-auto px-6 mt-20 flex flex-wrap justify-center gap-12 opacity-30 grayscale invert">
             {['Uber Freight', 'Lalamove', 'Flexport', 'Convoy'].map(brand => (
-              <span key={brand} className="text-xs font-black uppercase tracking-[0.5em] text-white italic">{brand}</span>
+              <span key={brand} className="text-sm font-bold uppercase tracking-[0.2em] text-white italic opacity-50">{brand}</span>
             ))}
         </div>
       </div>

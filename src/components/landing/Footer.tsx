@@ -21,7 +21,7 @@ const Footer = () => (
              </div>
              <span className="text-3xl font-black text-white italic tracking-tighter uppercase leading-none">Zentra</span>
            </Link>
-           <p className="text-[10px] text-zinc-700 font-black uppercase tracking-[0.4em] max-w-[240px] leading-relaxed">
+           <p className="text-xs text-zinc-500 font-medium max-w-[280px] leading-relaxed">
              The Professional Logistics Operating System for the Modern Era.
            </p>
         </div>
@@ -37,7 +37,7 @@ const Footer = () => (
              <a 
               key={link.label} 
               href={link.href} 
-              className="group flex items-center gap-2 text-[10px] font-black text-zinc-500 hover:text-white transition-all uppercase tracking-widest"
+              className="group flex items-center gap-2 text-xs font-bold text-zinc-400 hover:text-white transition-all uppercase tracking-widest"
              >
                {link.label}
                <ArrowUpRight className="w-2.5 h-2.5 opacity-0 group-hover:opacity-100 transition-all -translate-y-0.5" />
@@ -49,9 +49,9 @@ const Footer = () => (
         <div className="space-y-4 text-center md:text-right">
            <div className="inline-flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/20 px-4 py-1.5 rounded-full shadow-lg shadow-emerald-500/5">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              <span className="text-[9px] font-black text-emerald-400 uppercase tracking-widest">Global Systems: Optimal</span>
+              <span className="text-xs font-bold text-emerald-400 uppercase tracking-widest">Global Systems: Optimal</span>
            </div>
-           <p className="text-[9px] text-zinc-800 font-black uppercase tracking-[0.3em]">
+           <p className="text-[10px] text-zinc-600 font-bold uppercase tracking-[0.2em]">
              © 2026 ZENTRA PROJECT. All Rights Reserved. <br /> <span className="opacity-50">Logistics OS v3.1.2</span>
            </p>
         </div>

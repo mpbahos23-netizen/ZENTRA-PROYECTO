@@ -34,11 +34,11 @@ const HowItWorks = () => {
       
       <div className="container mx-auto px-6">
         <div className="text-center mb-24 space-y-4">
-           <h2 className="text-[10px] font-black text-blue-500 uppercase tracking-[0.4em]">Arquitectura Operativa</h2>
-           <h1 className="text-4xl sm:text-6xl font-black text-white italic tracking-tighter uppercase italic leading-none">
+           <h2 className="text-xs font-bold text-blue-500 uppercase tracking-[0.2em]">Arquitectura Operativa</h2>
+           <h1 className="text-4xl sm:text-6xl font-black text-white italic tracking-tighter uppercase leading-none">
               Cómo <span className="text-zinc-700">funciona</span> Zentra
            </h1>
-           <p className="text-[10px] text-zinc-600 font-black uppercase tracking-widest max-w-xl mx-auto leading-relaxed mt-4">
+           <p className="text-sm text-zinc-400 font-medium max-w-xl mx-auto leading-relaxed mt-4">
               Desde la identificación hasta la rentabilidad — tres fases estratégicas para una logística de alto rendimiento.
            </p>
         </div>
@@ -63,9 +63,9 @@ const HowItWorks = () => {
               </div>
 
               <div className="space-y-4 px-6 scale-90 group-hover:scale-100 transition-transform duration-500">
-                <p className="text-[9px] font-black text-blue-500 uppercase tracking-[0.2em]">{step.tag}</p>
+                <p className="text-xs font-bold text-blue-500 uppercase tracking-[0.1em]">{step.tag}</p>
                 <h3 className="text-2xl font-black text-white italic tracking-tighter uppercase">{step.title}</h3>
-                <p className="text-[11px] text-zinc-600 font-black uppercase tracking-widest leading-relaxed max-w-[240px] mx-auto py-2 group-hover:text-zinc-400 transition-colors">
+                <p className="text-sm text-zinc-400 font-medium leading-relaxed max-w-[260px] mx-auto py-2 group-hover:text-white transition-colors">
                   {step.description}
                 </p>
               </div>

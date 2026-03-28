@@ -97,7 +97,7 @@ const Login = () => {
             />
           </div>
 
-          <div className="pt-6">
+          <div className="pt-6 space-y-4">
             <Button type="submit" className="w-full h-18 bg-white text-black font-black uppercase tracking-[0.3em] rounded-[32px] shadow-[0_20px_40px_rgba(255,255,255,0.05)] hover:bg-zinc-200 transition-all flex items-center justify-center gap-3 text-sm relative group overflow-hidden" disabled={loading}>
               <div className="absolute inset-0 bg-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
               {loading ? <Loader2 className="w-6 h-6 animate-spin" /> : (
@@ -107,6 +107,19 @@ const Login = () => {
                 </>
               )}
             </Button>
+            
+            {/* Quick Access Portals */}
+            <div className="grid grid-cols-3 gap-2 pt-4">
+              <Button type="button" variant="ghost" onClick={() => { setEmail("admin@zentra.com"); setPassword("zentra123"); }} className="h-10 text-[8px] font-black border border-white/5 rounded-xl uppercase tracking-widest text-zinc-500 hover:text-blue-500">
+                Admin
+              </Button>
+              <Button type="button" variant="ghost" onClick={() => { setEmail("carrier@zentra.com"); setPassword("zentra123"); }} className="h-10 text-[8px] font-black border border-white/5 rounded-xl uppercase tracking-widest text-zinc-500 hover:text-blue-500">
+                Carrier
+              </Button>
+              <Button type="button" variant="ghost" onClick={() => { setEmail("client@zentra.com"); setPassword("zentra123"); }} className="h-10 text-[8px] font-black border border-white/5 rounded-xl uppercase tracking-widest text-zinc-500 hover:text-blue-500">
+                Client
+              </Button>
+            </div>
           </div>
 
           <div className="text-center pt-4">

@@ -47,11 +47,11 @@ const PricingSection = () => {
       
       <div className="container mx-auto px-6">
         <div className="text-center mb-20 space-y-4">
-           <h2 className="text-[10px] font-black text-blue-500 uppercase tracking-[0.4em]">Optimización de Costos</h2>
-           <h1 className="text-4xl sm:text-6xl font-black text-white italic tracking-tighter uppercase italic leading-none">
+           <h2 className="text-xs font-bold text-blue-500 uppercase tracking-[0.2em]">Optimización de Costos</h2>
+           <h1 className="text-4xl sm:text-6xl font-black text-white italic tracking-tighter uppercase leading-none">
               Inversión <span className="text-zinc-700">Inteligente</span>
            </h1>
-           <p className="text-[10px] text-zinc-600 font-black uppercase tracking-widest max-w-xl mx-auto leading-relaxed mt-4 px-10">
+           <p className="text-sm text-zinc-400 font-medium max-w-xl mx-auto leading-relaxed mt-4 px-10">
               Escala tus operaciones con infraestructura logística de grado empresarial. Sin comisiones ocultas.
            </p>
         </div>
@@ -77,12 +77,12 @@ const PricingSection = () => {
                      <tier.icon className={cn("w-5 h-5", tier.highlighted ? "text-blue-500" : "text-zinc-600")} />
                      <h3 className="text-2xl font-black text-white italic tracking-tighter uppercase leading-none">{tier.name}</h3>
                   </div>
-                  <p className="text-[10px] text-zinc-400 font-black uppercase tracking-[0.1em]">{tier.description}</p>
+                   <p className="text-sm text-zinc-400 font-medium">{tier.description}</p>
                 </div>
 
                 <div className="flex items-baseline gap-2 py-4 border-y border-white/5">
                   <span className="text-5xl font-black text-white italic tracking-tighter uppercase font-inter">{tier.price}</span>
-                  {tier.price !== "Custom" && <span className="text-[10px] font-black text-zinc-600 uppercase tracking-widest">/ Mes</span>}
+                  {tier.price !== "Custom" && <span className="text-xs font-bold text-zinc-500 uppercase tracking-widest">/ Mes</span>}
                 </div>
 
                 <ul className="space-y-4">
@@ -91,7 +91,7 @@ const PricingSection = () => {
                       <div className="w-5 h-5 rounded-full bg-blue-600/10 flex items-center justify-center border border-blue-600/20">
                          <Check className="w-3 h-3 text-blue-500" />
                       </div>
-                      <span className="text-[11px] font-black text-zinc-600 uppercase tracking-widest group-hover/item:text-white transition-colors">{f}</span>
+                      <span className="text-sm font-medium text-zinc-400 group-hover:item:text-white transition-colors">{f}</span>
                     </li>
                   ))}
                 </ul>
@@ -99,7 +99,7 @@ const PricingSection = () => {
                 <Button
                   asChild
                   className={cn(
-                    "w-full h-18 rounded-[32px] font-black uppercase tracking-[0.3em] transition-all text-[10px] shadow-2xl group",
+                    "w-full h-18 rounded-[32px] font-bold uppercase tracking-[0.2em] transition-all text-sm shadow-2xl group",
                     tier.highlighted 
                       ? "bg-blue-600 text-white hover:bg-blue-500 shadow-blue-600/20" 
                       : "bg-white/5 border border-white/5 text-white hover:bg-white/10"

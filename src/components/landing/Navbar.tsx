@@ -23,17 +23,17 @@ const Navbar = () => {
 
         {/* Desktop Links */}
         <div className="hidden md:flex items-center gap-10">
-          <a href="#how-it-works" className="text-[10px] font-black text-zinc-500 hover:text-white uppercase tracking-[0.2em] transition-all">Sistemas</a>
-          <a href="#features" className="text-[10px] font-black text-zinc-500 hover:text-white uppercase tracking-[0.2em] transition-all">Tecnología</a>
-          <a href="#pricing" className="text-[10px] font-black text-zinc-500 hover:text-white uppercase tracking-[0.2em] transition-all">Red</a>
+          <a href="#how-it-works" className="text-xs font-medium text-zinc-400 hover:text-white tracking-widest transition-all">Sistemas</a>
+          <a href="#features" className="text-xs font-medium text-zinc-400 hover:text-white tracking-widest transition-all">Tecnología</a>
+          <a href="#pricing" className="text-xs font-medium text-zinc-400 hover:text-white tracking-widest transition-all">Red</a>
         </div>
 
         {/* Auth Actions */}
         <div className="hidden md:flex items-center gap-6">
-          <Link to="/login" className="text-[10px] font-black text-zinc-400 hover:text-white uppercase tracking-[0.2em] transition-all">
+          <Link to="/login" className="text-xs font-medium text-zinc-400 hover:text-white tracking-widest transition-all">
             Identificación
           </Link>
-          <Button asChild className="h-12 bg-white text-black font-black uppercase tracking-[0.2em] rounded-full px-8 hover:bg-zinc-200 shadow-xl text-[10px]">
+          <Button asChild className="h-12 bg-white text-black font-bold tracking-widest rounded-full px-8 hover:bg-zinc-200 shadow-xl text-xs">
             <Link to="/signup">Comenzar</Link>
           </Button>
         </div>
@@ -50,10 +50,13 @@ const Navbar = () => {
           <a href="#features" className="block text-sm font-black text-zinc-500 hover:text-white uppercase tracking-widest py-2" onClick={() => setMobileOpen(false)}>Tecnología</a>
           <a href="#pricing" className="block text-sm font-black text-zinc-500 hover:text-white uppercase tracking-widest py-2" onClick={() => setMobileOpen(false)}>Red</a>
           <div className="flex flex-col gap-4 pt-4">
-            <Button variant="ghost" asChild className="h-14 bg-white/5 text-white font-black uppercase tracking-widest rounded-2xl border border-white/5">
-               <Link to="/login" onClick={() => setMobileOpen(false)}>Iniciar Sesión</Link>
+            <Button variant="ghost" asChild className="h-14 bg-white/5 text-white font-medium tracking-widest rounded-2xl border border-white/5">
+               <Link to="/login" onClick={() => setMobileOpen(false)}>Acceso Personal</Link>
             </Button>
-            <Button asChild className="h-14 bg-blue-600 text-white font-black uppercase tracking-widest rounded-2xl shadow-xl shadow-blue-600/20">
+            <Button asChild variant="outline" className="h-14 border border-zinc-800 text-zinc-400 font-medium tracking-widest rounded-2xl hover:bg-zinc-800">
+               <Link to="/login" onClick={() => setMobileOpen(false)}>Soy administrador</Link>
+            </Button>
+            <Button asChild className="h-14 bg-blue-600 text-white font-bold tracking-widest rounded-2xl shadow-xl shadow-blue-600/20">
                <Link to="/signup" onClick={() => setMobileOpen(false)}>Crear Cuenta</Link>
             </Button>
           </div>

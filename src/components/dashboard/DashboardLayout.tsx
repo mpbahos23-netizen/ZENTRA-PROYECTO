@@ -55,7 +55,10 @@ const DashboardLayout = ({ children, role: initialRole }: DashboardLayoutProps) 
     ? [
         { label: "Panel Admin", href: "/admin", icon: LayoutDashboard },
         { label: "Operaciones", href: "/admin/operations", icon: Radio },
-        { label: "Facturación", href: "/client/invoices", icon: FileText },
+        { label: "Ganancias", href: "/carrier/earnings", icon: DollarSign },
+        { label: "Nuevo Envío", href: "/client/book", icon: PackagePlus },
+        { label: "Presupuesto", href: "/quote", icon: FileSignature },
+        { label: "Facturas", href: "/client/invoices", icon: FileText },
       ]
     : role === 'carrier' || role === 'client'
       ? [
