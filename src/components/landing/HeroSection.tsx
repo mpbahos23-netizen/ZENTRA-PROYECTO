@@ -39,15 +39,15 @@ const HeroSection = () => {
 
           <div className="flex flex-col sm:flex-row gap-6 justify-center animate-in fade-in zoom-in duration-1000 delay-700">
             <Button size="lg" asChild className="h-20 bg-white text-black font-bold uppercase tracking-[0.15em] rounded-full px-12 hover:bg-zinc-200 shadow-[0_20px_50px_rgba(255,255,255,0.05)] transition-all text-sm border border-white/10 group">
-              <Link to="/signup" className="flex items-center gap-3">
-                Soy transportista
-                <Zap className="w-4 h-4 fill-black group-hover:scale-110 transition-transform" />
+              <Link to="/signup?role=client" className="flex items-center gap-3">
+                Quiero realizar un envío
+                <ArrowRight className="w-4 h-4" />
               </Link>
             </Button>
             <Button size="lg" variant="outline" asChild className="h-20 bg-white/5 border-white/10 text-white font-bold uppercase tracking-[0.15em] rounded-full px-12 hover:bg-white/10 transition-all text-sm backdrop-blur-md">
-              <Link to="/signup?role=client" className="flex items-center gap-3">
-                 Quiero realizar un envío
-                 <ArrowRight className="w-4 h-4" />
+              <Link to="/signup" className="flex items-center gap-3">
+                 Soy transportista
+                 <Zap className="w-4 h-4 fill-white group-hover:scale-110 transition-transform" />
               </Link>
             </Button>
             <Button size="lg" variant="ghost" asChild className="h-20 bg-transparent border border-white/5 text-zinc-500 font-bold uppercase tracking-[0.15em] rounded-full px-12 hover:bg-white/5 hover:text-white transition-all text-sm backdrop-blur-md">

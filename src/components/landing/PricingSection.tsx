@@ -49,7 +49,7 @@ const PricingSection = () => {
         <div className="text-center mb-20 space-y-4">
            <h2 className="text-xs font-bold text-blue-500 uppercase tracking-[0.2em]">Optimización de Costos</h2>
            <h1 className="text-4xl sm:text-6xl font-black text-white italic tracking-tighter uppercase leading-none">
-              Inversión <span className="text-zinc-700">Inteligente</span>
+              Inversión <span className="text-blue-500">Inteligente</span>
            </h1>
            <p className="text-sm text-zinc-400 font-medium max-w-xl mx-auto leading-relaxed mt-4 px-10">
               Escala tus operaciones con infraestructura logística de grado empresarial. Sin comisiones ocultas.
