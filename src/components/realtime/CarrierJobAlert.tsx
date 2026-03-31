@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import { useCarrierJobRequests, useSubmitBid, useRejectJob } from '@/hooks/useJobRequests';
 import type { JobRequest, Shipment } from '@/types/database';
+import { toast } from 'sonner';
 
 // ============================================
 // CarrierJobAlert: Full-screen overlay with countdown
@@ -49,7 +50,13 @@ function JobAlertCard({ job, onAccepted, onRejected }: JobAlertCardProps) {
     if (isNaN(amount) || amount <= 0) return;
     
     const success = await submitBid(job.id, job.shipment_id, amount, bidMessage);
-    if (success) onAccepted();
+    if (success) {
+      onAccepted();
+      toast.success("¡Oferta Enviada!", {
+        description: "Eres el motor de la industria. Confía en tu profesionalismo, ¡este viaje puede ser tuyo! 🚛✨",
+        duration: 5000,
+      });
+    }
   }, [submitBid, job.id, job.shipment_id, bidAmount, bidMessage, onAccepted]);
 
   const handleReject = useCallback(async () => {
