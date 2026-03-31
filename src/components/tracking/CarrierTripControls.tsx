@@ -52,6 +52,10 @@ export default function CarrierTripControls({
     const success = await updateStatus(shipmentId, 'in_transit');
     if (success) {
       setPhase('heading_to_pickup');
+      toast.success("¡Viaje Iniciado!", {
+        description: "¡Mucho ánimo! Tu dedicación mueve el mundo. ZENTRA está contigo en cada kilómetro. 🚛✨",
+        duration: 5000,
+      });
     }
   };
 

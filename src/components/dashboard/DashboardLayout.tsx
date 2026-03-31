@@ -60,14 +60,18 @@ const DashboardLayout = ({ children, role: initialRole }: DashboardLayoutProps) 
         { label: "Presupuesto", href: "/quote", icon: FileSignature },
         { label: "Facturas", href: "/client/invoices", icon: FileText },
       ]
-    : role === 'carrier' || role === 'client'
+    : role === 'carrier'
       ? [
           { label: "Panel Principal", href: "/carrier", icon: LayoutDashboard },
           { label: "Solicitudes", href: "/carrier/jobs", icon: Radio },
           { label: "Ganancias", href: "/carrier/earnings", icon: DollarSign },
+        ]
+    : role === 'client'
+      ? [
+          { label: "Mis Envíos", href: "/client", icon: LayoutDashboard },
           { label: "Nuevo Envío", href: "/client/book", icon: PackagePlus },
-          { label: "Presupuesto", href: "/quote", icon: FileSignature },
           { label: "Facturas", href: "/client/invoices", icon: FileText },
+          { label: "Presupuesto", href: "/quote", icon: FileSignature },
         ]
       : []; // Don't show items while loading or if no role is found
 
@@ -128,8 +132,10 @@ const DashboardLayout = ({ children, role: initialRole }: DashboardLayoutProps) 
                 <img src="https://i.pravatar.cc/150?u=paula" alt="Paula Bahos" className="w-full h-full object-cover" />
               </div>
               <div>
-                <p className="font-bold">Paula Bahos</p>
-                <p className="text-xs text-zinc-500">Gestor Logístico</p>
+                <p className="font-bold">{role === 'admin' ? 'Paula Bahos' : 'Usuario Zentra'}</p>
+                <p className="text-xs text-zinc-500">
+                  {role === 'admin' ? 'Administrador' : role === 'carrier' ? 'Transportista Verificado' : 'Socio Corporativo'}
+                </p>
               </div>
             </div>
             <button onClick={handleLogout} className="w-12 h-12 rounded-2xl bg-red-500/10 flex items-center justify-center text-red-500">
@@ -192,8 +198,10 @@ const DashboardLayout = ({ children, role: initialRole }: DashboardLayoutProps) 
                 <img src="https://i.pravatar.cc/150?u=paula" alt="Paula Bahos" className="w-full h-full object-cover" />
               </div>
               <div className="flex flex-col">
-                <span className="text-sm font-semibold text-white">Paula Bahos</span>
-                <span className="text-xs text-zinc-500">Gestor Logístico</span>
+                <span className="text-sm font-semibold text-white">{role === 'admin' ? 'Paula Bahos' : 'Usuario Zentra'}</span>
+                <span className="text-xs text-zinc-500">
+                  {role === 'admin' ? 'Administrador' : role === 'carrier' ? 'Transportista Verificado' : 'Socio Corporativo'}
+                </span>
               </div>
             </div>
             <button 

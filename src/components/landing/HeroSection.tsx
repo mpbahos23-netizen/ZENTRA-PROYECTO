@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Shield, Zap, Sparkles, Globe } from "lucide-react";
+import { ArrowRight, Shield, Truck, Sparkles, Globe } from "lucide-react";
 import heroDashboard from "@/assets/hero-dashboard.jpg";
 
 // ============================================
@@ -47,7 +47,7 @@ const HeroSection = () => {
             <Button size="lg" variant="outline" asChild className="h-20 bg-white/5 border-white/10 text-white font-bold uppercase tracking-[0.15em] rounded-full px-12 hover:bg-white/10 transition-all text-sm backdrop-blur-md">
               <Link to="/signup" className="flex items-center gap-3">
                  Soy transportista
-                 <Zap className="w-4 h-4 fill-white group-hover:scale-110 transition-transform" />
+                 <Truck className="w-4 h-4 fill-white group-hover:scale-110 transition-transform" />
               </Link>
             </Button>
             <Button size="lg" variant="ghost" asChild className="h-20 bg-transparent border border-white/5 text-zinc-500 font-bold uppercase tracking-[0.15em] rounded-full px-12 hover:bg-white/5 hover:text-white transition-all text-sm backdrop-blur-md">

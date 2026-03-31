@@ -51,7 +51,7 @@ const Navbar = () => {
           <a href="#pricing" className="block text-sm font-black text-zinc-500 hover:text-white uppercase tracking-widest py-2" onClick={() => setMobileOpen(false)}>Red</a>
           <div className="flex flex-col gap-4 pt-4">
             <Button variant="ghost" asChild className="h-14 bg-white/5 text-white font-medium tracking-widest rounded-2xl border border-white/5">
-               <Link to="/login" onClick={() => setMobileOpen(false)}>Acceso Personal</Link>
+               <Link to="/login" onClick={() => setMobileOpen(false)}>Acceso Cliente</Link>
             </Button>
             <Button asChild variant="outline" className="h-14 border border-zinc-800 text-zinc-400 font-medium tracking-widest rounded-2xl hover:bg-zinc-800">
                <Link to="/login" onClick={() => setMobileOpen(false)}>Soy administrador</Link>
