@@ -25,6 +25,7 @@ const DashboardLayout = ({ children, role: initialRole }: DashboardLayoutProps) 
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [role, setRole] = useState<string | undefined>(initialRole);
+  const [profileName, setProfileName] = useState<string>("Usuario Zentra");
   const [loading, setLoading] = useState(!initialRole);
 
   useEffect(() => {
@@ -36,11 +37,14 @@ const DashboardLayout = ({ children, role: initialRole }: DashboardLayoutProps) 
         if (user) {
           const { data: profile } = await supabase
             .from("profiles")
-            .select("role")
+            .select("role, full_name")
             .eq("id", user.id)
             .single();
           console.log("DashboardLayout - Profile fetched:", profile);
-          if (profile) setRole(profile.role);
+          if (profile) {
+            setRole(profile.role);
+            setProfileName(profile.full_name || "Usuario Zentra");
+          }
         }
         setLoading(false);
       } else {
@@ -132,7 +136,7 @@ const DashboardLayout = ({ children, role: initialRole }: DashboardLayoutProps) 
                 <img src="https://i.pravatar.cc/150?u=paula" alt="Paula Bahos" className="w-full h-full object-cover" />
               </div>
               <div>
-                <p className="font-bold">{role === 'admin' ? 'Paula Bahos' : 'Usuario Zentra'}</p>
+                <p className="font-bold">{profileName}</p>
                 <p className="text-xs text-zinc-500">
                   {role === 'admin' ? 'Administrador' : role === 'carrier' ? 'Transportista Verificado' : 'Socio Corporativo'}
                 </p>
@@ -198,7 +202,7 @@ const DashboardLayout = ({ children, role: initialRole }: DashboardLayoutProps) 
                 <img src="https://i.pravatar.cc/150?u=paula" alt="Paula Bahos" className="w-full h-full object-cover" />
               </div>
               <div className="flex flex-col">
-                <span className="text-sm font-semibold text-white">{role === 'admin' ? 'Paula Bahos' : 'Usuario Zentra'}</span>
+                <span className="text-sm font-semibold text-white">{profileName}</span>
                 <span className="text-xs text-zinc-500">
                   {role === 'admin' ? 'Administrador' : role === 'carrier' ? 'Transportista Verificado' : 'Socio Corporativo'}
                 </span>
