@@ -86,7 +86,7 @@ const Login = () => {
           <div className="space-y-1.5 px-2">
             <div className="flex items-center justify-between mb-1">
                <Label className="text-[10px] text-zinc-500 font-black uppercase tracking-widest">Protocolo de Seguridad</Label>
-               <Link to="/forgot-password" size="sm" className="text-[9px] font-black text-blue-500 uppercase tracking-widest hover:underline">
+               <Link to="/forgot-password" className="text-[9px] font-black text-blue-500 uppercase tracking-widest hover:underline">
                   Recuperar
                </Link>
             </div>
@@ -108,24 +108,13 @@ const Login = () => {
               )}
             </Button>
             
-            {/* Quick Access Portals */}
-            <div className="grid grid-cols-3 gap-2 pt-4">
-              <Button type="button" variant="ghost" onClick={() => { setEmail("admin@zentra.com"); setPassword("zentra123"); }} className="h-10 text-[8px] font-black border border-white/5 rounded-xl uppercase tracking-widest text-zinc-500 hover:text-blue-500">
-                Admin
-              </Button>
-              <Button type="button" variant="ghost" onClick={() => { setEmail("carrier@zentra.com"); setPassword("zentra123"); }} className="h-10 text-[8px] font-black border border-white/5 rounded-xl uppercase tracking-widest text-zinc-500 hover:text-blue-500">
-                Carrier
-              </Button>
-              <Button type="button" variant="ghost" onClick={() => { setEmail("client@zentra.com"); setPassword("zentra123"); }} className="h-10 text-[8px] font-black border border-white/5 rounded-xl uppercase tracking-widest text-zinc-500 hover:text-blue-500">
-                Client
-              </Button>
-            </div>
+            {/* Quick Access Portals Removed */}
           </div>
 
           <div className="text-center pt-4">
             <p className="text-[10px] font-black text-zinc-600 uppercase tracking-widest">
               ¿Sin credenciales?{" "}
-              <Link to="/signup" className="text-blue-500 hover:text-white transition-colors">Solicitar Acceso</Link>
+              <Link to="/signup" className="text-blue-500 hover:text-white transition-colors">Crear Cuenta</Link>
             </p>
           </div>
         </form>

@@ -36,7 +36,7 @@ const HowItWorks = () => {
         <div className="text-center mb-24 space-y-4">
            <h2 className="text-xs font-bold text-blue-500 uppercase tracking-[0.2em]">Arquitectura Operativa</h2>
            <h1 className="text-4xl sm:text-6xl font-black text-white italic tracking-tighter uppercase leading-none">
-              Cómo <span className="text-zinc-700">funciona</span> Zentra
+              Cómo <span className="text-blue-500">funciona</span> Zentra
            </h1>
            <p className="text-sm text-zinc-400 font-medium max-w-xl mx-auto leading-relaxed mt-4">
               Desde la identificación hasta la rentabilidad — tres fases estratégicas para una logística de alto rendimiento.

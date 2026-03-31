@@ -70,7 +70,7 @@ const FeaturesSection = () => {
         <div className="text-center mb-24 space-y-4">
            <h2 className="text-xs font-bold text-blue-500 uppercase tracking-[0.2em]">Core Capabilities</h2>
            <h1 className="text-4xl sm:text-6xl font-black text-white italic tracking-tighter uppercase leading-none">
-              Todo lo que necesitas <br /> <span className="text-zinc-700">para avanzar</span>
+              Todo lo que necesitas <br /> <span className="text-blue-500">para avanzar</span>
            </h1>
            <p className="text-sm text-zinc-400 font-medium max-w-xl mx-auto leading-relaxed mt-4">
               Herramientas tácticas diseñadas para la confiabilidad extrema en operaciones logísticas.

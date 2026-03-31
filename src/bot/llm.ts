@@ -1,15 +1,18 @@
 import { config } from './config';
 import { saveMemory } from './memory';
+import { googleManager } from './google';
 import OpenAI from 'openai';
 
 // Cliente LLM - puedes utilizar Groq, OpenAI u OpenRouter
-const client = new OpenAI({
-  apiKey: config.GROQ_API_KEY || config.OPENROUTER_API_KEY,
-  baseURL: config.GROQ_API_KEY ? 'https://api.groq.com/openai/v1' : 'https://openrouter.ai/api/v1',
+const groq = new OpenAI({
+  apiKey: config.GROQ_API_KEY,
+  baseURL: 'https://api.groq.com/openai/v1',
 });
 
-// Modelo estándar actualizado (Groq recomienda llama-3.3-70b-versatile)
-const MODEL = config.GROQ_API_KEY ? 'llama-3.3-70b-versatile' : config.OPENROUTER_MODEL;
+const openrouter = new OpenAI({
+  apiKey: config.OPENROUTER_API_KEY,
+  baseURL: "https://openrouter.ai/api/v1",
+});
 
 // Definimos la estructura de nuestras herramientas
 export const toolsDefinitions: any[] = [
@@ -45,14 +48,50 @@ export const toolsDefinitions: any[] = [
   {
     type: "function",
     function: {
-      name: "google_workspace_gog",
-      description: "Ejecuta comandos de Google Workspace usando gog.exe.",
+      name: "gmail_list_emails",
+      description: "Lista los correos electrónicos más recientes de la cuenta autorizada.",
+      parameters: { type: "object", properties: {} }
+    }
+  },
+  {
+    type: "function",
+    function: {
+      name: "gmail_send_email",
+      description: "Envía un correo electrónico a un destinatario específico.",
       parameters: {
         type: "object",
         properties: {
-          command: { type: "string", description: "El comando de gog a ejecutar." }
+          to: { type: "string", description: "Email del destinatario." },
+          subject: { type: "string", description: "Asunto del mensaje." },
+          body: { type: "string", description: "Contenido (HTML permitido)." }
         },
-        required: ["command"]
+        required: ["to", "subject", "body"]
+      }
+    }
+  },
+  {
+    type: "function",
+    function: {
+      name: "calendar_list_events",
+      description: "Lista los próximos eventos del Google Calendar.",
+      parameters: { type: "object", properties: {} }
+    }
+  },
+  {
+    type: "function",
+    function: {
+      name: "calendar_create_event",
+      description: "Crea un nuevo evento en el calendario.",
+      parameters: {
+        type: "object",
+        properties: {
+          summary: { type: "string" },
+          location: { type: "string" },
+          description: { type: "string" },
+          start: { type: "string", description: "Formato ISO (ej: 2024-12-01T10:00:00Z)" },
+          end: { type: "string", description: "Formato ISO (ej: 2024-12-01T11:00:00Z)" }
+        },
+        required: ["summary", "start", "end"]
       }
     }
   }
@@ -72,6 +111,7 @@ export async function executeTool(name: string, args: any, userId: number): Prom
     case 'remember_fact':
       await saveMemory(userId, args.key, args.value);
       return `Dato recordado: ${args.key} = ${args.value}`;
+    
     case 'execute_terminal_command':
       try {
         const { stdout, stderr } = await execAsync(args.command, { cwd: 'c:\\Users\\Bryce\\Paula proyecto' });
@@ -79,41 +119,64 @@ export async function executeTool(name: string, args: any, userId: number): Prom
       } catch (error: any) {
         return `Error al ejecutar comando: ${error.message}`;
       }
+
+    case 'gmail_list_emails':
+      try {
+        const emails = await googleManager.listRecentEmails();
+        return JSON.stringify(emails, null, 2);
+      } catch (error: any) {
+        return `Error Gmail: ${error.message}`;
+      }
+
+    case 'gmail_send_email':
+      try {
+        return await googleManager.sendEmail(args.to, args.subject, args.body);
+      } catch (error: any) {
+        return `Error Gmail: ${error.message}`;
+      }
+
+    case 'calendar_list_events':
+      try {
+        const events = await googleManager.listEvents();
+        return JSON.stringify(events, null, 2);
+      } catch (error: any) {
+        return `Error Calendar: ${error.message}`;
+      }
+
+    case 'calendar_create_event':
+      try {
+        return await googleManager.createEvent(args.summary, args.location || '', args.description || '', args.start, args.end);
+      } catch (error: any) {
+        return `Error Calendar: ${error.message}`;
+      }
+
     case 'get_current_time':
       return new Date().toLocaleString();
+
     default:
       throw new Error(`Herramienta desconocida: ${name}`);
   }
 }
 
-const openrouter = new OpenAI({
-  apiKey: config.OPENROUTER_API_KEY,
-  baseURL: "https://openrouter.ai/api/v1",
-});
-
-export async function generateCompletion(messages: any[], userId: number): Promise<any> {
+export async function generateCompletion(messages: any[], tools: any[]): Promise<any> {
   try {
     // Intento 1: Groq (Rápido y gratis)
     const response = await groq.chat.completions.create({
       model: "llama-3.3-70b-versatile",
       messages,
-      tools: toolsDefinitions,
-      tool_choice: toolsDefinitions.length > 0 ? "auto" : undefined,
+      tools: tools.length > 0 ? tools : undefined,
+      tool_choice: tools.length > 0 ? "auto" : undefined,
     });
     return response.choices[0].message;
   } catch (error: any) {
-    if (error.status === 429 || error.status >= 500) {
-      console.log("[GROQ LIMIT REACHED] -> Escalandado a OpenRouter...");
-      // Intento 2: OpenRouter (Respaldo Premium)
-      const response = await openrouter.chat.completions.create({
-        model: "anthropic/claude-3.5-sonnet",
-        messages,
-        tools: toolsDefinitions,
-        tool_choice: toolsDefinitions.length > 0 ? "auto" : undefined,
-      });
-      return response.choices[0].message;
-    }
-    throw error;
+    console.warn("[GROQ ERROR] -> Escalando a OpenRouter...", error.message);
+    // Intento 2: OpenRouter (Respaldo Premium)
+    const response = await openrouter.chat.completions.create({
+      model: config.OPENROUTER_MODEL || "anthropic/claude-3.5-sonnet",
+      messages,
+      tools: tools.length > 0 ? tools : undefined,
+      tool_choice: tools.length > 0 ? "auto" : undefined,
+    });
+    return response.choices[0].message;
   }
 }
-```

@@ -147,6 +147,14 @@ export default function ShipmentTracking() {
             </div>
           )}
 
+          {/* DIGITAL MANIFEST: Aurex Vital Control Reference */}
+          {shipment?.items && (
+            <DigitalManifest 
+              items={shipment.items as any[]} 
+              readOnly={true} 
+            />
+          )}
+
           {/* SHIPMENT DETAILS TICKET */}
           <Card className="bg-[#060E20] border-white/5 rounded-[40px] p-10 space-y-8 shadow-2xl relative overflow-hidden group">
              <div className="flex justify-between items-center border-b border-white/5 pb-6">

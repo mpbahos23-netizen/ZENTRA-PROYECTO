@@ -25,6 +25,7 @@ const DashboardLayout = ({ children, role: initialRole }: DashboardLayoutProps) 
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [role, setRole] = useState<string | undefined>(initialRole);
+  const [profileName, setProfileName] = useState<string>("Usuario Zentra");
   const [loading, setLoading] = useState(!initialRole);
 
   useEffect(() => {
@@ -36,11 +37,14 @@ const DashboardLayout = ({ children, role: initialRole }: DashboardLayoutProps) 
         if (user) {
           const { data: profile } = await supabase
             .from("profiles")
-            .select("role")
+            .select("role, full_name")
             .eq("id", user.id)
             .single();
           console.log("DashboardLayout - Profile fetched:", profile);
-          if (profile) setRole(profile.role);
+          if (profile) {
+            setRole(profile.role);
+            setProfileName(profile.full_name || "Usuario Zentra");
+          }
         }
         setLoading(false);
       } else {
@@ -55,19 +59,24 @@ const DashboardLayout = ({ children, role: initialRole }: DashboardLayoutProps) 
     ? [
         { label: "Panel Admin", href: "/admin", icon: LayoutDashboard },
         { label: "Operaciones", href: "/admin/operations", icon: Radio },
+        { label: "Inventario", href: "/admin/inventory", icon: Package },
         { label: "Ganancias", href: "/carrier/earnings", icon: DollarSign },
         { label: "Nuevo Envío", href: "/client/book", icon: PackagePlus },
         { label: "Presupuesto", href: "/quote", icon: FileSignature },
         { label: "Facturas", href: "/client/invoices", icon: FileText },
       ]
-    : role === 'carrier' || role === 'client'
+    : role === 'carrier'
       ? [
           { label: "Panel Principal", href: "/carrier", icon: LayoutDashboard },
           { label: "Solicitudes", href: "/carrier/jobs", icon: Radio },
           { label: "Ganancias", href: "/carrier/earnings", icon: DollarSign },
+        ]
+    : role === 'client'
+      ? [
+          { label: "Mis Envíos", href: "/client", icon: LayoutDashboard },
           { label: "Nuevo Envío", href: "/client/book", icon: PackagePlus },
-          { label: "Presupuesto", href: "/quote", icon: FileSignature },
           { label: "Facturas", href: "/client/invoices", icon: FileText },
+          { label: "Presupuesto", href: "/quote", icon: FileSignature },
         ]
       : []; // Don't show items while loading or if no role is found
 
@@ -124,12 +133,18 @@ const DashboardLayout = ({ children, role: initialRole }: DashboardLayoutProps) 
           </nav>
           <div className="mt-auto border-t border-white/10 pt-8 pb-4 flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-full bg-zinc-800 border border-white/10 overflow-hidden">
-                <img src="https://i.pravatar.cc/150?u=paula" alt="Paula Bahos" className="w-full h-full object-cover" />
+              <div className="w-12 h-12 rounded-full bg-zinc-800 border border-white/10 overflow-hidden flex items-center justify-center">
+                {role === 'admin' ? (
+                  <img src="https://i.pravatar.cc/150?u=paula" alt={profileName} className="w-full h-full object-cover" />
+                ) : (
+                  <Truck className="w-6 h-6 text-zinc-600" />
+                )}
               </div>
               <div>
-                <p className="font-bold">Paula Bahos</p>
-                <p className="text-xs text-zinc-500">Gestor Logístico</p>
+                <p className="font-bold">{profileName}</p>
+                <p className="text-xs text-zinc-500">
+                  {role === 'admin' ? 'Administrador' : role === 'carrier' ? 'Transportista Verificado' : 'Socio Corporativo'}
+                </p>
               </div>
             </div>
             <button onClick={handleLogout} className="w-12 h-12 rounded-2xl bg-red-500/10 flex items-center justify-center text-red-500">
@@ -189,11 +204,17 @@ const DashboardLayout = ({ children, role: initialRole }: DashboardLayoutProps) 
           <div className="flex items-center justify-between px-2 pt-2 pb-4">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-full bg-zinc-800 flex items-center justify-center overflow-hidden border border-white/10">
-                <img src="https://i.pravatar.cc/150?u=paula" alt="Paula Bahos" className="w-full h-full object-cover" />
+                {role === 'admin' ? (
+                  <img src="https://i.pravatar.cc/150?u=paula" alt={profileName} className="w-full h-full object-cover" />
+                ) : (
+                  <Truck className="w-5 h-5 text-zinc-600" />
+                )}
               </div>
               <div className="flex flex-col">
-                <span className="text-sm font-semibold text-white">Paula Bahos</span>
-                <span className="text-xs text-zinc-500">Gestor Logístico</span>
+                <span className="text-[10px] font-black text-white uppercase tracking-widest">{profileName}</span>
+                <span className="text-[8px] text-zinc-500 font-black uppercase tracking-widest">
+                  {role === 'admin' ? 'Administrador' : role === 'carrier' ? 'Transportista Verificado' : 'Socio Corporativo'}
+                </span>
               </div>
             </div>
             <button 

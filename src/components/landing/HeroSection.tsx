@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Shield, Zap, Sparkles, Globe } from "lucide-react";
+import { ArrowRight, Shield, Truck, Sparkles, Globe } from "lucide-react";
 import heroDashboard from "@/assets/hero-dashboard.jpg";
 
 // ============================================
@@ -38,19 +38,16 @@ const HeroSection = () => {
           </div>
 
           <div className="flex flex-col sm:flex-row gap-6 justify-center animate-in fade-in zoom-in duration-1000 delay-700">
-            <Button size="lg" variant="outline" asChild className="h-20 bg-white/5 border-white/10 text-white font-bold uppercase tracking-[0.15em] rounded-full px-12 hover:bg-white/10 transition-all text-sm backdrop-blur-md">
-              <Link to="/signup" className="flex items-center gap-3">
-                Soy transportista
-                <Zap className="w-4 h-4 text-zinc-500 transition-transform" />
+            <Button size="lg" asChild className="h-20 bg-white text-black font-bold uppercase tracking-[0.15em] rounded-full px-12 hover:bg-zinc-200 shadow-[0_20px_50px_rgba(255,255,255,0.05)] transition-all text-sm border border-white/10 group">
+              <Link to="/signup?role=client" className="flex items-center gap-3">
+                Quiero realizar un envío
+                <ArrowRight className="w-4 h-4" />
               </Link>
             </Button>
-            <Button size="lg" asChild className="h-20 bg-white text-black font-bold uppercase tracking-[0.15em] rounded-full px-12 hover:bg-zinc-200 shadow-[0_20px_50px_rgba(255,255,255,0.05)] transition-all text-sm border border-white/10 group">
-              <Link to="/signup?role=client" className="flex flex-col items-center justify-center gap-0.5">
-                 <div className="flex items-center gap-3">
-                    Quiero realizar un envío
-                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                 </div>
-                 <span className="text-[9px] font-black opacity-40 lowercase tracking-widest leading-none">(Rentar camión, mudanza)</span>
+            <Button size="lg" variant="outline" asChild className="h-20 bg-white/5 border-white/10 text-white font-bold uppercase tracking-[0.15em] rounded-full px-12 hover:bg-white/10 transition-all text-sm backdrop-blur-md">
+              <Link to="/signup" className="flex items-center gap-3">
+                 Soy transportista
+                 <Truck className="w-4 h-4 fill-white group-hover:scale-110 transition-transform" />
               </Link>
             </Button>
             <Button size="lg" variant="ghost" asChild className="h-20 bg-transparent border border-white/5 text-zinc-500 font-bold uppercase tracking-[0.15em] rounded-full px-12 hover:bg-white/5 hover:text-white transition-all text-sm backdrop-blur-md">
