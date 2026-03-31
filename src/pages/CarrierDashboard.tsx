@@ -53,6 +53,7 @@ export default function CarrierDashboard() {
   const [totalEarnings, setTotalEarnings] = useState(0);
   const [hotZones, setHotZones] = useState<{zone: string, count: number}[]>([]);
   const [isOnline, setIsOnline] = useState(false);
+  const [profileName, setProfileName] = useState("USUARIO");
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -82,6 +83,14 @@ export default function CarrierDashboard() {
         .slice(0, 3);
 
       setHotZones(processedZones);
+      
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('full_name')
+        .eq('id', user.id)
+        .single();
+      if (profile?.full_name) setProfileName(profile.full_name);
+      
       setLoading(false);
     };
 
@@ -91,7 +100,8 @@ export default function CarrierDashboard() {
   const toggleStatus = () => {
     setIsOnline(!isOnline);
     if (!isOnline) {
-      toast.success("ESTADO: EN LÍNEA. Buscando servicios cercanos...", {
+      toast.success("ESTADO: EN LÍNEA", {
+        description: "¡Vamos con toda! ¡Vamos por esa carga! ZENTRA está buscando servicios para ti. 🚛🔥",
         icon: <Zap className="w-4 h-4 text-blue-500" />,
         className: "bg-[#060E20] border-blue-500/30 text-white font-bold rounded-2xl"
       });
@@ -118,7 +128,9 @@ export default function CarrierDashboard() {
                 </span>
               </div>
               <h1 className="text-5xl md:text-6xl font-black text-white leading-tight tracking-tighter">
-                ¡HOLA,<br /><span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-blue-600">CENTRALIZADO!</span>
+                ¡HOLA,<br /><span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-blue-600 uppercase">
+                  {profileName.split(' ')[0]}!
+                </span>
               </h1>
               <p className="text-zinc-500 text-lg font-medium max-w-md">
                 Tu flota está lista para dominar la logística de hoy.

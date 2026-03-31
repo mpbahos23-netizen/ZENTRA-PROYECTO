@@ -53,7 +53,7 @@ function JobAlertCard({ job, onAccepted, onRejected }: JobAlertCardProps) {
     if (success) {
       onAccepted();
       toast.success("¡Oferta Enviada!", {
-        description: "Eres el motor de la industria. Confía en tu profesionalismo, ¡este viaje puede ser tuyo! 🚛✨",
+        description: "¡Vamos con toda! ¡Vamos por esa carga! Tu propuesta está en camino. 🚛🔥",
         duration: 5000,
       });
     }
