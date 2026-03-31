@@ -34,6 +34,8 @@ export default function BookShipment() {
   const [scanResult, setScanResult] = useState<{
     volume: string;
     confidence: number;
+    items?: number;
+    recommendation?: string;
   } | null>(null);
   
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -51,11 +53,18 @@ export default function BookShipment() {
       setFile(selectedFile);
       setPreviewUrl(URL.createObjectURL(selectedFile));
       setIsScanning(true);
+      
+      // Simulating ZENTRA VISION AI Analysis
       setTimeout(() => {
         setIsScanning(false);
-        setScanResult({ volume: "2.4 m³", confidence: 99.8 });
-        toast.success("Zentra AI: Volumen verificado");
-      }, 3000);
+        setScanResult({ 
+          volume: "2.85 m³", 
+          confidence: 99.9,
+          items: 12,
+          recommendation: "Carga optimizada para Camión Mediano (Z-Series)"
+        });
+        toast.success("ZENTRA AI: Volumen y Densidad Verificadas v4.1");
+      }, 3500);
     }
   };
 
@@ -182,7 +191,9 @@ export default function BookShipment() {
                     <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent" />
                     <div className="absolute bottom-6 left-6 right-6 flex items-end justify-between">
                        <div>
-                          <p className="text-[8px] text-zinc-400 font-black uppercase tracking-widest">Zentra AI Result</p>
+                          <p className="text-[8px] text-zinc-400 font-black uppercase tracking-widest">
+                             {scanResult?.recommendation || 'Análisis de Densidad...'}
+                          </p>
                           <p className="text-white font-black text-xl italic">{scanResult?.volume || 'Escaneando...'}</p>
                        </div>
                        <button onClick={() => {setPreviewUrl(null); setFile(null); setScanResult(null)}} className="w-10 h-10 rounded-full bg-red-500/80 flex items-center justify-center text-white backdrop-blur-md">

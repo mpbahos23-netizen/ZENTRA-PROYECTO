@@ -14,6 +14,7 @@ import {
   Zap,
   Navigation
 } from "lucide-react";
+import ETAValidator from "@/components/carrier/ETAValidator";
 import { 
   PieChart, 
   Pie, 
@@ -217,92 +218,105 @@ export default function CarrierDashboard() {
           </Card>
         </div>
 
-        {/* --- PERFORMANCE CHART --- */}
-        <div className="grid lg:grid-cols-3 gap-6">
-          <Card className="lg:col-span-2 bg-[#060E20] border-white/5 p-8 md:p-10 rounded-[40px] shadow-2xl relative overflow-hidden">
-             <div className="flex justify-between items-center mb-10">
-                <div>
-                  <h2 className="text-2xl font-black text-white uppercase tracking-tighter">Gráfico de Tracción</h2>
-                  <p className="text-zinc-500 text-xs font-bold uppercase tracking-widest">Ingresos por Jornada Laboral</p>
-                </div>
-                <div className="bg-white/5 border border-white/10 rounded-2xl px-4 py-2 flex items-center gap-3">
-                   <div className="w-2 h-2 rounded-full bg-blue-500 shadow-[0_0_10px_#3B82F6]" />
-                   <span className="text-white text-[10px] font-black uppercase tracking-widest">Optimizado x IA</span>
-                </div>
-             </div>
-             <div className="h-[320px] w-full">
-               <ResponsiveContainer width="100%" height="100%">
-                 <LineChart data={revenueData}>
-                   <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.02)" vertical={false} />
-                   <XAxis 
-                     dataKey="name" 
-                     axisLine={false} 
-                     tickLine={false} 
-                     tick={{ fill: '#4b5563', fontSize: 10, fontWeight: '900' }} 
-                   />
-                   <YAxis 
-                     axisLine={false} 
-                     tickLine={false} 
-                     tick={{ fill: '#4b5563', fontSize: 10, fontWeight: '900' }} 
-                   />
-                   <RechartsTooltip
-                     contentStyle={{ 
-                        backgroundColor: 'rgba(6, 14, 32, 0.9)', 
-                        border: '1px solid rgba(255,255,255,0.1)', 
-                        borderRadius: '24px',
-                        backdropFilter: 'blur(10px)',
-                        padding: '16px'
-                      }}
-                     itemStyle={{ color: '#3B82F6', fontWeight: '900', textTransform: 'uppercase', fontSize: '10px' }}
-                   />
-                   <Line 
-                     type="monotone" 
-                     dataKey="ingresos" 
-                     stroke="#3B82F6" 
-                     strokeWidth={6} 
-                     dot={{ fill: '#3B82F6', r: 6, strokeWidth: 0 }} 
-                     activeDot={{ r: 10, fill: '#fff' }} 
-                   />
-                 </LineChart>
-               </ResponsiveContainer>
-             </div>
-          </Card>
-
-          <Card className="bg-[#060E20] border-white/5 p-8 rounded-[40px] shadow-2xl flex flex-col items-center">
-            <h2 className="text-lg font-black text-white uppercase tracking-widest mb-8">Flota Activa</h2>
-            <div className="flex-1 w-full relative">
-              <ResponsiveContainer width="100%" height={240}>
-                <PieChart>
-                  <Pie
-                    data={distributionData}
-                    cx="50%" cy="50%"
-                    innerRadius={70} outerRadius={100}
-                    paddingAngle={10}
-                    dataKey="value"
-                    stroke="none"
-                  >
-                    {distributionData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
-                  </Pie>
-                </PieChart>
-              </ResponsiveContainer>
-              <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                <span className="text-4xl font-black text-white tracking-tighter">83%</span>
-                <span className="text-[10px] text-zinc-500 uppercase font-black tracking-widest">Utilidad</span>
-              </div>
-            </div>
-
-            <div className="w-full space-y-3 mt-10">
-              {distributionData.map((item) => (
-                <div key={item.name} className="flex justify-between items-center text-[10px] bg-white/[0.03] border border-white/5 px-4 py-4 rounded-2xl group hover:bg-white/[0.06] transition-all">
-                  <div className="flex items-center gap-3">
-                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: item.color, boxShadow: `0 0 10px ${item.color}44` }}></div>
-                    <span className="text-zinc-400 font-black uppercase tracking-widest">{item.name}</span>
+        {/* --- PERFORMANCE & TOOLS --- */}
+        <div className="grid lg:grid-cols-12 gap-8">
+          <div className="lg:col-span-8">
+            <Card className="bg-[#060E20] border-white/5 p-8 md:p-10 rounded-[40px] shadow-2xl relative overflow-hidden h-full">
+               <div className="flex justify-between items-center mb-10">
+                  <div>
+                    <h2 className="text-2xl font-black text-white uppercase tracking-tighter">Gráfico de Tracción</h2>
+                    <p className="text-zinc-500 text-xs font-bold uppercase tracking-widest">Ingresos por Jornada Laboral</p>
                   </div>
-                  <span className="font-black text-white">{item.value}%</span>
+                  <div className="bg-white/5 border border-white/10 rounded-2xl px-4 py-2 flex items-center gap-3">
+                     <div className="w-2 h-2 rounded-full bg-blue-500 shadow-[0_0_10px_#3B82F6]" />
+                     <span className="text-white text-[10px] font-black uppercase tracking-widest">Optimizado x IA</span>
+                  </div>
+               </div>
+               <div className="h-[320px] w-full">
+                 <ResponsiveContainer width="100%" height="100%">
+                   <LineChart data={revenueData}>
+                     <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.02)" vertical={false} />
+                     <XAxis 
+                       dataKey="name" 
+                       axisLine={false} 
+                       tickLine={false} 
+                       tick={{ fill: '#4b5563', fontSize: 10, fontWeight: '900' }} 
+                     />
+                     <YAxis 
+                       axisLine={false} 
+                       tickLine={false} 
+                       tick={{ fill: '#4b5563', fontSize: 10, fontWeight: '900' }} 
+                     />
+                     <RechartsTooltip
+                       contentStyle={{ 
+                          backgroundColor: 'rgba(6, 14, 32, 0.9)', 
+                          border: '1px solid rgba(255,255,255,0.1)', 
+                          borderRadius: '24px',
+                          backdropFilter: 'blur(10px)',
+                          padding: '16px'
+                        }}
+                       itemStyle={{ color: '#3B82F6', fontWeight: '900', textTransform: 'uppercase', fontSize: '10px' }}
+                     />
+                     <Line 
+                       type="monotone" 
+                       dataKey="ingresos" 
+                       stroke="#3B82F6" 
+                       strokeWidth={6} 
+                       dot={{ fill: '#3B82F6', r: 6, strokeWidth: 0 }} 
+                       activeDot={{ r: 10, fill: '#fff' }} 
+                     />
+                   </LineChart>
+                 </ResponsiveContainer>
+               </div>
+            </Card>
+          </div>
+
+          <div className="lg:col-span-4">
+            <ETAValidator />
+          </div>
+        </div>
+
+        {/* --- FLEET DISTRIBUTION --- */}
+        <div className="grid lg:grid-cols-3 gap-6">
+          <Card className="lg:col-span-3 bg-[#060E20] border-white/5 p-8 rounded-[40px] shadow-2xl">
+            <div className="flex flex-col lg:flex-row items-center justify-between gap-10">
+              <div className="flex-1 w-full flex flex-col items-center">
+                <h2 className="text-lg font-black text-white uppercase tracking-widest mb-8">Flota Activa</h2>
+                <div className="w-full h-64 relative">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={distributionData}
+                        cx="50%" cy="50%"
+                        innerRadius={70} outerRadius={100}
+                        paddingAngle={10}
+                        dataKey="value"
+                        stroke="none"
+                      >
+                        {distributionData.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={entry.color} />
+                        ))}
+                      </Pie>
+                    </PieChart>
+                  </ResponsiveContainer>
+                  <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                    <span className="text-4xl font-black text-white tracking-tighter">83%</span>
+                    <span className="text-[10px] text-zinc-500 uppercase font-black tracking-widest">Utilidad</span>
+                  </div>
                 </div>
-              ))}
+              </div>
+
+              <div className="w-full lg:w-96 space-y-3">
+                {distributionData.map((item) => (
+                  <div key={item.name} className="flex justify-between items-center text-[10px] bg-white/[0.03] border border-white/5 px-4 py-4 rounded-2xl group hover:bg-white/[0.06] transition-all">
+                    <div className="flex items-center gap-3">
+                      <div className="w-3 h-3 rounded-full" style={{ backgroundColor: item.color, boxShadow: `0 0 10px ${item.color}44` }}></div>
+                      <span className="text-zinc-400 font-black uppercase tracking-widest">{item.name}</span>
+                    </div>
+                    <span className="font-black text-white">{item.value}%</span>
+                  </div>
+                ))}
+              </div>
             </div>
           </Card>
         </div>
