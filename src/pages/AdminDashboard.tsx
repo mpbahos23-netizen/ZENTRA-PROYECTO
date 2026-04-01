@@ -51,13 +51,6 @@ const AdminDashboard = () => {
     },
   });
 
-  const cards = [
-    { label: "Volumen Total (GMV)", value: `$${stats?.totalGMV.toLocaleString()}`, icon: DollarSign, color: "text-[#00e5ff]", bg: "bg-[#00e5ff]/10" },
-    { label: "Ingresos Netos", value: `$${stats?.netRevenue.toLocaleString()}`, icon: TrendingUp, color: "text-emerald-400", bg: "bg-emerald-500/10" },
-    { label: "Conductores Activos", value: stats?.carrierCount, icon: Truck, color: "text-violet-400", bg: "bg-violet-500/10" },
-    { label: "Envíos Totales", value: stats?.shipmentCount, icon: Package, color: "text-amber-400", bg: "bg-amber-500/10" },
-  ];
-
   if (isLoading) {
     return (
       <DashboardLayout role="admin">
@@ -68,6 +61,15 @@ const AdminDashboard = () => {
       </DashboardLayout>
     );
   }
+
+  if (!stats) return null;
+
+  const cards = [
+    { label: "Volumen Total (GMV)", value: `$${stats.totalGMV.toLocaleString()}`, icon: DollarSign, color: "text-[#00e5ff]", bg: "bg-[#00e5ff]/10" },
+    { label: "Ingresos Netos", value: `$${stats.netRevenue.toLocaleString()}`, icon: TrendingUp, color: "text-emerald-400", bg: "bg-emerald-500/10" },
+    { label: "Conductores Activos", value: stats.carrierCount, icon: Truck, color: "text-violet-400", bg: "bg-violet-500/10" },
+    { label: "Envíos Totales", value: stats.shipmentCount, icon: Package, color: "text-amber-400", bg: "bg-amber-500/10" },
+  ];
 
   return (
     <DashboardLayout role="admin">
