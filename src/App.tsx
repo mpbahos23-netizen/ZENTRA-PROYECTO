@@ -18,6 +18,7 @@ import CarrierJobs from "./pages/CarrierJobs";
 import ShipmentStatus from "./pages/ShipmentStatus";
 import ShipmentTracking from "./pages/ShipmentTracking";
 import AdminOperations from "./pages/AdminOperations";
+import Inventory from "./pages/Inventory";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import CarrierEarnings from "./pages/CarrierEarnings";
@@ -42,6 +43,7 @@ const App = () => (
           <Route path="/client" element={<ClientDashboard />} />
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/admin/operations" element={<AdminOperations />} />
+          <Route path="/admin/inventory" element={<Inventory />} />
           <Route path="/quote" element={<QuoteCalculator />} />
           <Route path="/client/book" element={<BookShipment />} />
           <Route path="/client/invoices" element={<Invoices />} />
