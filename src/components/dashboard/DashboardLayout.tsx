@@ -93,14 +93,17 @@ const DashboardLayout = ({ children, role: initialRole }: DashboardLayoutProps) 
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-screen bg-black">
-        <Loader2 className="w-8 h-8 animate-spin text-[#00e5ff]" />
+      <div className="flex items-center justify-center h-[100dvh] bg-black">
+        <div className="flex flex-col items-center gap-4">
+           <Loader2 className="w-8 h-8 animate-spin text-[#00e5ff]" />
+           <p className="text-[10px] text-zinc-600 font-black uppercase tracking-[0.4em]">Sincronizando Zentra...</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="flex h-screen bg-black text-white font-sans overflow-hidden">
+    <div className="flex h-[100dvh] bg-black text-white font-sans overflow-hidden">
       {/* Mobile Menu Overlay */}
       {mobileMenuOpen && (
         <div className="fixed inset-0 bg-black/90 z-50 md:hidden flex flex-col p-8 space-y-8 animate-in fade-in slide-in-from-top-4 duration-300">

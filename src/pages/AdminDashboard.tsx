@@ -62,7 +62,17 @@ const AdminDashboard = () => {
     );
   }
 
-  if (!stats) return null;
+  if (!stats) {
+    return (
+      <DashboardLayout role="admin">
+        <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-4">
+          <AlertTriangle className="w-12 h-12 text-red-500/50" />
+          <p className="text-zinc-600 font-black uppercase text-[10px] tracking-[0.4em]">Fallo de Sincronización Zentra</p>
+          <Button onClick={() => window.location.reload()} variant="outline" className="h-12 border-white/5 bg-white/5 rounded-2xl text-[10px] font-black uppercase">Refrescar Terminal</Button>
+        </div>
+      </DashboardLayout>
+    );
+  }
 
   const cards = [
     { label: "Volumen Total (GMV)", value: `$${stats.totalGMV.toLocaleString()}`, icon: DollarSign, color: "text-[#00e5ff]", bg: "bg-[#00e5ff]/10" },
