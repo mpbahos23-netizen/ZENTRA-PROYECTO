@@ -3,7 +3,9 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { supabase } from "./lib/supabase";
 import Landing from "./pages/Landing";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
@@ -25,6 +27,31 @@ import CarrierEarnings from "./pages/CarrierEarnings";
 
 const queryClient = new QueryClient();
 
+function ProtectedRoute({ children }: { children: React.ReactNode }) {
+  const [status, setStatus] = useState<'loading' | 'auth' | 'unauth'>('loading');
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setStatus(session ? 'auth' : 'unauth');
+    });
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_, session) => {
+      setStatus(session ? 'auth' : 'unauth');
+    });
+    return () => subscription.unsubscribe();
+  }, []);
+
+  if (status === 'loading') {
+    return (
+      <div className="flex items-center justify-center h-[100dvh] bg-black">
+        <div className="w-8 h-8 border-2 border-white/10 border-t-[#00e5ff] rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  if (status === 'unauth') return <Navigate to="/login" replace />;
+  return <>{children}</>;
+}
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
@@ -32,23 +59,26 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
+          {/* Public routes */}
           <Route path="/" element={<Landing />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password" element={<ResetPassword />} />
-          <Route path="/carrier" element={<CarrierDashboard />} />
-          <Route path="/carrier/jobs" element={<CarrierJobs />} />
-          <Route path="/carrier/earnings" element={<CarrierEarnings />} />
-          <Route path="/client" element={<ClientDashboard />} />
-          <Route path="/admin" element={<AdminDashboard />} />
-          <Route path="/admin/operations" element={<AdminOperations />} />
-          <Route path="/admin/inventory" element={<Inventory />} />
-          <Route path="/quote" element={<QuoteCalculator />} />
-          <Route path="/client/book" element={<BookShipment />} />
-          <Route path="/client/invoices" element={<Invoices />} />
-          <Route path="/shipment/:id/status" element={<ShipmentStatus />} />
-          <Route path="/shipment/:id/tracking" element={<ShipmentTracking />} />
+
+          {/* Protected routes */}
+          <Route path="/carrier" element={<ProtectedRoute><CarrierDashboard /></ProtectedRoute>} />
+          <Route path="/carrier/jobs" element={<ProtectedRoute><CarrierJobs /></ProtectedRoute>} />
+          <Route path="/carrier/earnings" element={<ProtectedRoute><CarrierEarnings /></ProtectedRoute>} />
+          <Route path="/client" element={<ProtectedRoute><ClientDashboard /></ProtectedRoute>} />
+          <Route path="/admin" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
+          <Route path="/admin/operations" element={<ProtectedRoute><AdminOperations /></ProtectedRoute>} />
+          <Route path="/admin/inventory" element={<ProtectedRoute><Inventory /></ProtectedRoute>} />
+          <Route path="/quote" element={<ProtectedRoute><QuoteCalculator /></ProtectedRoute>} />
+          <Route path="/client/book" element={<ProtectedRoute><BookShipment /></ProtectedRoute>} />
+          <Route path="/client/invoices" element={<ProtectedRoute><Invoices /></ProtectedRoute>} />
+          <Route path="/shipment/:id/status" element={<ProtectedRoute><ShipmentStatus /></ProtectedRoute>} />
+          <Route path="/shipment/:id/tracking" element={<ProtectedRoute><ShipmentTracking /></ProtectedRoute>} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

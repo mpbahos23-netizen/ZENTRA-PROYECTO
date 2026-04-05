@@ -3,32 +3,27 @@ import DashboardLayout from '@/components/dashboard/DashboardLayout';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { 
-  Package, Search, Plus, Filter, 
-  AlertTriangle, ArrowUpRight, ArrowDownRight,
-  Loader2, MoreVertical, Edit2, Trash2, 
-  TrendingUp, BarChart3, Box, Zap
+import {
+  Package, Search, Plus, Filter,
+  AlertTriangle, Loader2, Edit2, Trash2,
+  TrendingUp, BarChart3, Box, Zap, X, Check
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { toast } from 'sonner';
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
+  Table, TableBody, TableCell, TableHead,
+  TableHeader, TableRow,
 } from "@/components/ui/table";
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
-import { 
-  ResponsiveContainer, BarChart, Bar, XAxis, YAxis, 
-  CartesianGrid, Tooltip, Cell, AreaChart, Area
+import {
+  ResponsiveContainer, BarChart, Bar, XAxis,
+  CartesianGrid, Tooltip, Cell
 } from 'recharts';
 
 // ============================================
 // ZENTRA INVENTORY: Supply Chain Terminal
-// High-Octane Obsidian UI for Warehouse Ops
+// Full CRUD with Supabase
 // ============================================
 
 interface InventoryItem {
@@ -43,276 +38,496 @@ interface InventoryItem {
   last_updated: string;
 }
 
+const EMPTY_FORM: Omit<InventoryItem, 'id' | 'last_updated'> = {
+  name: '',
+  sku: '',
+  category: 'Carrier Parts',
+  quantity: 0,
+  min_stock: 5,
+  unit_price: 0,
+  location: 'Wh-Alpha',
+};
+
+const CATEGORIES = ['Carrier Parts', 'Maintenance', 'Electronics', 'Tools', 'Misc'];
+const LOCATIONS = ['Wh-Alpha', 'Wh-Beta', 'Wh-Main', 'Wh-Norte', 'Wh-Sur'];
+
+// Simple modal dialog (no radix dependency issues)
+function Modal({ open, title, onClose, children }: {
+  open: boolean;
+  title: string;
+  onClose: () => void;
+  children: React.ReactNode;
+}) {
+  if (!open) return null;
+  return (
+    <div className="fixed inset-0 z-50 flex items-end md:items-center justify-center p-4">
+      <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={onClose} />
+      <div className="relative bg-[#0a0a0a] border border-white/10 rounded-[32px] w-full max-w-lg p-6 md:p-8 shadow-2xl animate-in slide-in-from-bottom-4 md:slide-in-from-bottom-0 duration-300 max-h-[90dvh] overflow-y-auto">
+        <div className="flex items-center justify-between mb-6">
+          <h3 className="text-lg font-black text-white uppercase tracking-tight">{title}</h3>
+          <button onClick={onClose} className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-zinc-500 hover:text-white transition-colors">
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+        {children}
+      </div>
+    </div>
+  );
+}
+
+function ItemForm({ form, onChange, onSubmit, saving, submitLabel }: {
+  form: Omit<InventoryItem, 'id' | 'last_updated'>;
+  onChange: (field: keyof typeof form, value: string | number) => void;
+  onSubmit: () => void;
+  saving: boolean;
+  submitLabel: string;
+}) {
+  return (
+    <div className="space-y-4">
+      <div className="grid grid-cols-2 gap-3">
+        <div className="col-span-2">
+          <label className="text-[9px] font-black text-zinc-500 uppercase tracking-widest mb-1.5 block">Nombre del Producto *</label>
+          <Input
+            value={form.name}
+            onChange={e => onChange('name', e.target.value)}
+            placeholder="Ej: Aceite 5W-30"
+            className="bg-black border-white/10 text-white h-11 rounded-xl placeholder:text-zinc-700"
+          />
+        </div>
+        <div>
+          <label className="text-[9px] font-black text-zinc-500 uppercase tracking-widest mb-1.5 block">SKU *</label>
+          <Input
+            value={form.sku}
+            onChange={e => onChange('sku', e.target.value.toUpperCase())}
+            placeholder="OIL-030"
+            className="bg-black border-white/10 text-white h-11 rounded-xl placeholder:text-zinc-700"
+          />
+        </div>
+        <div>
+          <label className="text-[9px] font-black text-zinc-500 uppercase tracking-widest mb-1.5 block">Categoría</label>
+          <select
+            value={form.category}
+            onChange={e => onChange('category', e.target.value)}
+            className="w-full h-11 bg-black border border-white/10 rounded-xl text-white text-sm px-3 focus:outline-none focus:border-[#00e5ff]/50"
+          >
+            {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
+          </select>
+        </div>
+        <div>
+          <label className="text-[9px] font-black text-zinc-500 uppercase tracking-widest mb-1.5 block">Stock Actual</label>
+          <Input
+            type="number"
+            min="0"
+            value={form.quantity}
+            onChange={e => onChange('quantity', Number(e.target.value))}
+            className="bg-black border-white/10 text-white h-11 rounded-xl"
+          />
+        </div>
+        <div>
+          <label className="text-[9px] font-black text-zinc-500 uppercase tracking-widest mb-1.5 block">Stock Mínimo</label>
+          <Input
+            type="number"
+            min="0"
+            value={form.min_stock}
+            onChange={e => onChange('min_stock', Number(e.target.value))}
+            className="bg-black border-white/10 text-white h-11 rounded-xl"
+          />
+        </div>
+        <div>
+          <label className="text-[9px] font-black text-zinc-500 uppercase tracking-widest mb-1.5 block">Precio Unitario ($)</label>
+          <Input
+            type="number"
+            min="0"
+            step="0.01"
+            value={form.unit_price}
+            onChange={e => onChange('unit_price', Number(e.target.value))}
+            className="bg-black border-white/10 text-white h-11 rounded-xl"
+          />
+        </div>
+        <div>
+          <label className="text-[9px] font-black text-zinc-500 uppercase tracking-widest mb-1.5 block">Almacén</label>
+          <select
+            value={form.location}
+            onChange={e => onChange('location', e.target.value)}
+            className="w-full h-11 bg-black border border-white/10 rounded-xl text-white text-sm px-3 focus:outline-none focus:border-[#00e5ff]/50"
+          >
+            {LOCATIONS.map(l => <option key={l} value={l}>{l}</option>)}
+          </select>
+        </div>
+      </div>
+      <Button
+        onClick={onSubmit}
+        disabled={saving || !form.name.trim() || !form.sku.trim()}
+        className="w-full h-12 rounded-xl bg-[#00e5ff] text-black font-black uppercase text-[10px] tracking-widest mt-2"
+      >
+        {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <><Check className="w-4 h-4 mr-2" />{submitLabel}</>}
+      </Button>
+    </div>
+  );
+}
+
 export default function Inventory() {
   const [items, setItems] = useState<InventoryItem[]>([]);
   const [loading, setLoading] = useState(true);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [filterCategory, setFilterCategory] = useState("all");
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filterCategory, setFilterCategory] = useState('all');
+  const [saving, setSaving] = useState(false);
 
-  const [stats, setStats] = useState({
-    totalValue: 0,
-    itemCount: 0,
-    lowStockCount: 0,
-    monthlyChange: 12.5
-  });
+  // Dialog states
+  const [showAdd, setShowAdd] = useState(false);
+  const [showEdit, setShowEdit] = useState(false);
+  const [showDeleteId, setShowDeleteId] = useState<string | null>(null);
+  const [addForm, setAddForm] = useState({ ...EMPTY_FORM });
+  const [editForm, setEditForm] = useState({ ...EMPTY_FORM });
+  const [editingId, setEditingId] = useState<string | null>(null);
+
+  const stats = {
+    totalValue: items.reduce((s, i) => s + i.quantity * i.unit_price, 0),
+    itemCount: items.length,
+    lowStockCount: items.filter(i => i.quantity <= i.min_stock).length,
+  };
 
   const fetchData = async () => {
     setLoading(true);
-    // In a real app, this would be a join with a warehouse table
-    // For now, using it as a simulated premium experience
     const { data, error } = await supabase
       .from('inventory')
       .select('*')
       .order('name');
 
     if (error) {
-      if (error.code === 'PGRST116') {
-        // Table doesn't exist yet, simulate data for WOW factor
-        const simulatedData: InventoryItem[] = [
+      if (error.code === 'PGRST116' || error.message?.includes('does not exist')) {
+        // Table doesn't exist yet — show demo data
+        const demo: InventoryItem[] = [
           { id: '1', name: 'Llantas de Alto Rendimiento', sku: 'WHE-001', category: 'Carrier Parts', quantity: 12, min_stock: 15, unit_price: 120, location: 'Wh-Alpha', last_updated: new Date().toISOString() },
           { id: '2', name: 'Aceite Sintético 5W-30', sku: 'OIL-030', category: 'Maintenance', quantity: 45, min_stock: 20, unit_price: 35, location: 'Wh-Beta', last_updated: new Date().toISOString() },
           { id: '3', name: 'Sensores Proximidad Z-1', sku: 'SNS-Z1', category: 'Electronics', quantity: 8, min_stock: 10, unit_price: 250, location: 'Wh-Alpha', last_updated: new Date().toISOString() },
           { id: '4', name: 'Pallets de Madera Std', sku: 'PLT-00', category: 'Tools', quantity: 120, min_stock: 50, unit_price: 15, location: 'Wh-Main', last_updated: new Date().toISOString() },
         ];
-        setItems(simulatedData);
-        calculateStats(simulatedData);
+        setItems(demo);
+        toast.info('Modo demo: crea la tabla "inventory" en Supabase para activar el CRUD.', { duration: 5000 });
       } else {
-        toast.error("Error al sincronizar inventario");
+        toast.error('Error al sincronizar inventario');
       }
-    } else if (data) {
-      setItems(data);
-      calculateStats(data);
+    } else {
+      setItems(data || []);
     }
     setLoading(false);
   };
 
-  const calculateStats = (data: InventoryItem[]) => {
-    const totalValue = data.reduce((sum, item) => sum + (item.quantity * item.unit_price), 0);
-    const lowStock = data.filter(item => item.quantity <= item.min_stock).length;
-    setStats({
-      totalValue,
-      itemCount: data.length,
-      lowStockCount: lowStock,
-      monthlyChange: 8.2
+  useEffect(() => { fetchData(); }, []);
+
+  // CREATE
+  const handleCreate = async () => {
+    if (!addForm.name.trim() || !addForm.sku.trim()) return;
+    setSaving(true);
+    const { error } = await supabase.from('inventory').insert({
+      ...addForm,
+      last_updated: new Date().toISOString(),
     });
+    setSaving(false);
+    if (error) {
+      toast.error('Error al crear item: ' + error.message);
+      return;
+    }
+    toast.success(`✅ ${addForm.name} añadido al inventario`);
+    setShowAdd(false);
+    setAddForm({ ...EMPTY_FORM });
+    fetchData();
   };
 
-  useEffect(() => {
-    fetchData();
-  }, []);
+  // OPEN EDIT
+  const openEdit = (item: InventoryItem) => {
+    setEditingId(item.id);
+    setEditForm({
+      name: item.name, sku: item.sku, category: item.category,
+      quantity: item.quantity, min_stock: item.min_stock,
+      unit_price: item.unit_price, location: item.location,
+    });
+    setShowEdit(true);
+  };
 
-  const filteredItems = items.filter(item => {
-    const matchesSearch = item.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                          item.sku.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesCategory = filterCategory === "all" || item.category === filterCategory;
-    return matchesSearch && matchesCategory;
+  // UPDATE
+  const handleUpdate = async () => {
+    if (!editingId) return;
+    setSaving(true);
+    const { error } = await supabase
+      .from('inventory')
+      .update({ ...editForm, last_updated: new Date().toISOString() })
+      .eq('id', editingId);
+    setSaving(false);
+    if (error) {
+      toast.error('Error al actualizar: ' + error.message);
+      return;
+    }
+    toast.success('✅ Item actualizado');
+    setShowEdit(false);
+    fetchData();
+  };
+
+  // DELETE
+  const handleDelete = async () => {
+    if (!showDeleteId) return;
+    setSaving(true);
+    const { error } = await supabase
+      .from('inventory')
+      .delete()
+      .eq('id', showDeleteId);
+    setSaving(false);
+    if (error) {
+      toast.error('Error al eliminar: ' + error.message);
+      return;
+    }
+    toast.success('Item eliminado del inventario');
+    setShowDeleteId(null);
+    fetchData();
+  };
+
+  const filtered = items.filter(item => {
+    const q = searchQuery.toLowerCase();
+    const matchSearch = item.name.toLowerCase().includes(q) || item.sku.toLowerCase().includes(q);
+    const matchCat = filterCategory === 'all' || item.category === filterCategory;
+    return matchSearch && matchCat;
   });
 
   return (
     <DashboardLayout role="admin">
-      <div className="max-w-7xl mx-auto space-y-8 pb-20 animate-in fade-in duration-1000">
-        {/* Header Section */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-          <div className="space-y-1">
-            <h1 className="text-4xl font-black text-white italic tracking-tighter uppercase leading-tight">
+      <div className="max-w-7xl mx-auto space-y-6 pb-4 animate-in fade-in duration-700">
+
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div>
+            <h1 className="text-3xl font-black text-white italic tracking-tighter uppercase">
               SUPPLY <span className="text-[#00e5ff]">TERMINAL</span>
             </h1>
-            <p className="text-[10px] font-black text-zinc-600 uppercase tracking-[0.4em] flex items-center gap-2">
+            <p className="text-[10px] font-black text-zinc-600 uppercase tracking-[0.4em] flex items-center gap-2 mt-1">
               <Zap className="w-3 h-3 text-[#00e5ff] animate-pulse" />
-              Control Maestro de Almacén y Suministros
+              Control Maestro de Almacén
             </p>
           </div>
-          <div className="flex items-center gap-3 w-full md:w-auto">
-            <Button onClick={() => window.location.reload()} disabled={loading} variant="outline" className="flex-1 md:flex-none h-14 rounded-2xl border-white/5 bg-white/5 text-[10px] font-black uppercase px-6 tracking-widest text-zinc-400">
-               {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Sincronizar"}
+          <div className="flex items-center gap-3 w-full sm:w-auto">
+            <Button
+              onClick={fetchData}
+              disabled={loading}
+              variant="outline"
+              className="flex-1 sm:flex-none h-11 rounded-xl border-white/10 bg-white/5 text-[10px] font-black uppercase tracking-widest text-zinc-400 hover:text-white"
+            >
+              {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Sincronizar"}
             </Button>
-            <Button className="flex-1 md:flex-none h-14 rounded-2xl bg-[#00e5ff] text-black font-black uppercase text-[10px] px-8 tracking-widest shadow-[0_10px_30px_rgba(0,229,255,0.2)] hover:scale-[1.02] transition-all">
+            <Button
+              onClick={() => { setAddForm({ ...EMPTY_FORM }); setShowAdd(true); }}
+              className="flex-1 sm:flex-none h-11 rounded-xl bg-[#00e5ff] text-black font-black uppercase text-[10px] tracking-widest shadow-[0_8px_24px_rgba(0,229,255,0.2)]"
+            >
               <Plus className="w-4 h-4 mr-2" /> Añadir SKU
             </Button>
           </div>
         </div>
 
-        {/* Intelligence Cards */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+        {/* Stats */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           {[
-            { label: 'Valor Total', value: `$${stats.totalValue.toLocaleString()}`, icon: TrendingUp, color: 'text-emerald-400', bg: 'bg-emerald-500/10', trend: '+8%' },
-            { label: 'Stock Bajo', value: stats.lowStockCount, icon: AlertTriangle, color: 'text-red-400', bg: 'bg-red-500/10', trend: 'CRÍTICO' },
-            { label: 'Items SKU', value: stats.itemCount, icon: Box, color: 'text-[#00e5ff]', bg: 'bg-[#00e5ff]/10', trend: 'ACTIVO' },
-            { label: 'Despachos Mes', value: '24', icon: BarChart3, color: 'text-violet-400', bg: 'bg-violet-500/10', trend: '+14%' },
+            { label: 'Valor Total', value: `$${stats.totalValue.toLocaleString()}`, icon: TrendingUp, color: 'text-emerald-400', bg: 'bg-emerald-500/10' },
+            { label: 'Stock Bajo', value: stats.lowStockCount, icon: AlertTriangle, color: 'text-red-400', bg: 'bg-red-500/10' },
+            { label: 'Items SKU', value: stats.itemCount, icon: Box, color: 'text-[#00e5ff]', bg: 'bg-[#00e5ff]/10' },
+            { label: 'Categorías', value: CATEGORIES.length, icon: BarChart3, color: 'text-violet-400', bg: 'bg-violet-500/10' },
           ].map((stat, i) => (
-            <Card key={i} className="bg-[#0a0a0a] border-white/5 rounded-[32px] p-8 shadow-2xl relative overflow-hidden group">
-               <div className={`absolute -top-12 -right-12 w-32 h-32 blur-3xl rounded-full opacity-10 group-hover:opacity-20 transition-opacity ${stat.bg}`} />
-               <div className="flex justify-between items-start mb-6">
-                 <div className={`w-14 h-14 rounded-2xl ${stat.bg} flex items-center justify-center border border-white/5`}>
-                   <stat.icon className={`w-7 h-7 ${stat.color}`} />
-                 </div>
-                 <Badge variant="outline" className={cn("text-[8px] font-black tracking-widest border-white/10", stat.color)}>
-                    {stat.trend}
-                 </Badge>
-               </div>
-               <p className="text-4xl font-black text-white tracking-tighter mb-1">{stat.value}</p>
-               <p className="text-[9px] font-black text-zinc-600 uppercase tracking-widest">{stat.label}</p>
+            <Card key={i} className="bg-[#0a0a0a] border-white/5 rounded-[24px] p-6">
+              <div className={`w-10 h-10 rounded-xl ${stat.bg} flex items-center justify-center mb-4`}>
+                <stat.icon className={`w-5 h-5 ${stat.color}`} />
+              </div>
+              <p className="text-3xl font-black text-white tracking-tighter">{stat.value}</p>
+              <p className="text-[9px] font-black text-zinc-600 uppercase tracking-widest mt-1">{stat.label}</p>
             </Card>
           ))}
         </div>
 
-        {/* Data Visualization Row */}
-        <div className="grid lg:grid-cols-3 gap-6">
-           <Card className="lg:col-span-2 bg-[#0a0a0a] border-white/5 rounded-[40px] p-10 shadow-3xl">
-              <div className="flex justify-between items-center mb-10">
-                 <div>
-                    <h3 className="text-xl font-black text-white uppercase italic tracking-tight">Análisis de Existencia</h3>
-                    <p className="text-[10px] text-zinc-500 font-black uppercase tracking-widest mt-1">Comparativa de stock por categoría</p>
-                 </div>
-              </div>
-              <ResponsiveContainer width="100%" height={280}>
-                 <BarChart data={[
-                    { name: 'Parts', v: 45 }, { name: 'Tools', v: 120 }, { name: 'Elec', v: 32 }, { name: 'Maint', v: 67 }, { name: 'Misc', v: 15 }
-                 ]}>
-                    <CartesianGrid strokeDasharray="5 5" stroke="rgba(255,255,255,0.03)" vertical={false} />
-                    <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#444', fontSize: 10, fontWeight: 900 }} />
-                    <YAxis hide />
-                    <Tooltip contentStyle={{ backgroundColor: '#000', border: '1px solid #00e5ff', borderRadius: 20 }} />
-                    <Bar dataKey="v" radius={[10, 10, 0, 0]}>
-                       {items.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={index % 2 === 0 ? '#00e5ff' : '#00e5ff33'} />
-                       ))}
-                    </Bar>
-                 </BarChart>
-              </ResponsiveContainer>
-           </Card>
+        {/* Chart */}
+        <Card className="bg-[#0a0a0a] border-white/5 rounded-[32px] p-6 md:p-8">
+          <h3 className="text-base font-black text-white uppercase italic tracking-tight mb-6">Análisis de Stock por Categoría</h3>
+          <ResponsiveContainer width="100%" height={200}>
+            <BarChart data={CATEGORIES.map(cat => ({
+              name: cat.split(' ')[0],
+              v: items.filter(i => i.category === cat).reduce((s, i) => s + i.quantity, 0)
+            }))}>
+              <CartesianGrid strokeDasharray="5 5" stroke="rgba(255,255,255,0.03)" vertical={false} />
+              <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#444', fontSize: 10, fontWeight: 900 }} />
+              <Tooltip contentStyle={{ backgroundColor: '#000', border: '1px solid #00e5ff', borderRadius: 16 }} />
+              <Bar dataKey="v" radius={[8, 8, 0, 0]}>
+                {CATEGORIES.map((_, index) => (
+                  <Cell key={index} fill={index % 2 === 0 ? '#00e5ff' : '#00e5ff33'} />
+                ))}
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+        </Card>
 
-           <Card className="bg-[#0a0a0a] border-white/5 rounded-[40px] p-10 flex flex-col justify-between shadow-3xl relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-48 h-48 bg-blue-600/5 blur-[80px] rounded-full -mr-20 -mt-20" />
-              <div>
-                 <h3 className="text-lg font-black text-white uppercase italic tracking-tight mb-4">Eficiencia Flujo</h3>
-                 <p className="text-[10px] text-zinc-500 font-black uppercase tracking-widest mb-8 leading-loose">Items críticos repuestos en promedio: **4.2 días**</p>
-                 <div className="space-y-6">
-                    <div className="flex justify-between items-end">
-                       <span className="text-[10px] font-black text-zinc-500 uppercase tracking-widest">Rotación Stock</span>
-                       <span className="text-xl font-black text-white">4.8x</span>
-                    </div>
-                    <div className="w-full h-1.5 bg-white/5 rounded-full overflow-hidden">
-                       <div className="h-full bg-blue-500 w-[72%] rounded-full shadow-[0_0_15px_rgba(59,130,246,0.5)]" />
-                    </div>
-                 </div>
-              </div>
-              <div className="pt-10 flex items-center gap-4">
-                 <div className="w-12 h-12 rounded-full border border-white/5 flex items-center justify-center">
-                    <TrendingUp className="w-6 h-6 text-emerald-400" />
-                 </div>
-                 <p className="text-[9px] font-black text-zinc-500 uppercase tracking-widest leading-relaxed">Optimizando espacio de almacén en un **12%** este trimestre.</p>
-              </div>
-           </Card>
-        </div>
-
-        {/* Main Terminal Table */}
-        <Card className="bg-[#0a0a0a] border-white/5 rounded-[48px] overflow-hidden shadow-3xl">
-          <div className="p-10 border-b border-white/5 flex flex-col md:flex-row justify-between items-start md:items-center gap-6 bg-[#0d0d0d]">
-             <div className="flex items-center gap-6 w-full md:w-auto">
-                <div className="relative flex-1 md:w-80">
-                   <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-600" />
-                   <Input 
-                      placeholder="Identificador SKU / Nombre..." 
-                      className="h-12 bg-black border-white/5 rounded-xl pl-12 text-xs font-black uppercase tracking-widest placeholder:text-zinc-800"
-                      value={searchQuery}
-                      onChange={e => setSearchQuery(e.target.value)}
-                   />
-                </div>
-                <Button variant="ghost" className="h-12 w-12 rounded-xl bg-white/5 border border-white/5 text-zinc-500 hover:text-white">
-                   <Filter className="w-5 h-5" />
-                </Button>
-             </div>
-             <div className="flex items-center gap-3">
-                <Badge className="bg-white/5 text-zinc-500 border-white/10 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest">
-                   {filteredItems.length} REGISTROS ACTIVOS
-                </Badge>
-             </div>
+        {/* Table */}
+        <Card className="bg-[#0a0a0a] border-white/5 rounded-[32px] overflow-hidden">
+          {/* Table filters */}
+          <div className="p-5 border-b border-white/5 flex flex-col sm:flex-row gap-3">
+            <div className="relative flex-1">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-600" />
+              <Input
+                placeholder="Buscar por nombre o SKU..."
+                className="h-11 bg-black border-white/5 rounded-xl pl-10 text-xs font-black uppercase placeholder:text-zinc-800"
+                value={searchQuery}
+                onChange={e => setSearchQuery(e.target.value)}
+              />
+            </div>
+            <select
+              value={filterCategory}
+              onChange={e => setFilterCategory(e.target.value)}
+              className="h-11 bg-black border border-white/5 rounded-xl text-zinc-400 text-xs font-black uppercase px-4 focus:outline-none min-w-[140px]"
+            >
+              <option value="all">Todas</option>
+              {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
+            </select>
+            <Badge className="bg-white/5 text-zinc-500 border-white/10 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest self-center whitespace-nowrap">
+              {filtered.length} items
+            </Badge>
           </div>
 
-          <Table>
-            <TableHeader className="bg-white/[0.02]">
-              <TableRow className="border-white/5 hover:bg-transparent">
-                <TableHead className="text-zinc-600 font-black uppercase text-[10px] h-16 pl-10">Producto / Identidad</TableHead>
-                <TableHead className="text-zinc-600 font-black uppercase text-[10px] h-16">Ubicación</TableHead>
-                <TableHead className="text-zinc-600 font-black uppercase text-[10px] h-16">Stock Disponible</TableHead>
-                <TableHead className="text-zinc-600 font-black uppercase text-[10px] h-16">Valor Unitario</TableHead>
-                <TableHead className="text-zinc-600 font-black uppercase text-[10px] h-16 text-right pr-10">Terminal</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredItems.map((item) => (
-                <TableRow key={item.id} className="border-white/5 hover:bg-white/[0.02] transition-colors group">
-                  <TableCell className="py-6 pl-10">
-                    <div className="flex items-center gap-5">
-                       <div className={cn(
-                          "w-12 h-12 rounded-2xl flex items-center justify-center border border-white/5 shadow-inner transition-transform group-hover:scale-110 duration-500",
-                          item.quantity <= item.min_stock ? "bg-red-500/10" : "bg-white/5"
-                       )}>
-                          <Package className={cn("w-6 h-6", item.quantity <= item.min_stock ? "text-red-500" : "text-zinc-500")} />
-                       </div>
-                       <div>
-                          <p className="text-sm font-black text-white uppercase tracking-tight mb-1">{item.name}</p>
-                          <div className="flex items-center gap-3">
-                             <span className="text-[9px] font-black text-[#00e5ff] tracking-widest">{item.sku}</span>
-                             <span className="text-[9px] text-zinc-700 font-black uppercase">|</span>
-                             <span className="text-[9px] text-zinc-600 font-black uppercase tracking-[0.2em]">{item.category}</span>
+          {loading ? (
+            <div className="p-16 flex items-center justify-center">
+              <Loader2 className="w-8 h-8 animate-spin text-[#00e5ff]" />
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow className="border-white/5 hover:bg-transparent">
+                    <TableHead className="text-zinc-600 font-black uppercase text-[9px] h-12 pl-6">Producto</TableHead>
+                    <TableHead className="text-zinc-600 font-black uppercase text-[9px] hidden md:table-cell">Almacén</TableHead>
+                    <TableHead className="text-zinc-600 font-black uppercase text-[9px]">Stock</TableHead>
+                    <TableHead className="text-zinc-600 font-black uppercase text-[9px] hidden sm:table-cell">Precio</TableHead>
+                    <TableHead className="text-zinc-600 font-black uppercase text-[9px] text-right pr-6">Acciones</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filtered.map((item) => (
+                    <TableRow key={item.id} className="border-white/5 hover:bg-white/[0.02] group">
+                      <TableCell className="py-4 pl-6">
+                        <div className="flex items-center gap-3">
+                          <div className={cn(
+                            "w-9 h-9 rounded-xl flex items-center justify-center border border-white/5 shrink-0",
+                            item.quantity <= item.min_stock ? "bg-red-500/10" : "bg-white/5"
+                          )}>
+                            <Package className={cn("w-4 h-4", item.quantity <= item.min_stock ? "text-red-500" : "text-zinc-500")} />
                           </div>
-                       </div>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-2 text-zinc-400">
-                       <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                       <span className="text-[10px] font-black uppercase tracking-widest">{item.location}</span>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex flex-col gap-2">
-                       <div className="flex justify-between items-center w-32">
-                          <span className={cn("text-lg font-black tracking-tighter", item.quantity <= item.min_stock ? "text-red-500" : "text-white")}>
-                             {item.quantity}
-                          </span>
-                          <span className="text-[8px] text-zinc-700 font-black italic">/ {item.min_stock} MIN</span>
-                       </div>
-                       <div className="w-32 h-1 bg-white/5 rounded-full overflow-hidden">
-                          <div 
-                             className={cn("h-full rounded-full", item.quantity <= item.min_stock ? "bg-red-500" : "bg-emerald-500")}
-                             style={{ width: `${Math.min((item.quantity / (item.min_stock * 2)) * 100, 100)}%` }}
-                          />
-                       </div>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <p className="text-sm font-black text-zinc-300 tracking-tighter">${item.unit_price.toFixed(2)}</p>
-                    <p className="text-[8px] text-zinc-700 font-black uppercase tracking-widest mt-1">Total: ${(item.quantity * item.unit_price).toLocaleString()}</p>
-                  </TableCell>
-                  <TableCell className="text-right pr-10">
-                    <div className="flex justify-end gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
-                       <Button variant="ghost" size="icon" className="w-10 h-10 rounded-xl bg-white/5 text-zinc-500 hover:text-white">
-                          <Edit2 className="w-4 h-4" />
-                       </Button>
-                       <Button variant="ghost" size="icon" className="w-10 h-10 rounded-xl bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white">
-                          <Trash2 className="w-4 h-4" />
-                       </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-          
-          {filteredItems.length === 0 && (
-             <div className="p-20 flex flex-col items-center justify-center text-center">
-                <div className="w-20 h-20 rounded-full bg-white/2 border border-white/5 flex items-center justify-center mb-6">
-                   <Search className="w-10 h-10 text-zinc-800" />
+                          <div className="min-w-0">
+                            <p className="text-sm font-black text-white uppercase tracking-tight truncate max-w-[140px] sm:max-w-none">{item.name}</p>
+                            <span className="text-[9px] font-black text-[#00e5ff] tracking-widest">{item.sku}</span>
+                          </div>
+                        </div>
+                      </TableCell>
+                      <TableCell className="hidden md:table-cell">
+                        <span className="text-[10px] font-black text-zinc-500 uppercase tracking-widest">{item.location}</span>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex flex-col gap-1 w-20">
+                          <div className="flex items-end gap-1">
+                            <span className={cn("text-lg font-black", item.quantity <= item.min_stock ? "text-red-500" : "text-white")}>
+                              {item.quantity}
+                            </span>
+                            <span className="text-[8px] text-zinc-700 font-black mb-0.5">/{item.min_stock}</span>
+                          </div>
+                          <div className="w-full h-1 bg-white/5 rounded-full overflow-hidden">
+                            <div
+                              className={cn("h-full rounded-full", item.quantity <= item.min_stock ? "bg-red-500" : "bg-emerald-500")}
+                              style={{ width: `${Math.min((item.quantity / Math.max(item.min_stock * 2, 1)) * 100, 100)}%` }}
+                            />
+                          </div>
+                        </div>
+                      </TableCell>
+                      <TableCell className="hidden sm:table-cell">
+                        <p className="text-sm font-black text-zinc-300">${item.unit_price.toFixed(2)}</p>
+                      </TableCell>
+                      <TableCell className="text-right pr-6">
+                        <div className="flex justify-end gap-2">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => openEdit(item)}
+                            className="w-9 h-9 rounded-xl bg-white/5 text-zinc-500 hover:text-white hover:bg-white/10 transition-all"
+                          >
+                            <Edit2 className="w-3.5 h-3.5" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => setShowDeleteId(item.id)}
+                            className="w-9 h-9 rounded-xl bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white transition-all"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+
+              {filtered.length === 0 && (
+                <div className="p-16 flex flex-col items-center justify-center text-center">
+                  <div className="w-16 h-16 rounded-full bg-white/[0.02] border border-white/5 flex items-center justify-center mb-4">
+                    <Search className="w-8 h-8 text-zinc-800" />
+                  </div>
+                  <h4 className="text-white font-black uppercase tracking-tight mb-2 text-sm">Sin Resultados</h4>
+                  <p className="text-zinc-600 text-xs font-bold uppercase tracking-widest">Ajusta los filtros de búsqueda.</p>
                 </div>
-                <h4 className="text-white font-black uppercase tracking-tight mb-2">Sin Resultados de Inventario</h4>
-                <p className="text-zinc-600 text-xs font-bold uppercase tracking-widest">Ajusta los parámetros para volver a escanear.</p>
-             </div>
+              )}
+            </div>
           )}
         </Card>
       </div>
+
+      {/* ADD DIALOG */}
+      <Modal open={showAdd} title="Añadir Nuevo SKU" onClose={() => setShowAdd(false)}>
+        <ItemForm
+          form={addForm}
+          onChange={(field, value) => setAddForm(prev => ({ ...prev, [field]: value }))}
+          onSubmit={handleCreate}
+          saving={saving}
+          submitLabel="Crear Item"
+        />
+      </Modal>
+
+      {/* EDIT DIALOG */}
+      <Modal open={showEdit} title="Editar Item" onClose={() => setShowEdit(false)}>
+        <ItemForm
+          form={editForm}
+          onChange={(field, value) => setEditForm(prev => ({ ...prev, [field]: value }))}
+          onSubmit={handleUpdate}
+          saving={saving}
+          submitLabel="Guardar Cambios"
+        />
+      </Modal>
+
+      {/* DELETE CONFIRMATION */}
+      <Modal open={!!showDeleteId} title="Confirmar Eliminación" onClose={() => setShowDeleteId(null)}>
+        <div className="space-y-6">
+          <div className="bg-red-500/10 border border-red-500/20 rounded-2xl p-5 text-center">
+            <Trash2 className="w-8 h-8 text-red-500 mx-auto mb-3" />
+            <p className="text-sm text-white font-bold">¿Eliminar este item del inventario?</p>
+            <p className="text-xs text-zinc-500 mt-1">Esta acción no se puede deshacer.</p>
+          </div>
+          <div className="flex gap-3">
+            <Button
+              variant="outline"
+              onClick={() => setShowDeleteId(null)}
+              className="flex-1 border-white/10 text-zinc-400 hover:text-white bg-transparent h-11 rounded-xl"
+            >
+              Cancelar
+            </Button>
+            <Button
+              onClick={handleDelete}
+              disabled={saving}
+              className="flex-1 bg-red-500 hover:bg-red-600 text-white font-black uppercase text-[10px] tracking-widest h-11 rounded-xl"
+            >
+              {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Eliminar'}
+            </Button>
+          </div>
+        </div>
+      </Modal>
     </DashboardLayout>
   );
 }

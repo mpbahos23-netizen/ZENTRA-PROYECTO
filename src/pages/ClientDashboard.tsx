@@ -49,12 +49,12 @@ const ClientDashboard = () => {
   const activeShipment = shipments?.[0];
 
   const services = [
-    { id: 'heavy', label: 'Carga Pesada', icon: Truck, color: 'text-blue-500', bg: 'bg-blue-500/10' },
-    { id: 'express', label: 'Envío Express', icon: Zap, color: 'text-emerald-500', bg: 'bg-emerald-500/10' },
-    { id: 'moving', label: 'Mudanzas', icon: Home, color: 'text-orange-500', bg: 'bg-orange-500/10' },
-    { id: 'shared', label: 'Ruta Compartida', icon: Users, color: 'text-purple-500', bg: 'bg-purple-500/10' },
-    { id: 'rental', label: 'Alquiler Truck', icon: Key, color: 'text-zinc-400', bg: 'bg-zinc-400/10' },
-    { id: 'rewards', label: 'Puntos Zentra', icon: Gift, color: 'text-blue-400', bg: 'bg-blue-400/10' },
+    { id: 'heavy', label: 'Carga Pesada', icon: Truck, color: 'text-blue-500', bg: 'bg-blue-500/10', href: '/client/book?type=heavy' },
+    { id: 'express', label: 'Envío Express', icon: Zap, color: 'text-emerald-500', bg: 'bg-emerald-500/10', href: '/client/book?type=express' },
+    { id: 'moving', label: 'Mudanzas', icon: Home, color: 'text-orange-500', bg: 'bg-orange-500/10', href: '/client/book?type=moving' },
+    { id: 'shared', label: 'Ruta Compartida', icon: Users, color: 'text-purple-500', bg: 'bg-purple-500/10', href: '/client/book?type=shared' },
+    { id: 'rental', label: 'Alquiler Truck', icon: Key, color: 'text-zinc-400', bg: 'bg-zinc-400/10', href: '/quote' },
+    { id: 'rewards', label: 'Facturas', icon: Gift, color: 'text-blue-400', bg: 'bg-blue-400/10', href: '/client/invoices' },
   ];
 
   return (
@@ -92,7 +92,7 @@ const ClientDashboard = () => {
           <div className="space-y-4">
             <div className="flex justify-between items-center px-2">
                <p className="text-xs font-black text-zinc-500 uppercase tracking-widest">Rastreo en Tiempo Real</p>
-               <Link to={`/carrier/tracking/${activeShipment.id}`} className="text-[10px] font-black text-blue-500 uppercase tracking-widest hover:underline">Ver Mapa</Link>
+               <Link to={`/shipment/${activeShipment.id}/tracking`} className="text-[10px] font-black text-blue-500 uppercase tracking-widest hover:underline">Ver Mapa</Link>
             </div>
             
             <Card className="bg-[#060E20] border-white/5 rounded-[40px] p-8 shadow-2xl relative overflow-hidden group border-l-4 border-l-blue-500">
@@ -130,9 +130,9 @@ const ClientDashboard = () => {
            <p className="text-xs font-black text-zinc-500 uppercase tracking-widest px-2">Nuestros Servicios</p>
            <div className="grid grid-cols-2 gap-4">
              {services.map((service) => (
-               <Link 
-                 key={service.id} 
-                 to={service.id === 'heavy' ? '/quote' : '#'}
+               <Link
+                 key={service.id}
+                 to={service.href}
                  className="group"
                >
                  <Card className="h-full bg-[#060E20] border-white/5 rounded-[40px] p-8 hover:border-white/20 transition-all duration-300 relative overflow-hidden group-hover:scale-[1.02] shadow-xl">
