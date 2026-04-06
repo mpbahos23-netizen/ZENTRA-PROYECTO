@@ -15,7 +15,7 @@ const TOKEN_PATH = path.join(process.cwd(), 'token.json');
 const CREDENTIALS_PATH = path.join(process.cwd(), 'credentials.json');
 
 export class GoogleWorkspaceManager {
-  private oauth2Client: any;
+  private oauth2Client: InstanceType<typeof google.auth.OAuth2> | null;
 
   constructor() {
     this.oauth2Client = null;

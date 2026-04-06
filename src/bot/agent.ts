@@ -1,6 +1,18 @@
 import { saveMessage, getRecentHistory, getAllMemories } from './memory';
 import { generateCompletion, toolsDefinitions, executeTool } from './llm';
 
+// Minimal typed shape for LLM messages passed through the agent loop
+interface LLMMessage {
+  role: 'system' | 'user' | 'assistant' | 'tool';
+  content: string | null;
+  name?: string;
+  tool_call_id?: string;
+  tool_calls?: Array<{
+    id: string;
+    function: { name: string; arguments: string };
+  }>;
+}
+
 const SYSTEM_PROMPT = `Eres PaulaBot, una Estación de Desarrollo Autónoma integrada con ZENTRA Logistics OS.
 
 Tu objetivo es operar como un sistema agente capaz de gestionar la logística y ampliar tus propias capacidades técnicas:
@@ -25,13 +37,13 @@ export async function processUserMessage(userId: number, text: string): Promise<
   // 3. Montar historial reciente (últimos 15 intercambios).
   const rawHistory = await getRecentHistory(userId, 15);
   // Re-estructurarlo para el LLM.
-  const messagesContext: any[] = rawHistory.map((row: any) => ({
-    role: row.role,
-    content: row.content
+  const messagesContext: LLMMessage[] = rawHistory.map((row: { role: string; content: string }) => ({
+    role: row.role as LLMMessage['role'],
+    content: row.content,
   }));
 
   // Compilar prompt
-  const messages: any[] = [
+  const messages: LLMMessage[] = [
     { role: 'system', content: SYSTEM_PROMPT + memoryContext },
     ...messagesContext
   ];
@@ -45,20 +57,21 @@ export async function processUserMessage(userId: number, text: string): Promise<
     
     // Llamar modelo.
     const messageResponse = await generateCompletion(messages, toolsDefinitions);
-    messages.push(messageResponse); // Añadir contexto iterativo
+    messages.push(messageResponse as LLMMessage); // Añadir contexto iterativo
 
     // Verificar si el LLM invocó herramientas.
     if (messageResponse.tool_calls && messageResponse.tool_calls.length > 0) {
       for (const toolCall of messageResponse.tool_calls) {
         let result: string;
         try {
-          const args = JSON.parse(toolCall.function.arguments || '{}');
+          const args = JSON.parse(toolCall.function.arguments || '{}') as Record<string, unknown>;
           result = await executeTool(toolCall.function.name, args, userId);
-        } catch (e: any) {
-          console.error(`Error ejecutando tool ${toolCall.function.name}: ${e.message}`);
-          result = `Error ejecutando esta herramienta: ${e.message}`;
+        } catch (e: unknown) {
+          const errMsg = e instanceof Error ? e.message : String(e);
+          console.error(`Error ejecutando tool ${toolCall.function.name}: ${errMsg}`);
+          result = `Error ejecutando esta herramienta: ${errMsg}`;
         }
-        
+
         messages.push({
           role: "tool",
           name: toolCall.function.name,

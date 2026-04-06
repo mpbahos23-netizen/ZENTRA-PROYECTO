@@ -139,7 +139,18 @@ export function useFleetTracking() {
 
       if (!error && data) {
         const latest: Record<string, LocationPoint & { carrier_name?: string }> = {};
-        data.forEach((update: any) => {
+
+        interface LocationRow {
+          carrier_id: string;
+          lat: number;
+          lng: number;
+          timestamp: string;
+          accuracy: number | null;
+          speed: number | null;
+          heading: number | null;
+        }
+
+        (data as LocationRow[]).forEach((update) => {
           if (!latest[update.carrier_id]) {
             latest[update.carrier_id] = {
               lat: update.lat,
@@ -165,16 +176,24 @@ export function useFleetTracking() {
         'postgres_changes',
         { event: 'INSERT', schema: 'public', table: 'location_updates' },
         (payload) => {
-          const newLoc = payload.new as any;
+          const newLoc = payload.new as {
+            carrier_id: string;
+            lat: number;
+            lng: number;
+            timestamp: string;
+            accuracy: number | null;
+            speed: number | null;
+            heading: number | null;
+          };
           setCarriers(prev => ({
             ...prev,
             [newLoc.carrier_id]: {
               lat: newLoc.lat,
               lng: newLoc.lng,
               timestamp: newLoc.timestamp,
-              accuracy: newLoc.accuracy,
-              speed: newLoc.speed,
-              heading: newLoc.heading,
+              accuracy: newLoc.accuracy ?? undefined,
+              speed: newLoc.speed ?? undefined,
+              heading: newLoc.heading ?? undefined,
               carrier_name: prev[newLoc.carrier_id]?.carrier_name || 'Cargando...',
             }
           }));
@@ -239,14 +258,21 @@ export function useShipperTracking(shipmentId: string | null) {
           filter: `shipment_id=eq.${shipmentId}`,
         },
         (payload) => {
-          const newLoc = payload.new as any;
+          const newLoc = payload.new as {
+            lat: number;
+            lng: number;
+            timestamp: string;
+            accuracy: number | null;
+            speed: number | null;
+            heading: number | null;
+          };
           const point: LocationPoint = {
             lat: newLoc.lat,
             lng: newLoc.lng,
             timestamp: newLoc.timestamp,
-            accuracy: newLoc.accuracy,
-            speed: newLoc.speed,
-            heading: newLoc.heading,
+            accuracy: newLoc.accuracy ?? undefined,
+            speed: newLoc.speed ?? undefined,
+            heading: newLoc.heading ?? undefined,
           };
           if (isMounted) {
             setLocations(prev => [...prev, point]);
@@ -290,8 +316,9 @@ export function useUpdateShipmentStatus() {
         toast.success('✅ ¡Entrega confirmada!');
       }
       return true;
-    } catch (error: any) {
-      toast.error(error.message || 'Error al actualizar estado');
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Error al actualizar estado';
+      toast.error(message);
       return false;
     } finally {
       setUpdating(false);
@@ -323,7 +350,7 @@ export function useUpdateShipmentETA() {
 
       if (error) throw error;
       return true;
-    } catch (error: any) {
+    } catch (_error: unknown) {
       toast.error('Error al actualizar ETA');
       return false;
     } finally {

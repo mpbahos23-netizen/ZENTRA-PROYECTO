@@ -2,6 +2,7 @@ import { config } from './config';
 import { saveMemory } from './memory';
 import { googleManager } from './google';
 import OpenAI from 'openai';
+import type { ChatCompletionMessageParam, ChatCompletionTool, ChatCompletionMessage } from 'openai/resources/chat/completions';
 
 // Cliente LLM - puedes utilizar Groq, OpenAI u OpenRouter
 const groq = new OpenAI({
@@ -15,7 +16,7 @@ const openrouter = new OpenAI({
 });
 
 // Definimos la estructura de nuestras herramientas
-export const toolsDefinitions: any[] = [
+export const toolsDefinitions: ChatCompletionTool[] = [
   {
     type: "function",
     function: {
@@ -105,49 +106,60 @@ import { exec } from 'child_process';
 import { promisify } from 'util';
 const execAsync = promisify(exec);
 
-export async function executeTool(name: string, args: any, userId: number): Promise<string> {
+/** Safely extract a string field from an untyped args object. */
+function str(value: unknown, fallback = ''): string {
+  return typeof value === 'string' ? value : fallback;
+}
+
+export async function executeTool(name: string, args: Record<string, unknown>, userId: number): Promise<string> {
   console.log(`[Ejecutando Herramienta] -> ${name}`, args);
   switch (name) {
     case 'remember_fact':
-      await saveMemory(userId, args.key, args.value);
-      return `Dato recordado: ${args.key} = ${args.value}`;
-    
+      await saveMemory(userId, str(args.key), str(args.value));
+      return `Dato recordado: ${str(args.key)} = ${str(args.value)}`;
+
     case 'execute_terminal_command':
       try {
-        const { stdout, stderr } = await execAsync(args.command, { cwd: 'c:\\Users\\Bryce\\Paula proyecto' });
+        const { stdout, stderr } = await execAsync(str(args.command), { cwd: 'c:\\Users\\Bryce\\Paula proyecto' });
         return stdout || stderr || "Comando ejecutado sin salida.";
-      } catch (error: any) {
-        return `Error al ejecutar comando: ${error.message}`;
+      } catch (error: unknown) {
+        return `Error al ejecutar comando: ${error instanceof Error ? error.message : String(error)}`;
       }
 
     case 'gmail_list_emails':
       try {
         const emails = await googleManager.listRecentEmails();
         return JSON.stringify(emails, null, 2);
-      } catch (error: any) {
-        return `Error Gmail: ${error.message}`;
+      } catch (error: unknown) {
+        return `Error Gmail: ${error instanceof Error ? error.message : String(error)}`;
       }
 
     case 'gmail_send_email':
       try {
-        return await googleManager.sendEmail(args.to, args.subject, args.body);
-      } catch (error: any) {
-        return `Error Gmail: ${error.message}`;
+        return await googleManager.sendEmail(str(args.to), str(args.subject), str(args.body));
+      } catch (error: unknown) {
+        return `Error Gmail: ${error instanceof Error ? error.message : String(error)}`;
       }
 
     case 'calendar_list_events':
       try {
         const events = await googleManager.listEvents();
         return JSON.stringify(events, null, 2);
-      } catch (error: any) {
-        return `Error Calendar: ${error.message}`;
+      } catch (error: unknown) {
+        return `Error Calendar: ${error instanceof Error ? error.message : String(error)}`;
       }
 
     case 'calendar_create_event':
       try {
-        return await googleManager.createEvent(args.summary, args.location || '', args.description || '', args.start, args.end);
-      } catch (error: any) {
-        return `Error Calendar: ${error.message}`;
+        return await googleManager.createEvent(
+          str(args.summary),
+          str(args.location),
+          str(args.description),
+          str(args.start),
+          str(args.end),
+        );
+      } catch (error: unknown) {
+        return `Error Calendar: ${error instanceof Error ? error.message : String(error)}`;
       }
 
     case 'get_current_time':
@@ -158,7 +170,10 @@ export async function executeTool(name: string, args: any, userId: number): Prom
   }
 }
 
-export async function generateCompletion(messages: any[], tools: any[]): Promise<any> {
+export async function generateCompletion(
+  messages: ChatCompletionMessageParam[],
+  tools: ChatCompletionTool[],
+): Promise<ChatCompletionMessage> {
   try {
     // Intento 1: Groq (Rápido y gratis)
     const response = await groq.chat.completions.create({
@@ -168,8 +183,9 @@ export async function generateCompletion(messages: any[], tools: any[]): Promise
       tool_choice: tools.length > 0 ? "auto" : undefined,
     });
     return response.choices[0].message;
-  } catch (error: any) {
-    console.warn("[GROQ ERROR] -> Escalando a OpenRouter...", error.message);
+  } catch (error: unknown) {
+    const errMsg = error instanceof Error ? error.message : String(error);
+    console.warn("[GROQ ERROR] -> Escalando a OpenRouter...", errMsg);
     // Intento 2: OpenRouter (Respaldo Premium)
     const response = await openrouter.chat.completions.create({
       model: config.OPENROUTER_MODEL || "anthropic/claude-3.5-sonnet",

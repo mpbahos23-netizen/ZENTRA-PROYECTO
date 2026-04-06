@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(grep -v '^$')",
+      "Bash(wc -l src/pages/*.tsx src/bot/*.ts src/hooks/*.ts)",
+      "Bash(npm run:*)",
+      "Bash(npx tsc:*)",
+      "Bash(echo \"EXIT_CODE:$?\")",
+      "Bash(echo \"EXIT_CODE: $?\")",
+      "Bash(echo \"EXIT: $?\")"
+    ]
+  }
+}

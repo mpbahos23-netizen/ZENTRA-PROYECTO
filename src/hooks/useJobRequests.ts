@@ -128,8 +128,9 @@ export function useSubmitBid() {
 
       toast.success('✅ ¡Oferta enviada! Esperando respuesta del cliente.');
       return true;
-    } catch (error: any) {
-      toast.error(error.message || 'Error al enviar la oferta');
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Error al enviar la oferta';
+      toast.error(message);
       return false;
     } finally {
       setSubmitting(false);
@@ -142,8 +143,13 @@ export function useSubmitBid() {
 // ============================================
 // Hook: Fetch and listen for bids (Shipper side)
 // ============================================
+interface BidProfile {
+  full_name: string | null;
+  rating: number | null;
+}
+
 export function useShipmentBids(shipmentId: string | null) {
-  const [bids, setBids] = useState<(JobRequest & { profile: any })[]>([]);
+  const [bids, setBids] = useState<(JobRequest & { profile: BidProfile | null })[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -163,7 +169,7 @@ export function useShipmentBids(shipmentId: string | null) {
       }
 
       if (isMounted && data) {
-        setBids(data as any[]);
+        setBids(data as (JobRequest & { profile: BidProfile | null })[]);
       }
       setLoading(false);
     };
@@ -254,8 +260,9 @@ export function useSelectWinner() {
 
       toast.success('✅ Transportista seleccionado con éxito.');
       return true;
-    } catch (error: any) {
-      toast.error(error.message || 'Error al seleccionar transportista');
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Error al seleccionar transportista';
+      toast.error(message);
       return false;
     } finally {
       setSelecting(false);
@@ -295,8 +302,9 @@ export function useRejectJob() {
 
       toast('Solicitud rechazada', { description: 'No te preocupes, habrá más viajes.' });
       return true;
-    } catch (error: any) {
-      toast.error(error.message || 'Error al rechazar la solicitud');
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Error al rechazar la solicitud';
+      toast.error(message);
       return false;
     } finally {
       setRejecting(false);
@@ -421,8 +429,9 @@ export function useCreateJobBroadcast() {
       if (error) throw error;
 
       return data?.id || null;
-    } catch (error: any) {
-      toast.error(error.message || 'Error al buscar conductores');
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Error al buscar conductores';
+      toast.error(message);
       return null;
     } finally {
       setCreating(false);

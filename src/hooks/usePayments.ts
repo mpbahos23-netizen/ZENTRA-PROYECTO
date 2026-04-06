@@ -37,8 +37,9 @@ export function useCreatePayment() {
 
       toast.success('💳 Pago retenido exitosamente');
       return response.data.payment as Payment;
-    } catch (error: any) {
-      toast.error(error.message || 'Error al procesar pago');
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Error al procesar pago';
+      toast.error(message);
       return null;
     } finally {
       setProcessing(false);

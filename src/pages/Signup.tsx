@@ -32,6 +32,8 @@ const Signup = () => {
         email,
         password,
         options: {
+          // Asegura que el link de confirmación regrese a ZENTRA, no a otra app
+          emailRedirectTo: `${window.location.origin}/login`,
           data: {
             full_name: name,
             role: role,
@@ -42,22 +44,28 @@ const Signup = () => {
       if (error) throw error;
 
       if (data.user) {
-        const { error: profileError } = await supabase
-          .from("profiles")
-          .insert([
-            {
-              id: data.user.id,
-              full_name: name,
-              role: role,
-            },
-          ]);
+        // El perfil lo crea el trigger "on_auth_user_created" en Supabase (SECURITY DEFINER).
+        // No insertamos desde el cliente para evitar errores de RLS.
 
-        if (profileError) throw profileError;
-        toast.success("¡Bienvenido a ZENTRA! Verifica tu correo.");
-        navigate("/login");
+        // Si la sesión ya está activa (confirmación de email desactivada en Supabase),
+        // ir directo al dashboard correspondiente
+        if (data.session) {
+          toast.success(`¡Bienvenido a ZENTRA, ${name}!`);
+          switch (role) {
+            case "admin": navigate("/admin"); break;
+            case "carrier": navigate("/carrier"); break;
+            case "client": navigate("/client"); break;
+            default: navigate("/login");
+          }
+        } else {
+          // Email de confirmación enviado — esperar que el usuario confirme
+          toast.success("¡Cuenta creada! Revisa tu correo para activarla.");
+          navigate("/login");
+        }
       }
-    } catch (error: any) {
-      toast.error(error.message || "Error ZENTRA-AUTH-001");
+    } catch (error: unknown) {
+      const msg = error instanceof Error ? error.message : "Error ZENTRA-AUTH-001";
+      toast.error(msg);
     } finally {
       setLoading(false);
     }

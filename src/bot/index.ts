@@ -7,7 +7,7 @@ import axios from 'axios';
 
 const bot = new Bot(config.TELEGRAM_BOT_TOKEN);
 
-bot.use(async (ctx: Context, next: Function) => {
+bot.use(async (ctx: Context, next: () => Promise<void>) => {
   const userId = ctx.from?.id;
   
   // Whitelist de Telegram user ID (Seguridad como prioridad)
@@ -26,8 +26,9 @@ bot.command("google_auth", async (ctx) => {
   try {
     const authUrl = await googleManager.getAuthUrl();
     await ctx.reply(`🔓 *Autorización de Google Workspace*\n\nPor favor, abre este enlace, autoriza a Paula y pega el código aquí:\n\n[ENLACE DE AUTORIZACIÓN](${authUrl})`, { parse_mode: "Markdown" });
-  } catch (error: any) {
-    await ctx.reply(`❌ Error preparando Auth: ${error.message}`);
+  } catch (error: unknown) {
+    const msg = error instanceof Error ? error.message : String(error);
+    await ctx.reply(`❌ Error preparando Auth: ${msg}`);
   }
 });
 
@@ -43,7 +44,7 @@ bot.on("message:text", async (ctx) => {
       await googleManager.setToken(text);
       await ctx.reply("✅ ¡Conexión con Google Workspace Establecida! Ahora puedo gestionar tu Gmail y Calendar.");
       return;
-    } catch (e: any) {
+    } catch (_e: unknown) {
       // Si falla, quizás no era un código de Google, proceder al flujo normal.
     }
   }
@@ -53,9 +54,10 @@ bot.on("message:text", async (ctx) => {
   try {
     const replyText = await processUserMessage(userId, text);
     await ctx.reply(replyText);
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error(`[Fatal Error Text]`, error);
-    await ctx.reply(`[Fallo en los sistemas cognitivos] - ${error.message}`);
+    const msg = error instanceof Error ? error.message : String(error);
+    await ctx.reply(`[Fallo en los sistemas cognitivos] - ${msg}`);
   }
 });
 
@@ -83,9 +85,10 @@ bot.on("message:voice", async (ctx) => {
     await ctx.reply(`🎤 _Escuché:_ "${transcription}"`, { parse_mode: "Markdown" });
     await ctx.reply(replyText);
 
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error(`[Fatal Error Voice]`, error);
-    await ctx.reply(`[Error procesando audio] - ${error.message}`);
+    const msg = error instanceof Error ? error.message : String(error);
+    await ctx.reply(`[Error procesando audio] - ${msg}`);
   }
 });
 

@@ -190,12 +190,12 @@ export default function Inventory() {
   const fetchData = async () => {
     setLoading(true);
     const { data, error } = await supabase
-      .from('inventory')
+      .from('inventory_items')
       .select('*')
       .order('name');
 
     if (error) {
-      if (error.code === 'PGRST116' || error.message?.includes('does not exist')) {
+      if (error.code === 'PGRST116' || error.code === 'PGRST205' || error.message?.includes('does not exist')) {
         // Table doesn't exist yet — show demo data
         const demo: InventoryItem[] = [
           { id: '1', name: 'Llantas de Alto Rendimiento', sku: 'WHE-001', category: 'Carrier Parts', quantity: 12, min_stock: 15, unit_price: 120, location: 'Wh-Alpha', last_updated: new Date().toISOString() },
@@ -204,7 +204,7 @@ export default function Inventory() {
           { id: '4', name: 'Pallets de Madera Std', sku: 'PLT-00', category: 'Tools', quantity: 120, min_stock: 50, unit_price: 15, location: 'Wh-Main', last_updated: new Date().toISOString() },
         ];
         setItems(demo);
-        toast.info('Modo demo: crea la tabla "inventory" en Supabase para activar el CRUD.', { duration: 5000 });
+        toast.info('Modo demo: crea la tabla "inventory_items" en Supabase para activar el CRUD.', { duration: 5000 });
       } else {
         toast.error('Error al sincronizar inventario');
       }
@@ -220,7 +220,7 @@ export default function Inventory() {
   const handleCreate = async () => {
     if (!addForm.name.trim() || !addForm.sku.trim()) return;
     setSaving(true);
-    const { error } = await supabase.from('inventory').insert({
+    const { error } = await supabase.from('inventory_items').insert({
       ...addForm,
       last_updated: new Date().toISOString(),
     });
@@ -251,7 +251,7 @@ export default function Inventory() {
     if (!editingId) return;
     setSaving(true);
     const { error } = await supabase
-      .from('inventory')
+      .from('inventory_items')
       .update({ ...editForm, last_updated: new Date().toISOString() })
       .eq('id', editingId);
     setSaving(false);
@@ -269,7 +269,7 @@ export default function Inventory() {
     if (!showDeleteId) return;
     setSaving(true);
     const { error } = await supabase
-      .from('inventory')
+      .from('inventory_items')
       .delete()
       .eq('id', showDeleteId);
     setSaving(false);

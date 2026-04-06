@@ -33,24 +33,47 @@ const Login = () => {
       if (error) throw error;
 
       if (data.user) {
+        let userRole: string | null = null;
+
         const { data: profile, error: profileError } = await supabase
           .from("profiles")
           .select("role")
           .eq("id", data.user.id)
           .single();
 
-        if (profileError) throw profileError;
+        if (profileError && profileError.code === "PGRST116") {
+          // Perfil no existe (falló al crearse en el signup) — crearlo ahora
+          const meta = data.user.user_metadata as { full_name?: string; role?: string };
+          const { data: newProfile, error: createError } = await supabase
+            .from("profiles")
+            .insert([{
+              id: data.user.id,
+              full_name: meta?.full_name ?? email,
+              role: meta?.role ?? "client",
+            }])
+            .select("role")
+            .single();
+
+          if (createError) throw createError;
+          userRole = newProfile?.role ?? "client";
+        } else if (profileError) {
+          throw profileError;
+        } else {
+          userRole = profile?.role ?? null;
+        }
+
         toast.success("Protocolo de Acceso Completado");
 
-        switch (profile.role) {
+        switch (userRole) {
           case "admin": navigate("/admin"); break;
           case "carrier": navigate("/carrier"); break;
           case "client": navigate("/client"); break;
           default: navigate("/");
         }
       }
-    } catch (error: any) {
-      toast.error(error.message || "Error ZENTRA-AUTH-002");
+    } catch (error: unknown) {
+      const msg = error instanceof Error ? error.message : "Error ZENTRA-AUTH-002";
+      toast.error(msg);
     } finally {
       setLoading(false);
     }

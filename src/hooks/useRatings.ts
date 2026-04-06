@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/lib/supabase';
 import { toast } from 'sonner';
 
@@ -52,8 +52,9 @@ export function useSubmitRating() {
 
       toast.success('⭐ ¡Calificación enviada!');
       return true;
-    } catch (error: any) {
-      toast.error(error.message || 'Error al enviar calificación');
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Error al enviar calificación';
+      toast.error(message);
       return false;
     } finally {
       setSubmitting(false);
@@ -69,7 +70,7 @@ export function useSubmitRating() {
 export function useUserRating(userId: string | null) {
   const [rating, setRating] = useState<{ avg: number; total: number } | null>(null);
 
-  useState(() => {
+  useEffect(() => {
     if (!userId) return;
     supabase
       .from('profiles')
@@ -81,7 +82,7 @@ export function useUserRating(userId: string | null) {
           setRating({ avg: Number(data.rating), total: data.total_reviews });
         }
       });
-  });
+  }, [userId]);
 
   return rating;
 }
