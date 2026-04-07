@@ -95,7 +95,7 @@ const DashboardLayout = ({ children, role: initialRole }: DashboardLayoutProps) 
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-[100dvh] bg-black">
+      <div className="flex items-center justify-center h-screen bg-black w-full">
         <div className="flex flex-col items-center gap-4">
           <Loader2 className="w-8 h-8 animate-spin text-[#00e5ff]" />
           <p className="text-[10px] text-zinc-600 font-black uppercase tracking-[0.4em]">Sincronizando Zentra...</p>
@@ -108,7 +108,7 @@ const DashboardLayout = ({ children, role: initialRole }: DashboardLayoutProps) 
     location.pathname === href || (location.pathname.startsWith(href) && href !== '/');
 
   return (
-    <div className="flex h-[100dvh] bg-black text-white font-sans overflow-hidden">
+    <div className="flex h-screen bg-black text-white font-sans overflow-hidden w-full relative">
 
       {/* ── Mobile Full-Screen Menu Overlay (for extra items / settings) ── */}
       {mobileMenuOpen && (
