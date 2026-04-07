@@ -5,12 +5,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { ArrowLeft, Loader2, Mail, Shield, Key } from "lucide-react";
-import { supabase } from "@/lib/supabase";
+import { supabase, SITE_URL } from "@/lib/supabase";
 import { toast } from "sonner";
-
-// ============================================
-// ZENTRA OBSIDIAN: Password Recovery
-// ============================================
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState("");
@@ -22,20 +18,23 @@ const ForgotPassword = () => {
     setLoading(true);
 
     try {
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/reset-password`,
-      });
+      const { error } = await supabase.auth.resetPasswordForEmail(
+        email.trim().toLowerCase(),
+        { redirectTo: `${SITE_URL}/reset-password` }
+      );
 
-      if (error) throw error;
+      if (error) {
+        if (error.message.includes("rate limit")) {
+          throw new Error("Demasiados intentos. Espera unos minutos e intenta de nuevo.");
+        }
+        throw error;
+      }
 
       setSubmitted(true);
-      toast.success("Enlace de recuperación enviado a tu correo");
-    } catch (error: any) {
-      if (error.message?.includes("rate limit")) {
-        toast.error("Demasiados intentos. Espera unos minutos e intenta de nuevo.");
-      } else {
-        toast.error(error.message || "Error al enviar el correo de recuperación");
-      }
+      toast.success("Enlace de recuperación enviado");
+    } catch (error: unknown) {
+      const msg = error instanceof Error ? error.message : "Error al enviar el correo";
+      toast.error(msg);
     } finally {
       setLoading(false);
     }
@@ -53,7 +52,7 @@ const ForgotPassword = () => {
             <div className="space-y-2">
               <h1 className="text-3xl font-black text-white italic uppercase tracking-tighter">Revisa tu <span className="text-blue-500">Correo</span></h1>
               <p className="text-[10px] text-zinc-500 font-black uppercase tracking-widest leading-relaxed">
-                Hemos enviado instrucciones para restablecer tu contraseña a <span className="text-white">{email}</span>
+                Hemos enviado instrucciones para restablecer tu contraseña a <span className="text-white break-all">{email}</span>
               </p>
             </div>
             <div className="w-full space-y-3 pt-4">
@@ -61,8 +60,15 @@ const ForgotPassword = () => {
                 <Link to="/login">Volver al Login</Link>
               </Button>
               <p className="text-[9px] text-zinc-600 font-bold uppercase tracking-widest">
-                ¿No recibiste el correo? Revisa la carpeta de spam.
+                ¿No recibiste el correo? Revisa la carpeta de spam o espera 1 minuto e intenta de nuevo.
               </p>
+              <Button
+                variant="ghost"
+                onClick={() => setSubmitted(false)}
+                className="text-[9px] font-black text-blue-500 uppercase tracking-widest"
+              >
+                Reenviar correo
+              </Button>
             </div>
           </div>
         </Card>
@@ -78,8 +84,8 @@ const ForgotPassword = () => {
       <Card className="w-full max-w-md bg-white/[0.02] border-white/5 backdrop-blur-3xl rounded-[48px] p-12 shadow-2xl relative z-10">
         <div className="text-center space-y-4 mb-10">
           <div className="inline-flex items-center gap-3 bg-blue-500/10 border border-blue-500/20 px-4 py-1.5 rounded-full mb-4">
-             <Key className="w-3.5 h-3.5 text-blue-500" />
-             <span className="text-[10px] font-black text-blue-400 uppercase tracking-widest">Recuperar Acceso</span>
+            <Key className="w-3.5 h-3.5 text-blue-500" />
+            <span className="text-[10px] font-black text-blue-400 uppercase tracking-widest">Recuperar Acceso</span>
           </div>
           <h1 className="text-3xl font-black text-white italic tracking-tighter uppercase leading-none">
             ¿Olvidaste tu <span className="text-blue-500">Contraseña</span>?
@@ -90,21 +96,14 @@ const ForgotPassword = () => {
         <form onSubmit={handleResetPassword} className="space-y-8">
           <div className="space-y-1.5 px-2">
             <Label className="text-[10px] text-zinc-500 font-black uppercase tracking-widest">Email Registrado</Label>
-            <Input 
-              className="bg-white/5 border-white/5 h-16 rounded-[24px] focus:ring-blue-500 text-white font-bold placeholder:text-zinc-800 transition-all focus:bg-white/[0.05]" 
-              type="email" 
-              placeholder="tu@empresa.com" 
-              value={email} 
-              onChange={e => setEmail(e.target.value)} 
-              required 
+            <Input
+              className="bg-white/5 border-white/5 h-16 rounded-[24px] focus:ring-blue-500 text-white font-bold placeholder:text-zinc-700 transition-all focus:bg-white/[0.05]"
+              type="email" placeholder="tu@empresa.com"
+              value={email} onChange={e => setEmail(e.target.value)} required
             />
           </div>
 
-          <Button 
-            type="submit" 
-            className="w-full h-16 bg-blue-600 hover:bg-blue-500 text-white font-black uppercase tracking-[0.2em] rounded-[32px] shadow-[0_15px_40px_rgba(37,99,235,0.3)] transition-all" 
-            disabled={loading}
-          >
+          <Button type="submit" className="w-full h-16 bg-blue-600 hover:bg-blue-500 text-white font-black uppercase tracking-[0.2em] rounded-[32px] shadow-[0_15px_40px_rgba(37,99,235,0.3)] transition-all" disabled={loading}>
             {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Enviar enlace de recuperación"}
           </Button>
 
@@ -115,8 +114,8 @@ const ForgotPassword = () => {
         </form>
 
         <div className="mt-10 pt-8 border-t border-white/5 flex items-center justify-center gap-2 opacity-30">
-           <Shield className="w-3 h-3 text-zinc-500" />
-           <span className="text-[8px] font-black text-zinc-500 uppercase tracking-widest italic">Zentra Recovery Protocol</span>
+          <Shield className="w-3 h-3 text-zinc-500" />
+          <span className="text-[8px] font-black text-zinc-500 uppercase tracking-widest italic">Zentra Recovery Protocol</span>
         </div>
       </Card>
     </div>

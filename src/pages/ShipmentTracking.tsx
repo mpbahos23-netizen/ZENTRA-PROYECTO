@@ -183,7 +183,7 @@ export default function ShipmentTracking() {
             {[
               { label: 'Peso', value: `${shipment?.weight} KG`, icon: Package },
               { label: 'Tipo de Carga', value: shipment?.cargo_type, icon: ShieldCheck },
-              { label: 'Valor del Servicio', value: `$${shipment?.price?.toLocaleString()}`, icon: Clock },
+              { label: 'Valor del Servicio', value: `S/${shipment?.price?.toLocaleString()}`, icon: Clock },
               ...(etaFormatted ? [{ label: 'ETA', value: etaFormatted, icon: MapPin }] : []),
             ].map((item, i) => (
               <div key={i} className="flex items-center justify-between">
