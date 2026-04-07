@@ -5,14 +5,15 @@ import { Input } from '@/components/ui/input';
 import { 
   ListChecks, Plus, Trash2, ShieldCheck, 
   AlertCircle, ChevronRight, Hash, Info,
-  Scale, Box, History, CheckCircle2, Clock
+  Scale, Box, History, CheckCircle2, Clock,
+  Save, Check
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 
 // ============================================
-// ZENTRA VITAL CONTROL (Aurex Inspired)
-// High-Level Audit & Load Verification Module
+// ZENTRA INVENTARIO (Z-Inventario)
+// Dynamic Manifest & Logic Controls
 // ============================================
 
 interface ManifestItem {
@@ -37,6 +38,12 @@ export default function DigitalManifest({
 }: DigitalManifestProps) {
   const [items, setItems] = useState<ManifestItem[]>(initialItems || []);
   const [activeItem, setActiveItem] = useState<string | null>(null);
+  
+  // Local state for editing to allow "Guardar" button functionality
+  const [editFields, setEditFields] = useState<{
+    quantity: number;
+    weightPerUnit: number;
+  }>({ quantity: 1, weightPerUnit: 1 });
 
   const addItem = () => {
     const newItem: ManifestItem = {
@@ -76,10 +83,37 @@ export default function DigitalManifest({
     onUpdate?.(newItems);
   };
 
-  const updateItem = (id: string, field: keyof ManifestItem, value: any) => {
-    const newItems = items.map(i => i.id === id ? { ...i, [field]: value } : i);
+  const updateItemName = (id: string, name: string) => {
+    const newItems = items.map(i => i.id === id ? { ...i, name } : i);
     setItems(newItems);
     onUpdate?.(newItems);
+  };
+
+  const handleApplyChanges = (id: string) => {
+    const newItems = items.map(i => 
+      i.id === id ? { 
+        ...i, 
+        quantity: editFields.quantity, 
+        weightPerUnit: editFields.weightPerUnit,
+        lastAudit: new Date().toISOString()
+      } : i
+    );
+    setItems(newItems);
+    onUpdate?.(newItems);
+    toast.success("Cambios guardados");
+    // Optionally close the accordion or stay open
+  };
+
+  const handleExpand = (item: ManifestItem) => {
+    if (activeItem === item.id) {
+      setActiveItem(null);
+    } else {
+      setActiveItem(item.id);
+      setEditFields({
+        quantity: item.quantity,
+        weightPerUnit: item.weightPerUnit
+      });
+    }
   };
 
   const totalWeight = items.reduce((acc, curr) => acc + (curr.quantity * curr.weightPerUnit), 0);
@@ -87,21 +121,21 @@ export default function DigitalManifest({
 
   return (
     <Card className="bg-[#050505] border-white/5 rounded-[32px] overflow-hidden shadow-2xl font-inter">
-      {/* AUDIT HEADER: Vital Control Header */}
+      {/* AUDIT HEADER: Zentra Inventario */}
       <div className="p-6 border-b border-white/5 bg-gradient-to-r from-blue-500/5 to-transparent flex items-center justify-between">
          <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-2xl bg-blue-600/10 border border-blue-500/20 flex items-center justify-center">
                <ShieldCheck className="w-5 h-5 text-blue-500" />
             </div>
             <div>
-               <h3 className="text-white font-black text-[10px] uppercase tracking-[0.3em]">Aurex Vital Control</h3>
-               <p className="text-zinc-500 text-[8px] font-medium tracking-widest">VERIFICACIÓN DE CARGA EN TIEMPO REAL</p>
+               <h3 className="text-white font-black text-[10px] uppercase tracking-[0.3em]">Zentra Inventario</h3>
+               <p className="text-zinc-500 text-[8px] font-medium tracking-widest uppercase">VERIFICACIÓN DE CARGA EN TIEMPO REAL</p>
             </div>
          </div>
          
          <div className="flex items-center gap-4">
             <div className="text-right hidden sm:block">
-               <p className="text-[8px] text-zinc-600 font-black uppercase">Tasa de Auditoría</p>
+               <p className="text-[8px] text-zinc-600 font-black uppercase tracking-widest">Tasa de Auditoría</p>
                <p className="text-emerald-400 font-mono text-[10px]">{verifiedCount}/{items.length} VALIDADOS</p>
             </div>
             {!readOnly && (
@@ -127,13 +161,12 @@ export default function DigitalManifest({
           items.map((item) => (
             <div 
               key={item.id}
-              onClick={() => setActiveItem(activeItem === item.id ? null : item.id)}
               className={cn(
                 "group relative bg-[#0a0a0a] border border-white/5 rounded-2xl p-4 transition-all hover:bg-white/[0.02] cursor-pointer",
                 activeItem === item.id && "bg-white/[0.04] border-blue-500/30"
               )}
             >
-               <div className="flex items-center justify-between">
+               <div className="flex items-center justify-between" onClick={() => handleExpand(item)}>
                   <div className="flex items-center gap-4">
                      {/* Item Indicator with Status */}
                      <div 
@@ -152,13 +185,13 @@ export default function DigitalManifest({
 
                      <div className="space-y-1">
                         {readOnly ? (
-                          <p className="text-white font-bold text-xs">{item.name}</p>
+                          <p className="text-white font-bold text-xs uppercase tracking-tight">{item.name}</p>
                         ) : (
                           <input 
                             value={item.name}
-                            onChange={(e) => updateItem(item.id, 'name', e.target.value)}
+                            onChange={(e) => updateItemName(item.id, e.target.value)}
                             onClick={(e) => e.stopPropagation()}
-                            className="bg-transparent border-none text-white font-bold text-xs focus:ring-0 p-0 w-32 md:w-48"
+                            className="bg-transparent border-none text-white font-black text-xs uppercase tracking-tight focus:ring-0 p-0 w-32 md:w-48 appearance-none"
                           />
                         )}
                         <div className="flex items-center gap-3">
@@ -177,7 +210,7 @@ export default function DigitalManifest({
                         <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                             <button 
                               onClick={(e) => { e.stopPropagation(); removeItem(item.id); }}
-                              className="w-8 h-8 rounded-lg bg-red-500/10 text-red-500 flex items-center justify-center hover:bg-red-500 hover:text-white transition-all"
+                              className="w-8 h-8 rounded-lg bg-red-500/10 text-red-500 flex items-center justify-center hover:bg-red-500 hover:text-white transition-all shadow-[0_4px_10px_rgba(239,68,68,0.2)]"
                             >
                                <Trash2 className="w-3.5 h-3.5" />
                             </button>
@@ -194,38 +227,46 @@ export default function DigitalManifest({
                   </div>
                </div>
 
-               {/* Expanded Controls: Audit Log & Fine-Tuning */}
+               {/* Expanded Controls: Now with manual SAVE button */}
                {activeItem === item.id && !readOnly && (
-                  <div className="mt-4 pt-4 border-t border-white/5 grid grid-cols-2 gap-4 animate-in fade-in slide-in-from-top-2">
-                     <div className="space-y-2">
-                        <label className="text-[8px] text-zinc-600 font-black uppercase tracking-widest">Cantidad</label>
-                        <Input 
-                          type="number"
-                          value={item.quantity}
-                          onChange={(e) => updateItem(item.id, 'quantity', parseInt(e.target.value) || 1)}
-                          className="bg-black border-white/10 h-10 text-xs rounded-xl"
-                        />
-                     </div>
-                     <div className="space-y-2">
-                        <label className="text-[8px] text-zinc-600 font-black uppercase tracking-widest">Peso x Unidad</label>
-                        <Input 
-                          type="number"
-                          value={item.weightPerUnit}
-                          onChange={(e) => updateItem(item.id, 'weightPerUnit', parseInt(e.target.value) || 0)}
-                          className="bg-black border-white/10 h-10 text-xs rounded-xl"
-                        />
-                     </div>
-                     <div className="col-span-2 p-3 bg-white/[0.02] rounded-xl flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                           <History className="w-3.5 h-3.5 text-zinc-600" />
-                           <span className="text-[8px] text-zinc-500 font-medium uppercase tracking-[0.1em]">Última Auditoría: {new Date(item.lastAudit).toLocaleTimeString()}</span>
+                  <div className="mt-4 pt-6 border-t border-white/5 space-y-6 animate-in fade-in slide-in-from-top-2">
+                     <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                            <label className="text-[8px] text-zinc-600 font-black uppercase tracking-[0.2em] px-1 italic">Cantidad</label>
+                            <Input 
+                              type="number"
+                              value={editFields.quantity}
+                              onChange={(e) => setEditFields({...editFields, quantity: parseInt(e.target.value) || 0})}
+                              className="bg-zinc-900/50 border-white/10 h-12 text-white font-black text-sm rounded-2xl focus:border-blue-500/50 transition-all placeholder:text-zinc-800"
+                            />
                         </div>
+                        <div className="space-y-2">
+                            <label className="text-[8px] text-zinc-600 font-black uppercase tracking-[0.2em] px-1 italic">Peso X Unidad</label>
+                            <Input 
+                              type="number"
+                              value={editFields.weightPerUnit}
+                              onChange={(e) => setEditFields({...editFields, weightPerUnit: parseInt(e.target.value) || 0})}
+                              className="bg-zinc-900/50 border-white/10 h-12 text-white font-black text-sm rounded-2xl focus:border-blue-500/50 transition-all placeholder:text-zinc-800"
+                            />
+                        </div>
+                     </div>
+
+                     <div className="grid grid-cols-2 gap-4 items-center">
+                        <div className="p-4 bg-white/[0.02] rounded-2xl flex items-center justify-between border border-white/5">
+                           <div className="flex items-center gap-2">
+                              <Clock className="w-3.5 h-3.5 text-zinc-600" />
+                              <span className="text-[8px] text-zinc-500 font-black uppercase tracking-widest italic">{new Date(item.lastAudit).toLocaleTimeString()}</span>
+                           </div>
+                           <Button variant="ghost" className="h-6 text-[7px] font-bold uppercase text-zinc-600 hover:text-white">Audit Log</Button>
+                        </div>
+                        
+                        {/* GUARDAR BUTTON: Only update parent when clicked */}
                         <Button 
-                          variant="ghost" 
-                          size="sm"
-                          className="h-7 text-[8px] font-black uppercase tracking-widest text-blue-500"
+                          onClick={() => handleApplyChanges(item.id)}
+                          className="h-14 bg-blue-600 hover:bg-blue-500 text-white font-black uppercase tracking-[0.2em] rounded-2xl shadow-[0_10px_30px_rgba(37,99,235,0.2)] group/btn flex items-center justify-center gap-2 text-[10px]"
                         >
-                           Ver Historial
+                           <Save className="w-4 h-4 group-hover/btn:scale-110 transition-transform" />
+                           GUARDAR CAMBIOS
                         </Button>
                      </div>
                   </div>
@@ -237,23 +278,23 @@ export default function DigitalManifest({
 
       {/* AUDIT SUMMARY: Footer Stats */}
       <div className="p-6 bg-[#0a0a0a] border-t border-white/5 flex items-center justify-between">
-         <div className="flex items-center gap-8">
+         <div className="flex items-center gap-10">
             <div className="space-y-1">
-               <p className="text-[8px] text-zinc-600 font-black uppercase tracking-widest">Total Masa</p>
-               <p className="text-white font-black text-sm italic">{totalWeight.toLocaleString()} KG</p>
+               <p className="text-[8px] text-zinc-600 font-black uppercase tracking-widest italic">Total Masa</p>
+               <p className="text-white font-black text-lg italic tracking-tight uppercase leading-none">{totalWeight.toLocaleString()} KG</p>
             </div>
             <div className="space-y-1">
-               <p className="text-[8px] text-zinc-600 font-black uppercase tracking-widest">Capacidad IA</p>
-               <div className="flex items-center gap-1.5">
+               <p className="text-[8px] text-zinc-600 font-black uppercase tracking-widest italic">Capacidad IA</p>
+               <div className="flex items-center gap-2">
                   <div className="w-1.5 h-1.5 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.8)]" />
-                  <p className="text-white font-black text-sm italic">99.2%</p>
+                  <p className="text-white font-black text-lg italic tracking-tight uppercase leading-none">99.2%</p>
                </div>
             </div>
          </div>
          
-         <div className="flex items-center gap-2 text-zinc-700">
-            <Clock className="w-4 h-4" />
-            <span className="text-[9px] font-mono tracking-tighter">VITAL_CTRL_2026_X</span>
+         <div className="flex items-center gap-2 text-zinc-800">
+            <Check className="w-4 h-4" />
+            <span className="text-[8px] font-mono tracking-tighter uppercase font-black">ZENTRA_SYS_AUTH_OK</span>
          </div>
       </div>
     </Card>
