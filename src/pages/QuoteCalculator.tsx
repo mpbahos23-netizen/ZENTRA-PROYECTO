@@ -21,7 +21,7 @@ import { cn } from "@/lib/utils";
 
 // ============================================
 // ZENTRA OBSIDIAN: Smart Quote Calculator
-// Ultra-Minimalist Quoting Terminal
+// Precios en SOLES (PEN) — Tarifa base: S/150 por 3km
 // ============================================
 
 const vehicles = [
@@ -39,21 +39,32 @@ const QuoteCalculator = () => {
   const [vehicleId, setVehicleId] = useState("light");
   const [weight, setWeight] = useState("100");
   
-  // Internal logic for mockup price
+  // Tarifa: S/150 base por 3 km → S/50 por km
+  const RATE_PER_KM = 50; // soles por km
+  const BASE_RATE = 150; // soles mínimo (3km)
+  
+  const calculateDistance = () => {
+    // Simular distancia basada en la longitud de las direcciones
+    const dist = Math.max(3, (origin.length + destination.length) * 1.5);
+    return Math.round(dist);
+  };
+  
   const calculatePrice = () => {
-    const dist = (origin.length + destination.length) * 15;
+    const dist = calculateDistance();
     const vehicleMult = vehicles.find(v => v.id === vehicleId)?.multiplier || 1;
-    const base = 50000;
-    return (base + (dist * 1000 * vehicleMult) + (parseInt(weight) * 50));
+    const weightSurcharge = parseInt(weight) > 200 ? (parseInt(weight) - 200) * 0.5 : 0;
+    const distancePrice = Math.max(BASE_RATE, dist * RATE_PER_KM);
+    return Math.round((distancePrice * vehicleMult) + weightSurcharge);
   };
 
   const totalPrice = calculatePrice();
+  const estimatedDistance = calculateDistance();
 
   return (
     <DashboardLayout role="client">
       <div className="max-w-md mx-auto space-y-10 pb-32 animate-in fade-in duration-700 font-inter">
         
-        {/* HEADER: Minimalist Title */}
+        {/* HEADER */}
         <div className="flex items-center justify-between">
           <Button 
             variant="ghost" 
@@ -73,10 +84,10 @@ const QuoteCalculator = () => {
               ))}
             </div>
           </div>
-          <div className="w-10" /> {/* Spacer */}
+          <div className="w-10" />
         </div>
 
-        {/* STEP 1: VEHICLE SELECTION */}
+        {/* STEP 1: VEHICLE */}
         {step === 1 && (
           <div className="space-y-6 animate-in slide-in-from-right-5">
             <div className="space-y-1">
@@ -115,7 +126,7 @@ const QuoteCalculator = () => {
           </div>
         )}
 
-        {/* STEP 2: ORIGIN & DESTINATION */}
+        {/* STEP 2: ROUTE */}
         {step === 2 && (
           <div className="space-y-8 animate-in slide-in-from-right-5">
             <div className="space-y-1">
@@ -134,7 +145,7 @@ const QuoteCalculator = () => {
                    <p className="text-[9px] text-zinc-600 font-black uppercase tracking-widest mb-1">Punto de Carga</p>
                    <input 
                     className="bg-transparent border-none p-0 text-white font-black placeholder:text-zinc-800 focus:ring-0 w-full uppercase tracking-tight"
-                    placeholder="Escribre origen..."
+                    placeholder="Escribe origen..."
                     value={origin}
                     onChange={(e) => setOrigin(e.target.value)}
                    />
@@ -149,7 +160,7 @@ const QuoteCalculator = () => {
                    <p className="text-[9px] text-zinc-600 font-black uppercase tracking-widest mb-1">Destino Final</p>
                    <input 
                     className="bg-transparent border-none p-0 text-white font-black placeholder:text-zinc-800 focus:ring-0 w-full uppercase tracking-tight"
-                    placeholder="Escribre destino..."
+                    placeholder="Escribe destino..."
                     value={destination}
                     onChange={(e) => setDestination(e.target.value)}
                    />
@@ -171,6 +182,10 @@ const QuoteCalculator = () => {
                 value={weight}
                 onChange={(e) => setWeight(e.target.value)}
                />
+               <div className="flex justify-between text-[8px] text-zinc-700 font-bold uppercase">
+                 <span>10 kg</span>
+                 <span>5,000 kg</span>
+               </div>
             </div>
 
             <Button 
@@ -183,7 +198,7 @@ const QuoteCalculator = () => {
           </div>
         )}
 
-        {/* STEP 3: FINAL SUMMARY */}
+        {/* STEP 3: RESULT */}
         {step === 3 && (
           <div className="space-y-8 animate-in zoom-in-95 duration-500">
             <Card className="bg-[#060E20] border-white/5 rounded-[48px] p-10 shadow-2xl relative overflow-hidden text-center">
@@ -201,8 +216,9 @@ const QuoteCalculator = () => {
                   <div>
                      <p className="text-[10px] text-zinc-600 font-black uppercase tracking-widest mb-2">Presupuesto Sugerido</p>
                      <h2 className="text-6xl font-black text-white tracking-tighter italic">
-                       ${totalPrice.toLocaleString()}
+                       S/{totalPrice.toLocaleString()}
                      </h2>
+                     <p className="text-[9px] text-zinc-600 font-bold uppercase tracking-widest mt-2">Soles Peruanos (PEN)</p>
                   </div>
 
                   <div className="grid grid-cols-2 gap-4 border-t border-white/5 pt-8">
@@ -212,13 +228,13 @@ const QuoteCalculator = () => {
                      </div>
                      <div className="text-right space-y-1">
                         <p className="text-[8px] text-zinc-600 font-black uppercase tracking-widest">Distancia Est.</p>
-                        <p className="text-xs font-black text-zinc-300 uppercase">342 KM</p>
+                        <p className="text-xs font-black text-zinc-300 uppercase">{estimatedDistance} KM</p>
                      </div>
                   </div>
 
                   <div className="bg-emerald-500/5 border border-emerald-500/10 p-5 rounded-3xl">
                      <p className="text-[10px] text-emerald-400 font-black uppercase leading-relaxed tracking-wider">
-                        Estás ahorrando un <span className="underline">12%</span> comparado con tarifas de mercado hoy.
+                        Tarifa base: S/150 por 3 km. Estás ahorrando un <span className="underline">12%</span> comparado con tarifas de mercado hoy.
                      </p>
                   </div>
                </div>

@@ -30,7 +30,16 @@ const Login = () => {
         password,
       });
 
-      if (error) throw error;
+      if (error) {
+        // Traducir mensajes de Supabase al español
+        if (error.message.includes("Invalid login credentials")) {
+          throw new Error("Email o contraseña incorrectos. Verifica tus datos.");
+        }
+        if (error.message.includes("Email not confirmed")) {
+          throw new Error("Tu email no ha sido confirmado. Revisa tu correo.");
+        }
+        throw error;
+      }
 
       if (data.user) {
         let userRole: string | null = null;
@@ -42,15 +51,15 @@ const Login = () => {
           .single();
 
         if (profileError && profileError.code === "PGRST116") {
-          // Perfil no existe (falló al crearse en el signup) — crearlo ahora
+          // Perfil no existe — crearlo ahora
           const meta = data.user.user_metadata as { full_name?: string; role?: string };
           const { data: newProfile, error: createError } = await supabase
             .from("profiles")
-            .insert([{
+            .upsert([{
               id: data.user.id,
               full_name: meta?.full_name ?? email,
               role: meta?.role ?? "client",
-            }])
+            }], { onConflict: "id" })
             .select("role")
             .single();
 
@@ -62,7 +71,7 @@ const Login = () => {
           userRole = profile?.role ?? null;
         }
 
-        toast.success("Protocolo de Acceso Completado");
+        toast.success("¡Acceso concedido! Bienvenido de nuevo.");
 
         switch (userRole) {
           case "admin": navigate("/admin"); break;
@@ -72,7 +81,7 @@ const Login = () => {
         }
       }
     } catch (error: unknown) {
-      const msg = error instanceof Error ? error.message : "Error ZENTRA-AUTH-002";
+      const msg = error instanceof Error ? error.message : "Error al iniciar sesión";
       toast.error(msg);
     } finally {
       setLoading(false);
@@ -108,7 +117,7 @@ const Login = () => {
           </div>
           <div className="space-y-1.5 px-2">
             <div className="flex items-center justify-between mb-1">
-               <Label className="text-[10px] text-zinc-500 font-black uppercase tracking-widest">Protocolo de Seguridad</Label>
+               <Label className="text-[10px] text-zinc-500 font-black uppercase tracking-widest">Contraseña</Label>
                <Link to="/forgot-password" className="text-[9px] font-black text-blue-500 uppercase tracking-widest hover:underline">
                   Recuperar
                </Link>
@@ -130,8 +139,6 @@ const Login = () => {
                 </>
               )}
             </Button>
-            
-            {/* Quick Access Portals Removed */}
           </div>
 
           <div className="text-center pt-4">

@@ -134,7 +134,7 @@ function ItemForm({ form, onChange, onSubmit, saving, submitLabel }: {
           />
         </div>
         <div>
-          <label className="text-[9px] font-black text-zinc-500 uppercase tracking-widest mb-1.5 block">Precio Unitario ($)</label>
+          <label className="text-[9px] font-black text-zinc-500 uppercase tracking-widest mb-1.5 block">Precio Unitario (S/)</label>
           <Input
             type="number"
             min="0"
@@ -325,7 +325,7 @@ export default function Inventory() {
         {/* Stats */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           {[
-            { label: 'Valor Total', value: `$${stats.totalValue.toLocaleString()}`, icon: TrendingUp, color: 'text-emerald-400', bg: 'bg-emerald-500/10' },
+            { label: 'Valor Total', value: `S/${stats.totalValue.toLocaleString()}`, icon: TrendingUp, color: 'text-emerald-400', bg: 'bg-emerald-500/10' },
             { label: 'Stock Bajo', value: stats.lowStockCount, icon: AlertTriangle, color: 'text-red-400', bg: 'bg-red-500/10' },
             { label: 'Items SKU', value: stats.itemCount, icon: Box, color: 'text-[#00e5ff]', bg: 'bg-[#00e5ff]/10' },
             { label: 'Categorías', value: CATEGORIES.length, icon: BarChart3, color: 'text-violet-400', bg: 'bg-violet-500/10' },
@@ -439,7 +439,7 @@ export default function Inventory() {
                         </div>
                       </TableCell>
                       <TableCell className="hidden sm:table-cell">
-                        <p className="text-sm font-black text-zinc-300">${item.unit_price.toFixed(2)}</p>
+                        <p className="text-sm font-black text-zinc-300">S/{item.unit_price.toFixed(2)}</p>
                       </TableCell>
                       <TableCell className="text-right pr-6">
                         <div className="flex justify-end gap-2">

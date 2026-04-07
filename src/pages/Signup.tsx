@@ -19,7 +19,7 @@ const Signup = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [role, setRole] = useState("carrier");
+  const [role, setRole] = useState("client");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -28,11 +28,11 @@ const Signup = () => {
     setLoading(true);
 
     try {
+      // 1. Crear la cuenta
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
-          // Asegura que el link de confirmación regrese a ZENTRA, no a otra app
           emailRedirectTo: `${window.location.origin}/login`,
           data: {
             full_name: name,
@@ -44,12 +44,15 @@ const Signup = () => {
       if (error) throw error;
 
       if (data.user) {
-        // El perfil lo crea el trigger "on_auth_user_created" en Supabase (SECURITY DEFINER).
-        // No insertamos desde el cliente para evitar errores de RLS.
-
-        // Si la sesión ya está activa (confirmación de email desactivada en Supabase),
-        // ir directo al dashboard correspondiente
+        // 2. Si ya hay sesión activa (confirm email desactivado), ir al dashboard
         if (data.session) {
+          // Crear perfil manualmente si el trigger no lo hizo
+          await supabase.from("profiles").upsert([{
+            id: data.user.id,
+            full_name: name,
+            role: role,
+          }], { onConflict: "id" });
+
           toast.success(`¡Bienvenido a ZENTRA, ${name}!`);
           switch (role) {
             case "admin": navigate("/admin"); break;
@@ -58,9 +61,32 @@ const Signup = () => {
             default: navigate("/login");
           }
         } else {
-          // Email de confirmación enviado — esperar que el usuario confirme
-          toast.success("¡Cuenta creada! Revisa tu correo para activarla.");
-          navigate("/login");
+          // 3. Si no hay sesión, intentar login directo con las mismas credenciales
+          const { data: loginData, error: loginError } = await supabase.auth.signInWithPassword({
+            email,
+            password,
+          });
+
+          if (loginError) {
+            // Si falla el login, significa que necesita confirmación de email
+            toast.success("¡Cuenta creada! Revisa tu correo para activarla.");
+            navigate("/login");
+          } else if (loginData.user) {
+            // Login exitoso — crear perfil y redirigir
+            await supabase.from("profiles").upsert([{
+              id: loginData.user.id,
+              full_name: name,
+              role: role,
+            }], { onConflict: "id" });
+
+            toast.success(`¡Bienvenido a ZENTRA, ${name}!`);
+            switch (role) {
+              case "admin": navigate("/admin"); break;
+              case "carrier": navigate("/carrier"); break;
+              case "client": navigate("/client"); break;
+              default: navigate("/client");
+            }
+          }
         }
       }
     } catch (error: unknown) {
@@ -99,7 +125,7 @@ const Signup = () => {
             />
           </div>
           <div className="space-y-1.5 px-2">
-            <Label className="text-[10px] text-zinc-500 font-black uppercase tracking-widest">Email Corporativo</Label>
+            <Label className="text-[10px] text-zinc-500 font-black uppercase tracking-widest">Email</Label>
             <Input 
               className="bg-white/5 border-white/5 h-14 rounded-2xl focus:ring-blue-500 text-white font-bold placeholder:text-zinc-800" 
               type="email" placeholder="tu@empresa.com" 
@@ -110,8 +136,9 @@ const Signup = () => {
             <Label className="text-[10px] text-zinc-500 font-black uppercase tracking-widest">Contraseña</Label>
             <Input 
               className="bg-white/5 border-white/5 h-14 rounded-2xl focus:ring-blue-500 text-white font-bold placeholder:text-zinc-800" 
-              type="password" placeholder="••••••••" 
+              type="password" placeholder="Mínimo 6 caracteres" 
               value={password} onChange={e => setPassword(e.target.value)} required 
+              minLength={6}
             />
           </div>
           <div className="space-y-1.5 px-2">
