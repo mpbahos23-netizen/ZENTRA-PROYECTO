@@ -71,10 +71,9 @@ const App = () => (
           <Route path="/carrier/jobs" element={<ProtectedRoute><CarrierJobs /></ProtectedRoute>} />
           <Route path="/carrier/earnings" element={<ProtectedRoute><CarrierEarnings /></ProtectedRoute>} />
           <Route path="/client" element={<ProtectedRoute><ClientDashboard /></ProtectedRoute>} />
+          <Route path="/client/quote" element={<ProtectedRoute><QuoteCalculator /></ProtectedRoute>} />
+          <Route path="/client/track/:id" element={<ProtectedRoute><ShipmentTracking /></ProtectedRoute>} />
           <Route path="/admin" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
-          <Route path="/admin/operations" element={<ProtectedRoute><AdminOperations /></ProtectedRoute>} />
-          <Route path="/admin/inventory" element={<ProtectedRoute><Inventory /></ProtectedRoute>} />
-          <Route path="/quote" element={<ProtectedRoute><QuoteCalculator /></ProtectedRoute>} />
           <Route path="/client/book" element={<ProtectedRoute><BookShipment /></ProtectedRoute>} />
           <Route path="/client/invoices" element={<ProtectedRoute><Invoices /></ProtectedRoute>} />
           <Route path="/shipment/:id/status" element={<ProtectedRoute><ShipmentStatus /></ProtectedRoute>} />
