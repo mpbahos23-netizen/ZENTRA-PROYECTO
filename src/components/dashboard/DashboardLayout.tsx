@@ -115,10 +115,7 @@ const DashboardLayout = ({ children, role: initialRole }: DashboardLayoutProps) 
         <div className="fixed inset-0 bg-black/95 z-50 md:hidden flex flex-col p-8 space-y-6 animate-in fade-in slide-in-from-top-4 duration-300">
           <div className="flex justify-between items-center">
             <Link to="/" className="flex items-center gap-3" onClick={() => setMobileMenuOpen(false)}>
-              <div className="w-10 h-10 rounded-xl bg-[#00e5ff] flex items-center justify-center">
-                <Truck className="w-6 h-6 text-black" fill="currentColor" />
-              </div>
-              <span className="text-xl font-bold tracking-tight">ZENTRA</span>
+              <img src="/zentra-logo.jpg" alt="Zentra Logo" className="h-10 w-auto object-contain rounded-lg" />
             </Link>
             <button
               onClick={() => setMobileMenuOpen(false)}
@@ -177,13 +174,7 @@ const DashboardLayout = ({ children, role: initialRole }: DashboardLayoutProps) 
       <aside className="hidden md:flex w-[260px] flex-col bg-black border-r border-white/5">
         <div className="p-6">
           <Link to="/" className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-[#00e5ff] flex items-center justify-center">
-              <Truck className="w-6 h-6 text-black" fill="currentColor" />
-            </div>
-            <div className="flex flex-col">
-              <span className="text-xl font-bold leading-tight text-white tracking-wide">ZENTRA</span>
-              <span className="text-[10px] font-bold text-[#00e5ff] tracking-wider">LOGISTICS OS</span>
-            </div>
+            <img src="/zentra-logo.jpg" alt="Zentra Logo" className="h-10 w-auto object-contain rounded-lg" />
           </Link>
         </div>
 
@@ -255,10 +246,7 @@ const DashboardLayout = ({ children, role: initialRole }: DashboardLayoutProps) 
         <header className="h-[64px] md:h-[88px] border-b border-white/5 bg-black flex items-center px-4 md:px-8 justify-between gap-4 shrink-0">
           {/* Mobile: Logo left, actions right */}
           <div className="md:hidden flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-[#00e5ff] flex items-center justify-center">
-              <Truck className="w-4 h-4 text-black" fill="currentColor" />
-            </div>
-            <span className="text-sm font-bold tracking-tight">ZENTRA</span>
+            <img src="/zentra-logo.jpg" alt="Zentra Logo" className="h-8 w-auto object-contain rounded-lg" />
           </div>
 
           {/* Desktop: Search bar */}
