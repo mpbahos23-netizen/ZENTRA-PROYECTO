@@ -1,11 +1,11 @@
-import { useState, useMemo, useRef } from "react";
+import { useState, useMemo } from "react";
 import DashboardLayout from "@/components/dashboard/DashboardLayout";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   ArrowRight, ChevronLeft, Zap, Truck, Cylinder, PackageCheck,
-  MapPin, Navigation, Sparkles, Camera, Plus, Trash2, ShieldCheck,
-  ToggleLeft, ToggleRight, LayoutDashboard, CreditCard
+  Camera, Plus, Trash2, LayoutDashboard, CreditCard
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -15,8 +15,7 @@ import { supabase } from "@/lib/supabase";
 
 // ============================================
 // ZENTRA OBSIDIAN: Advanced Quote & Booking Flow
-// Extended flow with Units, Services, Mapping,
-// and Final Review (Visual + Inventory)
+// Reordered: Map First (Uber Style)
 // ============================================
 
 interface LocationData {
@@ -56,7 +55,8 @@ function haversineKm(lat1: number, lng1: number, lat2: number, lng2: number): nu
 
 const QuoteCalculator = () => {
   const navigate = useNavigate();
-  const [step, setStep] = useState(1);
+  // Step 1: Map/Route | Step 2: Units/Services | Step 3: Reservation
+  const [step, setStep] = useState(1); 
   const [unitId, setUnitId] = useState("light");
   const [serviceId, setServiceId] = useState("carga_pesada");
   const [origin, setOrigin] = useState<LocationData | null>(null);
@@ -145,7 +145,7 @@ const QuoteCalculator = () => {
           <div className="text-center">
             <h1 className="text-white font-black text-xs uppercase tracking-[0.3em]">Operación ZENTRA</h1>
             <div className="flex justify-center gap-1 mt-2">
-              {[1, 2, 3, 4].map((s) => (
+              {[1, 2, 3].map((s) => (
                 <div key={s} className={cn(
                   "h-0.5 rounded-full transition-all duration-300",
                   step === s ? "w-6 bg-blue-500" : "w-1.5 bg-zinc-800"
@@ -154,74 +154,16 @@ const QuoteCalculator = () => {
             </div>
           </div>
           <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center">
-             <span className="text-[10px] font-black text-blue-500">{step}/4</span>
+             <span className="text-[10px] font-black text-blue-500">{step}/3</span>
           </div>
         </div>
 
-        {/* STEP 1: UNITS */}
+        {/* STEP 1: ROUTE & WEIGHT (UBER STYLE - MAP FIRST) */}
         {step === 1 && (
           <div className="space-y-8 animate-in slide-in-from-right-5">
             <div className="space-y-1">
-              <h2 className="text-4xl font-black text-white uppercase tracking-tighter italic">Selecciona tu <span className="text-blue-500">Unidad</span></h2>
-              <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">Capacidad optimizada por Zentra AI</p>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {units.map((u) => (
-                <button
-                  key={u.id}
-                  onClick={() => { setUnitId(u.id); setStep(2); }}
-                  className={cn(
-                    "flex items-center gap-5 p-6 rounded-[32px] border transition-all duration-300 relative overflow-hidden group text-left",
-                    unitId === u.id ? "bg-blue-600 border-blue-400 shadow-[0_15px_40px_rgba(59,130,246,0.3)]" : "bg-[#060E20] border-white/5 hover:border-white/20"
-                  )}
-                >
-                  <div className={cn(
-                    "w-14 h-14 rounded-2xl flex items-center justify-center transition-transform group-hover:scale-110",
-                    unitId === u.id ? "bg-white text-blue-600" : "bg-white/5 text-zinc-500"
-                  )}>
-                    <u.icon className="w-7 h-7" />
-                  </div>
-                  <div>
-                    <h4 className={cn("font-black text-base uppercase tracking-tight", unitId === u.id ? "text-white" : "text-zinc-200")}>{u.label}</h4>
-                    <p className={cn("text-[9px] font-black uppercase tracking-widest", unitId === u.id ? "text-blue-200" : "text-zinc-600")}>{u.sub}</p>
-                  </div>
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* STEP 2: SERVICES */}
-        {step === 2 && (
-          <div className="space-y-8 animate-in slide-in-from-right-5 text-center">
-            <div className="space-y-1">
-              <h2 className="text-4xl font-black text-white uppercase tracking-tighter italic whitespace-pre-line">Tipo de <span className="text-blue-500">Servicio</span></h2>
-              <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">Personaliza el protocolo de entrega</p>
-            </div>
-            <div className="grid gap-4 max-w-md mx-auto">
-              {services.map((s) => (
-                <button
-                  key={s.id}
-                  onClick={() => { setServiceId(s.id); setStep(3); }}
-                  className={cn(
-                    "flex flex-col items-center gap-2 p-8 rounded-[40px] border transition-all duration-300 relative overflow-hidden group",
-                    serviceId === s.id ? "bg-blue-600 border-blue-400" : "bg-[#060E20] border-white/5"
-                  )}
-                >
-                  <h4 className={cn("font-black text-xl uppercase tracking-tighter italic", serviceId === s.id ? "text-white" : "text-zinc-200")}>{s.label}</h4>
-                  <p className={cn("text-[10px] font-black uppercase tracking-widest", serviceId === s.id ? "text-blue-200" : "text-zinc-600")}>{s.sub}</p>
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* STEP 3: ROUTE & WEIGHT */}
-        {step === 3 && (
-          <div className="space-y-8 animate-in slide-in-from-right-5">
-            <div className="space-y-1">
               <h2 className="text-4xl font-black text-white uppercase tracking-tighter italic">Define la <span className="text-blue-500">Ruta</span></h2>
-              <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">Mapa de precisión Zentra OS</p>
+              <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">Google Maps Integration - Zentra OS</p>
             </div>
 
             <div className="space-y-6">
@@ -229,13 +171,13 @@ const QuoteCalculator = () => {
                 label="📍 Origen de la carga"
                 value={origin}
                 onChange={setOrigin}
-                placeholder="Dirección de carga..."
+                placeholder="Ej. Av. Javier Prado Este..."
               />
               <MapPicker
                 label="🏁 Destino final"
                 value={destination}
                 onChange={setDestination}
-                placeholder="Dirección de entrega..."
+                placeholder="Ej. Miraflores, Lima..."
                 color="#10B981"
               />
             </div>
@@ -248,7 +190,7 @@ const QuoteCalculator = () => {
                 </div>
                 {origin && destination && (
                   <div className="text-right">
-                    <span className="text-[10px] text-zinc-500 font-black uppercase tracking-widest">Distancia GPS</span>
+                    <span className="text-[10px] text-zinc-500 font-black uppercase tracking-widest">Distancia Aprox</span>
                     <p className="text-zinc-300 font-black text-xl tracking-tighter italic">{distanceKm} KM</p>
                   </div>
                 )}
@@ -262,16 +204,80 @@ const QuoteCalculator = () => {
 
             <Button
               disabled={!origin || !destination}
-              onClick={() => setStep(4)}
+              onClick={() => setStep(2)}
               className="w-full h-20 rounded-[32px] bg-blue-600 text-white font-black uppercase tracking-[0.2em] shadow-2xl hover:bg-blue-500 transition-all text-sm group"
             >
-              Siguiente <ArrowRight className="w-5 h-5 ml-3 group-hover:translate-x-1 transition-transform" />
+              Confirmar Ruta <ArrowRight className="w-5 h-5 ml-3 group-hover:translate-x-1 transition-transform" />
             </Button>
           </div>
         )}
 
-        {/* STEP 4: FINAL RESERVATION SCREEN (The Core Request) */}
-        {step === 4 && (
+        {/* STEP 2: UNITS & SERVICES */}
+        {step === 2 && (
+          <div className="space-y-12 animate-in slide-in-from-right-5">
+            {/* Units */}
+            <div>
+              <div className="space-y-1 mb-6">
+                <h2 className="text-2xl font-black text-white uppercase tracking-tighter italic">Selecciona <span className="text-blue-500">Unidad</span></h2>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {units.map((u) => (
+                  <button
+                    key={u.id}
+                    onClick={() => setUnitId(u.id)}
+                    className={cn(
+                      "flex items-center gap-5 p-6 rounded-[32px] border transition-all duration-300 relative overflow-hidden group text-left",
+                      unitId === u.id ? "bg-blue-600 border-blue-400 shadow-[0_15px_40px_rgba(59,130,246,0.3)]" : "bg-[#060E20] border-white/5 hover:border-white/20"
+                    )}
+                  >
+                    <div className={cn(
+                      "w-14 h-14 rounded-2xl flex items-center justify-center transition-transform group-hover:scale-110",
+                      unitId === u.id ? "bg-white text-blue-600" : "bg-white/5 text-zinc-500"
+                    )}>
+                      <u.icon className="w-7 h-7" />
+                    </div>
+                    <div>
+                      <h4 className={cn("font-black text-base uppercase tracking-tight", unitId === u.id ? "text-white" : "text-zinc-200")}>{u.label}</h4>
+                      <p className={cn("text-[9px] font-black uppercase tracking-widest", unitId === u.id ? "text-blue-200" : "text-zinc-600")}>{u.sub}</p>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Services */}
+            <div>
+              <div className="space-y-1 mb-6">
+                <h2 className="text-2xl font-black text-white uppercase tracking-tighter italic">Personaliza <span className="text-emerald-500">Servicio</span></h2>
+              </div>
+              <div className="grid gap-4 max-w-md">
+                {services.map((s) => (
+                  <button
+                    key={s.id}
+                    onClick={() => setServiceId(s.id)}
+                    className={cn(
+                      "flex flex-col items-center gap-2 p-6 rounded-[32px] border transition-all duration-300 relative overflow-hidden group",
+                      serviceId === s.id ? "bg-emerald-600 border-emerald-400 text-center" : "bg-[#060E20] border-white/5 text-center"
+                    )}
+                  >
+                    <h4 className={cn("font-black text-xl uppercase tracking-tighter italic", serviceId === s.id ? "text-white" : "text-zinc-200")}>{s.label}</h4>
+                    <p className={cn("text-[10px] font-black uppercase tracking-widest", serviceId === s.id ? "text-emerald-200" : "text-zinc-600")}>{s.sub}</p>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <Button
+              onClick={() => setStep(3)}
+              className="w-full h-20 rounded-[32px] bg-white text-black font-black uppercase tracking-[0.2em] shadow-2xl hover:bg-zinc-200 transition-all text-sm group"
+            >
+              Continuar a Reserva <ArrowRight className="w-5 h-5 ml-3 group-hover:translate-x-1 transition-transform" />
+            </Button>
+          </div>
+        )}
+
+        {/* STEP 3: FINAL RESERVATION SCREEN */}
+        {step === 3 && (
           <div className="space-y-8 animate-in zoom-in-95 duration-500">
              <div className="text-center space-y-2 mb-10">
                 <h2 className="text-2xl font-black text-white uppercase tracking-[0.3em]">Reserva <span className="text-blue-500">Final</span></h2>
@@ -288,7 +294,7 @@ const QuoteCalculator = () => {
                 <div className="flex items-center justify-between gap-6 relative z-10">
                   <div className="flex flex-col items-center space-y-2">
                     <span className="text-[8px] font-black text-zinc-600 uppercase tracking-widest">Punto de Carga</span>
-                    <h4 className="text-lg font-black text-white uppercase tracking-tighter italic">{origin?.address.split(',')[0]}</h4>
+                    <h4 className="text-lg font-black text-white uppercase tracking-tighter italic text-center leading-tight">{origin?.address.split(',')[0]}</h4>
                   </div>
                   <div className="flex-1 flex items-center gap-2">
                     <div className="h-0.5 flex-1 bg-zinc-800 rounded-full relative overflow-hidden">
@@ -296,15 +302,15 @@ const QuoteCalculator = () => {
                       <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-3 h-3 bg-blue-600 rounded-full shadow-[0_0_15px_rgba(59,130,246,0.6)]" />
                     </div>
                   </div>
-                  <div className="flex flex-col items-center space-y-2">
+                  <div className="flex flex-col items-center space-y-2 text-center">
                     <span className="text-[8px] font-black text-zinc-600 uppercase tracking-widest">Destino</span>
-                    <h4 className="text-lg font-black text-emerald-500 uppercase tracking-tighter italic">{destination?.address.split(',')[0]}</h4>
+                    <h4 className="text-lg font-black text-emerald-500 uppercase tracking-tighter italic leading-tight">{destination?.address.split(',')[0]}</h4>
                   </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4 mt-8 pt-8 border-t border-white/5">
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-xl bg-blue-500/10 flex items-center justify-center">
+                    <div className="w-8 h-8 rounded-xl bg-blue-500/10 flex items-center justify-center shrink-0">
                       <Truck className="w-4 h-4 text-blue-500" />
                     </div>
                     <div>
@@ -313,7 +319,7 @@ const QuoteCalculator = () => {
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-xl bg-blue-500/10 flex items-center justify-center">
+                    <div className="w-8 h-8 rounded-xl bg-blue-500/10 flex items-center justify-center shrink-0">
                       <PackageCheck className="w-4 h-4 text-blue-500" />
                     </div>
                     <div>
@@ -381,9 +387,9 @@ const QuoteCalculator = () => {
                         placeholder="Nombre del ítem..."
                         value={newItemName}
                         onChange={(e) => setNewItemName(e.target.value)}
-                        onKeyPress={(e) => e.key === 'Enter' && addInventoryItem()}
+                        onKeyDown={(e) => e.key === 'Enter' && addInventoryItem()}
                       />
-                      <Button onClick={addInventoryItem} className="h-12 w-12 rounded-2xl bg-white text-black hover:bg-zinc-200">
+                      <Button onClick={addInventoryItem} className="h-12 w-12 rounded-2xl bg-white text-black hover:bg-zinc-200 shrink-0">
                         <Plus className="w-5 h-5" />
                       </Button>
                    </div>
@@ -398,8 +404,8 @@ const QuoteCalculator = () => {
                       ) : (
                         inventory.map((item) => (
                            <div key={item.id} className="flex items-center justify-between p-4 bg-zinc-950/50 rounded-2xl border border-white/5">
-                              <span className="text-xs font-black text-zinc-300 uppercase tracking-tight">{item.name}</span>
-                              <div className="flex items-center gap-4">
+                              <span className="text-xs font-black text-zinc-300 uppercase tracking-tight line-clamp-1">{item.name}</span>
+                              <div className="flex items-center gap-4 shrink-0">
                                  <span className="text-[10px] font-black text-blue-500">1 UNIT.</span>
                                  <button onClick={() => removeInventoryItem(item.id)} className="text-zinc-700 hover:text-red-500 transition-colors">
                                     <Trash2 className="w-4 h-4" />
@@ -412,7 +418,7 @@ const QuoteCalculator = () => {
 
                    <div className="flex items-center justify-between pt-4 border-t border-white/5">
                       <div className="flex flex-col">
-                        <span className="text-[8px] font-black text-zinc-600 uppercase tracking-widest uppercase">Total Masa</span>
+                        <span className="text-[8px] font-black text-zinc-600 uppercase tracking-widest">Total Masa</span>
                         <span className="text-white font-black text-lg italic tracking-tighter uppercase">{weight} KG</span>
                       </div>
                       <div className="flex flex-col text-right">
