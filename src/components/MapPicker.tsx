@@ -67,6 +67,7 @@ export default function MapPicker({
       zoom: value ? 16 : 12,
       disableDefaultUI: true,
       zoomControl: true,
+      mapId: "ZENTRA_MAP_ID",
       styles: [
         { elementType: "geometry", stylers: [{ color: "#242f3e" }] },
         { elementType: "labels.text.stroke", stylers: [{ color: "#242f3e" }] },
@@ -105,12 +106,12 @@ export default function MapPicker({
       const lng = e.latLng.lng();
       
       if (!markerInstance.current) {
-        markerInstance.current = new window.google.maps.Marker({
+        markerInstance.current = new window.google.maps.marker.AdvancedMarkerElement({
           position: { lat, lng },
           map: mapInstance.current,
         });
       } else {
-        markerInstance.current.setPosition({ lat, lng });
+        markerInstance.current.position = { lat, lng };
       }
 
       mapInstance.current.panTo({ lat, lng });
@@ -121,7 +122,7 @@ export default function MapPicker({
 
     // Initialize initial marker if value exists
     if (value) {
-      markerInstance.current = new window.google.maps.Marker({
+      markerInstance.current = new window.google.maps.marker.AdvancedMarkerElement({
         position: { lat: value.lat, lng: value.lng },
         map: mapInstance.current,
       });

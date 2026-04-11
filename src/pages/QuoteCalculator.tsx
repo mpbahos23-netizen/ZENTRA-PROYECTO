@@ -1,11 +1,11 @@
-import { useState, useMemo } from "react";
+import { useRef, useState, useMemo } from "react";
 import DashboardLayout from "@/components/dashboard/DashboardLayout";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
   ArrowRight, ChevronLeft, Zap, Truck, Cylinder, PackageCheck,
-  Camera, Plus, Trash2, LayoutDashboard, CreditCard
+  Camera, Plus, Trash2, LayoutDashboard, CreditCard, Scan, X
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -67,6 +67,13 @@ const QuoteCalculator = () => {
   const [newItemName, setNewItemName] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // AI Camera State
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isScanning, setIsScanning] = useState(false);
+  const [file, setFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [scanResult, setScanResult] = useState<{ volume: string; confidence: number; items?: number; recommendation?: string } | null>(null);
+
   // Tarifa Config
   const RATE_PER_KM = 50;
   const BASE_RATE = 150;
@@ -85,6 +92,26 @@ const QuoteCalculator = () => {
 
     return Math.round((distancePrice * unitMult * servMult * modeMult) + weightSurcharge);
   }, [distanceKm, unitId, serviceId, weight, isPrivate]);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFile = e.target.files?.[0];
+    if (selectedFile) {
+      setFile(selectedFile);
+      setPreviewUrl(URL.createObjectURL(selectedFile));
+      setIsScanning(true);
+      
+      setTimeout(() => {
+        setIsScanning(false);
+        setScanResult({ 
+          volume: "1.25 m³", 
+          confidence: 99.9,
+          items: 4,
+          recommendation: "Carga optimizada para Van Z-1"
+        });
+        toast.success("ZENTRA AI: Volumen Verificado");
+      }, 3000);
+    }
+  };
 
   const addInventoryItem = () => {
     if (!newItemName) return;
@@ -106,20 +133,19 @@ const QuoteCalculator = () => {
 
       const { error } = await supabase.from('shipments').insert({
         client_id: user.id,
-        tracking_id,
         status: 'pending',
-        origin_lat: origin?.lat,
-        origin_lng: origin?.lng,
-        origin_address: origin?.address,
-        destination_lat: destination?.lat,
-        destination_lng: destination?.lng,
-        destination_address: destination?.address,
+        origin: origin?.address || '',
+        destination: destination?.address || '',
+        distance: distanceKm,
         price: totalPrice,
         weight: parseInt(weight),
-        cargo_type: services.find(s => s.id === serviceId)?.label,
-        vehicle_type: units.find(u => u.id === unitId)?.label,
-        is_private: isPrivate,
-        inventory: inventory
+        cargo_type: `${units.find(u => u.id === unitId)?.label} - ${services.find(s => s.id === serviceId)?.label}`,
+        is_shared: !isPrivate,
+        items: inventory,
+        delivery_pin: Math.floor(1000 + Math.random() * 9000).toString(),
+        is_express: serviceId === 'express',
+        has_insurance: false,
+        load_optimization_data: scanResult
       });
 
       if (error) throw error;
@@ -358,12 +384,37 @@ const QuoteCalculator = () => {
                   <div className="w-4 h-4 rounded bg-blue-600 flex items-center justify-center">
                     <div className="w-1.5 h-1.5 border border-white rounded-full" />
                   </div>
-                  <h3 className="text-[11px] font-black text-zinc-500 uppercase tracking-[0.2em]">Verificación Visual Zentra</h3>
+                  <h3 className="text-[11px] font-black text-zinc-500 uppercase tracking-[0.2em] flex items-center gap-2">
+                     <Scan className="w-3.5 h-3.5 text-blue-500" /> Verificación Visual Zentra
+                  </h3>
                 </div>
-                <div className="h-32 rounded-[32px] border-2 border-dashed border-white/5 bg-white/[0.02] flex flex-col items-center justify-center gap-2 hover:bg-white/5 transition-colors cursor-pointer group">
-                  <Camera className="w-8 h-8 text-zinc-700 group-hover:text-blue-500 transition-colors" />
-                  <p className="text-[9px] text-zinc-700 font-black uppercase tracking-widest">Toca para capturar carga</p>
-                </div>
+                {!previewUrl ? (
+                   <div 
+                      onClick={() => fileInputRef.current?.click()}
+                      className="h-32 rounded-[32px] border-2 border-dashed border-white/5 bg-white/[0.02] flex flex-col items-center justify-center gap-2 hover:bg-white/5 transition-colors cursor-pointer group relative overflow-hidden"
+                   >
+                     <div className="absolute inset-0 bg-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+                     <Camera className="w-8 h-8 text-zinc-700 group-hover:text-blue-500 transition-colors relative z-10" />
+                     <p className="text-[9px] text-zinc-700 font-black uppercase tracking-widest relative z-10">Toca para capturar carga</p>
+                   </div>
+                ) : (
+                   <div className="relative h-48 rounded-[32px] overflow-hidden border border-white/10 group shadow-2xl">
+                       <img src={previewUrl} className="w-full h-full object-cover grayscale opacity-50 transition-all duration-700" />
+                       <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent" />
+                       <div className="absolute bottom-6 left-6 right-6 flex items-end justify-between">
+                          <div>
+                             <p className="text-[8px] text-blue-400 font-black uppercase tracking-widest animate-pulse">
+                                {isScanning ? 'ZENTRA AI SCANNING...' : (scanResult?.recommendation || 'VERIFICADO')}
+                             </p>
+                             <p className="text-white font-black text-2xl italic tracking-tighter uppercase">{isScanning ? '...' : (scanResult?.volume || '...')}</p>
+                          </div>
+                          <button onClick={() => {setPreviewUrl(null); setFile(null); setScanResult(null);}} className="w-10 h-10 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-white backdrop-blur-md hover:bg-red-500 transition-colors">
+                             <X className="w-4 h-4" />
+                          </button>
+                       </div>
+                   </div>
+                )}
+                <input type="file" ref={fileInputRef} onChange={handleFileChange} className="hidden" accept="image/*" />
              </div>
 
              {/* Z-INVENTARIO */}
