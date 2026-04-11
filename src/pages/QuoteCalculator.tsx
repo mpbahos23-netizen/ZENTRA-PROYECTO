@@ -5,13 +5,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
   ArrowRight, ChevronLeft, Zap, Truck, Cylinder, PackageCheck,
-  Camera, Plus, Trash2, LayoutDashboard, CreditCard, Scan, X
+  Camera, Plus, Trash2, LayoutDashboard, CreditCard, Scan, X, ListChecks
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import MapPicker from "@/components/MapPicker";
 import { toast } from "sonner";
 import { supabase } from "@/lib/supabase";
+import DigitalManifest from "@/components/tracking/DigitalManifest";
 
 // ============================================
 // ZENTRA OBSIDIAN: Advanced Quote & Booking Flow
@@ -320,7 +321,7 @@ const QuoteCalculator = () => {
                 <div className="flex items-center justify-between gap-6 relative z-10">
                   <div className="flex flex-col items-center space-y-2">
                     <span className="text-[8px] font-black text-zinc-600 uppercase tracking-widest">Punto de Carga</span>
-                    <h4 className="text-lg font-black text-white uppercase tracking-tighter italic text-center leading-tight">{origin?.address.split(',')[0]}</h4>
+                    <h4 className="text-lg font-black text-white uppercase tracking-tighter italic text-center leading-tight overflow-hidden text-ellipsis whitespace-nowrap max-w-[150px]">{origin?.address.split(',').slice(0,2).join(',')}</h4>
                   </div>
                   <div className="flex-1 flex items-center gap-2">
                     <div className="h-0.5 flex-1 bg-zinc-800 rounded-full relative overflow-hidden">
@@ -330,7 +331,7 @@ const QuoteCalculator = () => {
                   </div>
                   <div className="flex flex-col items-center space-y-2 text-center">
                     <span className="text-[8px] font-black text-zinc-600 uppercase tracking-widest">Destino</span>
-                    <h4 className="text-lg font-black text-emerald-500 uppercase tracking-tighter italic leading-tight">{destination?.address.split(',')[0]}</h4>
+                    <h4 className="text-lg font-black text-emerald-500 uppercase tracking-tighter italic leading-tight overflow-hidden text-ellipsis whitespace-nowrap max-w-[150px]">{destination?.address.split(',').slice(0,2).join(',')}</h4>
                   </div>
                 </div>
 
@@ -419,65 +420,16 @@ const QuoteCalculator = () => {
 
              {/* Z-INVENTARIO */}
              <div className="space-y-4">
-                <div className="flex items-center justify-between px-2">
-                   <div className="flex items-center gap-3">
-                      <LayoutDashboard className="w-4 h-4 text-zinc-600" />
-                      <h3 className="text-[11px] font-black text-zinc-500 uppercase tracking-[0.2em]">Desglose de items <span className="opacity-40 ml-1">Z-INVENTARIO</span></h3>
-                   </div>
-                   <div className="flex items-center gap-2">
-                      <span className="text-[9px] font-black text-zinc-700 uppercase tracking-widest">Tasa de Auditoría</span>
-                      <span className="text-[9px] font-black text-emerald-500 uppercase tracking-widest">{inventory.length}/{inventory.length} Validados</span>
-                   </div>
+                <div className="flex items-center gap-3 px-2 mb-2">
+                  <div className="w-4 h-4 rounded bg-[#00e5ff] flex items-center justify-center">
+                    <div className="w-1.5 h-1.5 border border-black rounded-full" />
+                  </div>
+                  <h3 className="text-[11px] font-black text-zinc-500 uppercase tracking-[0.2em] flex items-center gap-2">
+                     <ListChecks className="w-3.5 h-3.5 text-[#00e5ff]" />
+                     Desglose de items <span className="text-white text-[9px] font-bold">Z-INVENTARIO</span>
+                  </h3>
                 </div>
-
-                <div className="bg-white/5 border border-white/5 rounded-[40px] p-6 space-y-6">
-                   {/* Add item input */}
-                   <div className="flex gap-2">
-                      <Input
-                        className="bg-zinc-950 border-white/5 h-12 rounded-2xl text-white font-bold"
-                        placeholder="Nombre del ítem..."
-                        value={newItemName}
-                        onChange={(e) => setNewItemName(e.target.value)}
-                        onKeyDown={(e) => e.key === 'Enter' && addInventoryItem()}
-                      />
-                      <Button onClick={addInventoryItem} className="h-12 w-12 rounded-2xl bg-white text-black hover:bg-zinc-200 shrink-0">
-                        <Plus className="w-5 h-5" />
-                      </Button>
-                   </div>
-
-                   {/* Items list */}
-                   <div className="space-y-3">
-                      {inventory.length === 0 ? (
-                        <div className="text-center py-10 opacity-20">
-                          <PackageCheck className="w-10 h-10 mx-auto mb-2" />
-                          <p className="text-[10px] font-black uppercase tracking-widest">El manifiesto está vacío</p>
-                        </div>
-                      ) : (
-                        inventory.map((item) => (
-                           <div key={item.id} className="flex items-center justify-between p-4 bg-zinc-950/50 rounded-2xl border border-white/5">
-                              <span className="text-xs font-black text-zinc-300 uppercase tracking-tight line-clamp-1">{item.name}</span>
-                              <div className="flex items-center gap-4 shrink-0">
-                                 <span className="text-[10px] font-black text-blue-500">1 UNIT.</span>
-                                 <button onClick={() => removeInventoryItem(item.id)} className="text-zinc-700 hover:text-red-500 transition-colors">
-                                    <Trash2 className="w-4 h-4" />
-                                 </button>
-                              </div>
-                           </div>
-                        ))
-                      )}
-                   </div>
-
-                   <div className="flex items-center justify-between pt-4 border-t border-white/5">
-                      <div className="flex flex-col">
-                        <span className="text-[8px] font-black text-zinc-600 uppercase tracking-widest">Total Masa</span>
-                        <span className="text-white font-black text-lg italic tracking-tighter uppercase">{weight} KG</span>
-                      </div>
-                      <div className="flex flex-col text-right">
-                        <span className="text-[8px] font-black text-zinc-600 uppercase tracking-widest">Capacidad IA</span>
-                        <span className="text-blue-500 font-black text-lg italic tracking-tighter uppercase">99.2%</span>
-                      </div>
-                   </div>
-                </div>
+                <DigitalManifest items={inventory as any} onUpdate={setInventory as any} />
              </div>
 
              {/* FINAL PRICE & ACTION */}
