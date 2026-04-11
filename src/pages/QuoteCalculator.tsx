@@ -39,9 +39,17 @@ const units = [
 ];
 
 const services = [
-  { id: 'mudanza', label: 'Mudanza', sub: 'Servicio de hogar/oficina', multiplier: 1.2 },
-  { id: 'express', label: 'Envío Express', sub: 'Entrega prioritaria', multiplier: 1.4 },
-  { id: 'carga_pesada', label: 'Carga Pesada', sub: 'Solo transporte de carga', multiplier: 1 },
+  { id: 'mudanza_hogar', label: 'Mudanza de Hogar', sub: 'Casas y departamentos completos', multiplier: 1.2 },
+  { id: 'mudanza_oficina', label: 'Mudanza de Oficina', sub: 'Equipos, cubículos y mobiliario', multiplier: 1.3 },
+  { id: 'carga_pesada', label: 'Carga Pesada', sub: 'Materiales industriales o maquinaria', multiplier: 1.5 },
+  { id: 'express', label: 'Envío Express', sub: 'Entrega prioritaria el mismo día', multiplier: 1.4 },
+  { id: 'electrodomesticos', label: 'Transporte de Electrodomésticos', sub: 'Refrigeradoras, TV, lavadoras', multiplier: 1.1 },
+  { id: 'material_construccion', label: 'Materiales de Construcción', sub: 'Cemento, varillas, ladrillos', multiplier: 1.2 },
+  { id: 'distribucion_retail', label: 'Distribución Retail (B2B)', sub: 'Lotes hacia puntos de venta', multiplier: 1.1 },
+  { id: 'carga_fragil', label: 'Carga Delicada / Frágil', sub: 'Cristalería, arte, equipos de precisión', multiplier: 1.6 },
+  { id: 'cadena_frio', label: 'Cadena de Frío (Alimentos/Medicina)', sub: 'Transporte refrigerado exclusivo', multiplier: 1.8 },
+  { id: 'desmonte', label: 'Recolección de Desmonte', sub: 'Escombros y residuos de construcción', multiplier: 1.2 },
+  { id: 'remolque', label: 'Remolque de Vehículos', sub: 'Grúa para autos o motos', multiplier: 2.0 },
 ];
 
 function haversineKm(lat1: number, lng1: number, lat2: number, lng2: number): number {
@@ -277,20 +285,34 @@ const QuoteCalculator = () => {
               <div className="space-y-1 mb-6">
                 <h2 className="text-2xl font-black text-white uppercase tracking-tighter italic">Personaliza <span className="text-emerald-500">Servicio</span></h2>
               </div>
-              <div className="grid gap-4 max-w-md">
-                {services.map((s) => (
-                  <button
-                    key={s.id}
-                    onClick={() => setServiceId(s.id)}
-                    className={cn(
-                      "flex flex-col items-center gap-2 p-6 rounded-[32px] border transition-all duration-300 relative overflow-hidden group",
-                      serviceId === s.id ? "bg-emerald-600 border-emerald-400 text-center" : "bg-[#060E20] border-white/5 text-center"
-                    )}
+              <div className="max-w-md">
+                <div className="relative group">
+                  <select 
+                    value={serviceId}
+                    onChange={(e) => setServiceId(e.target.value)}
+                    className="w-full bg-[#060E20] border-2 border-white/5 text-white font-black text-lg p-6 rounded-[32px] appearance-none focus:outline-none focus:border-emerald-500/50 hover:bg-white/[0.02] transition-colors cursor-pointer"
                   >
-                    <h4 className={cn("font-black text-xl uppercase tracking-tighter italic", serviceId === s.id ? "text-white" : "text-zinc-200")}>{s.label}</h4>
-                    <p className={cn("text-[10px] font-black uppercase tracking-widest", serviceId === s.id ? "text-emerald-200" : "text-zinc-600")}>{s.sub}</p>
-                  </button>
-                ))}
+                    {services.map((s) => (
+                      <option key={s.id} value={s.id} className="bg-[#060E20] text-zinc-300 font-bold">
+                        {s.label} — {s.sub}
+                      </option>
+                    ))}
+                  </select>
+                  <div className="absolute inset-y-0 right-6 flex items-center pointer-events-none">
+                    <ChevronLeft className="w-6 h-6 text-emerald-500 -rotate-90 group-hover:translate-y-1 transition-transform" />
+                  </div>
+                </div>
+                {/* Visual Indicator of current service */}
+                <div className="mt-4 p-4 border border-emerald-500/20 bg-emerald-500/5 rounded-2xl flex items-center gap-4">
+                   <div className="w-10 h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center">
+                     <PackageCheck className="w-5 h-5 text-emerald-400" />
+                   </div>
+                   <div>
+                      <p className="text-[10px] text-emerald-400 font-black uppercase tracking-widest">Servicio Seleccionado</p>
+                      <p className="text-white font-black text-sm uppercase">{services.find(s=>s.id === serviceId)?.label}</p>
+                      <p className="text-[9px] text-zinc-400 font-bold">{services.find(s=>s.id === serviceId)?.sub}</p>
+                   </div>
+                </div>
               </div>
             </div>
 

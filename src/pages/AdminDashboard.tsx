@@ -4,13 +4,15 @@ import { Badge } from "@/components/ui/badge";
 import { 
   DollarSign, Truck, Package, Users, Loader2, 
   BarChart3, TrendingUp, Zap, ArrowUpRight, 
-  Map as MapIcon, ShieldCheck, Activity, Radio
+  Map as MapIcon, ShieldCheck, Activity, Radio, AlertTriangle
 } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, AreaChart, Area } from 'recharts';
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
+import { toast } from "sonner";
+import { useEffect } from "react";
 
 const AdminDashboard = () => {
   const { data: stats, isLoading } = useQuery({
@@ -50,6 +52,53 @@ const AdminDashboard = () => {
       };
     },
   });
+
+  const queryClient = useQueryClient();
+
+  useEffect(() => {
+    // Escuchar nuevos envíos (notificación vibrante al admin)
+    const channel = supabase.channel('admin-shipments-alert')
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'shipments' }, (payload) => {
+         // Sonido de alerta
+         try {
+           const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
+           const ctx = new AudioContext();
+           const playBeep = (freq: number, start: number, duration: number) => {
+             const osc = ctx.createOscillator();
+             const gain = ctx.createGain();
+             osc.connect(gain);
+             gain.connect(ctx.destination);
+             osc.frequency.value = freq;
+             osc.type = "square";
+             gain.gain.setValueAtTime(0.5, ctx.currentTime + start);
+             gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + start + duration);
+             osc.start(ctx.currentTime + start);
+             osc.stop(ctx.currentTime + start + duration);
+           };
+           playBeep(1000, 0.0, 0.1);
+           playBeep(1200, 0.2, 0.1);
+           playBeep(1000, 0.4, 0.2);
+         } catch(e) {}
+
+         toast.success('¡NUEVA SOLICITUD DE SERVICIO! 🚨', {
+            description: `Se acaba de crear un envío: ${payload.new.tracking_id} por S/ ${payload.new.price}`,
+            duration: 10000,
+            style: {
+               background: '#10b981',
+               color: 'white',
+               borderColor: 'transparent',
+               fontWeight: 'bold',
+               textTransform: 'uppercase',
+            }
+         });
+         
+         // Invalidate queries to refresh charts
+         queryClient.invalidateQueries({ queryKey: ["admin-stats-v2"] });
+      })
+      .subscribe();
+      
+    return () => { supabase.removeChannel(channel); };
+  }, [queryClient]);
 
   if (isLoading) {
     return (

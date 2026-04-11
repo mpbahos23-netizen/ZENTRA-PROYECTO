@@ -8,6 +8,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { useEffect, useState, useMemo } from "react";
 import { supabase } from "@/lib/supabase";
+import { toast } from "sonner";
+import ClientMapTracker from "@/components/tracking/ClientMapTracker";
 
 // ============================================
 // ZENTRA OBSIDIAN: Client Dashboard Refactor
@@ -57,9 +59,11 @@ const ClientDashboard = () => {
 
   const getStatusLabel = (status: string) => {
     switch (status) {
-      case 'on_route': return 'EN LÍNEA';
-      case 'delivered': return 'FINALIZADO';
-      case 'pending': return 'CONFIRMANDO';
+      case 'on_route': return 'CAMIÓN YA EN PROGRESO YENDO';
+      case 'pickup': return 'CAMIÓN EN RECOJO';
+      case 'transit': return 'CAMIÓN ENVIANDO LA CARGA';
+      case 'delivered': return 'CAMIÓN YA LLEGÓ';
+      case 'pending': return 'BUSCANDO CAMIONES ...';
       default: return 'PENDIENTE';
     }
   };
@@ -128,6 +132,50 @@ const ClientDashboard = () => {
             </div>
           </div>
 
+          {/* DRIVER RIDE-HAILING SIMULATION UI */}
+          {shipments.some(s => s.status === 'pending') && (
+            <div className="bg-[#101015] border border-blue-500/30 rounded-[32px] p-6 mb-6 shadow-[0_0_50px_rgba(59,130,246,0.15)] animate-in fade-in zoom-in-95 relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/10 blur-[50px] -mt-20 -mr-20" />
+                <div className="flex flex-col md:flex-row items-center justify-between gap-6 relative z-10">
+                   <div className="flex items-center gap-4">
+                      <div className="w-16 h-16 rounded-full border-2 border-blue-500 p-1 relative">
+                         <div className="absolute top-0 right-0 w-4 h-4 bg-emerald-500 border-2 border-[#101015] rounded-full" />
+                         <img src="https://i.pravatar.cc/150?img=11" alt="Driver" className="w-full h-full rounded-full object-cover" />
+                      </div>
+                      <div>
+                         <p className="text-[10px] text-blue-400 font-black uppercase tracking-widest animate-pulse">¡Camión Encontrado!</p>
+                         <h4 className="text-white font-black text-xl italic uppercase font-inter leading-none">Carlos R.</h4>
+                         <div className="flex items-center gap-2 mt-1">
+                            <span className="text-[9px] text-zinc-400 font-bold bg-white/5 px-2 py-0.5 rounded-md uppercase">Volvo FMX</span>
+                            <span className="text-[9px] text-yellow-500 font-black">★ 4.98</span>
+                         </div>
+                      </div>
+                   </div>
+                   
+                   <div className="flex items-center gap-4 w-full md:w-auto">
+                      <div className="text-right">
+                         <p className="text-[8px] text-zinc-500 font-black uppercase tracking-widest">Oferta del Conductor</p>
+                         <p className="text-2xl font-black text-white italic tracking-tighter">S/ {shipments.find(s => s.status === 'pending')?.price.toLocaleString()} PEN</p>
+                      </div>
+                      <Button 
+                        onClick={async () => {
+                           const target = shipments.find(s => s.status === 'pending');
+                           if(!target) return;
+                           const { error } = await supabase.from('shipments').update({ status: 'on_route' }).eq('id', target.id);
+                           if(!error) {
+                             setShipments(shipments.map(s => s.id === target.id ? { ...s, status: 'on_route' } : s));
+                             toast.success("¡Oferta Aceptada y Cobrada! El conductor va en camino.");
+                           }
+                        }}
+                        className="h-14 px-8 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white font-black uppercase tracking-[0.2em] shadow-[0_10px_20px_rgba(59,130,246,0.3)] hover:scale-105 active:scale-95 transition-all text-[10px]"
+                      >
+                         Aceptar
+                      </Button>
+                   </div>
+                </div>
+            </div>
+          )}
+
           <Card className="bg-[#060E20]/50 border-white/5 rounded-[40px] overflow-hidden backdrop-blur-3xl shadow-2xl">
             <div className="overflow-x-auto text-nowrap">
               <table className="w-full text-left">
@@ -187,16 +235,21 @@ const ClientDashboard = () => {
                           <div className="flex flex-col gap-2 max-w-[220px]">
                             <div className="flex items-center gap-3">
                                 <div className="w-1.5 h-1.5 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.5)]" />
-                                <p className="text-[11px] text-zinc-300 font-black truncate uppercase tracking-tight">{shipment.origin_address.split(',')[0]}</p>
+                                <p className="text-[11px] text-zinc-300 font-black truncate uppercase tracking-tight">{(shipment.origin_address || shipment.origin || 'Desconocido').split(',')[0]}</p>
                             </div>
                             <div className="flex items-center gap-3">
                                 <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
-                                <p className="text-[11px] text-zinc-300 font-black truncate uppercase tracking-tight">{shipment.destination_address.split(',')[0]}</p>
+                                <p className="text-[11px] text-zinc-300 font-black truncate uppercase tracking-tight">{(shipment.destination_address || shipment.destination || 'Desconocido').split(',')[0]}</p>
                             </div>
                           </div>
                         </td>
                         <td className="px-8 py-8">
-                          <div className={cn("inline-flex px-4 py-2 rounded-xl text-[9px] font-black tracking-[0.1em] border uppercase", getStatusColor(shipment.status))}>
+                          <div className={cn(
+                            "inline-flex px-4 py-2 rounded-xl text-[9px] font-black tracking-[0.1em] border uppercase overflow-hidden relative", 
+                            getStatusColor(shipment.status),
+                            shipment.status === 'pending' && "animate-pulse shadow-[0_0_20px_rgba(245,158,11,0.2)]"
+                          )}>
+                            {shipment.status === 'pending' && <div className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full animate-[shimmer_2s_infinite]" />}
                             {getStatusLabel(shipment.status)}
                           </div>
                         </td>
@@ -223,6 +276,15 @@ const ClientDashboard = () => {
               </table>
             </div>
           </Card>
+        </div>
+
+        {/* TRACKER MAP - Uber/indrive like view */}
+        <div className="mb-12">
+           <div className="flex items-center gap-3 mb-4 px-2">
+             <div className="w-1.5 h-6 bg-red-600 rounded-full" />
+             <h2 className="text-lg font-black text-white uppercase tracking-tighter">Monitoreo <span className="text-red-500">Live</span></h2>
+           </div>
+           <ClientMapTracker />
         </div>
 
         {/* BOTTOM TIDY: TIPS */}

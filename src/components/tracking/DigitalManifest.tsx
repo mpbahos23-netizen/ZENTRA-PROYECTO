@@ -6,7 +6,7 @@ import {
   ListChecks, Plus, Trash2, ShieldCheck, 
   AlertCircle, ChevronRight, Hash, Info,
   Scale, Box, History, CheckCircle2, Clock,
-  Save, Check
+  Save, Check, Camera
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
@@ -23,6 +23,7 @@ interface ManifestItem {
   weightPerUnit: number; // KG
   status: 'pending' | 'verified' | 'flagged';
   lastAudit: string;
+  imageUrl?: string;
 }
 
 interface DigitalManifestProps {
@@ -43,6 +44,7 @@ export default function DigitalManifest({
   const [editFields, setEditFields] = useState<{
     quantity: number;
     weightPerUnit: number;
+    imageUrl?: string;
   }>({ quantity: 1, weightPerUnit: 1 });
 
   const addItem = () => {
@@ -98,6 +100,7 @@ export default function DigitalManifest({
         ...i, 
         quantity: editFields.quantity, 
         weightPerUnit: editFields.weightPerUnit,
+        imageUrl: editFields.imageUrl,
         lastAudit: new Date().toISOString()
       } : i
     );
@@ -114,8 +117,18 @@ export default function DigitalManifest({
       setActiveItem(item.id);
       setEditFields({
         quantity: item.quantity,
-        weightPerUnit: item.weightPerUnit
+        weightPerUnit: item.weightPerUnit,
+        imageUrl: item.imageUrl
       });
+    }
+  };
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const url = URL.createObjectURL(file);
+      setEditFields(prev => ({ ...prev, imageUrl: url }));
+      toast.success("Imagen adjuntada al ítem");
     }
   };
 
@@ -252,6 +265,30 @@ export default function DigitalManifest({
                               className="bg-zinc-900/50 border-white/10 h-12 text-white font-black text-sm rounded-2xl focus:border-blue-500/50 transition-all placeholder:text-zinc-800"
                             />
                         </div>
+                     </div>
+
+                     {/* FOTO UPLOAD */}
+                     <div className="mb-4">
+                        <label className="flex items-center justify-between text-[8px] text-zinc-600 font-black uppercase tracking-[0.2em] px-1 italic mb-2">
+                          <span>Fotografía de Bulto/Ítem</span>
+                          {editFields.imageUrl && <span className="text-blue-500 font-black">1 FOTO ADJUNTADA</span>}
+                        </label>
+                        <label className="flex items-center justify-center h-20 w-full rounded-2xl border-2 border-dashed border-white/10 bg-zinc-900/50 cursor-pointer hover:bg-white/5 transition-colors overflow-hidden relative group">
+                          <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
+                          {editFields.imageUrl ? (
+                            <>
+                              <img src={editFields.imageUrl} alt="Ref" className="absolute inset-0 w-full h-full object-cover opacity-60" />
+                              <div className="absolute inset-0 flex items-center justify-center bg-black/40 group-hover:bg-black/60 transition-colors">
+                                 <p className="text-[10px] font-bold text-white uppercase flex items-center gap-2"><Camera className="w-4 h-4"/> Cambiar Foto</p>
+                              </div>
+                            </>
+                          ) : (
+                            <div className="flex items-center gap-2 text-zinc-500 group-hover:text-zinc-300">
+                              <Camera className="w-5 h-5" />
+                              <span className="text-xs font-bold uppercase tracking-widest">Subir Foto</span>
+                            </div>
+                          )}
+                        </label>
                      </div>
 
                      <div className="grid grid-cols-2 gap-4 items-center">

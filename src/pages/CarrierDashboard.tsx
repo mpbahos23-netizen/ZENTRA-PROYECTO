@@ -15,6 +15,7 @@ import {
   Navigation
 } from "lucide-react";
 import ETAValidator from "@/components/carrier/ETAValidator";
+import DriverLocationSender from "@/components/tracking/DriverLocationSender";
 import { 
   PieChart, 
   Pie, 
@@ -48,6 +49,8 @@ const revenueData = [
   { name: 'Vie', ingresos: 5900 }, { name: 'Sáb', ingresos: 3200 },
   { name: 'Dom', ingresos: 2100 },
 ];
+
+import { CurrentShipmentControl } from '@/components/carrier/CurrentShipmentControl';
 
 export default function CarrierDashboard() {
   const [activeShipments, setActiveShipments] = useState(0);
@@ -114,7 +117,11 @@ export default function CarrierDashboard() {
   return (
     <DashboardLayout role="carrier">
       <CarrierJobAlert />
+      {isOnline && <DriverLocationSender />}
       <div className="max-w-7xl mx-auto space-y-8 pb-32 animate-in fade-in duration-700">
+        
+        {/* ACTIVE SHIPMENT CONTROL */}
+        <CurrentShipmentControl isOnline={isOnline} />
 
         {/* --- HERO STATUS SECTION --- */}
         <div className="relative overflow-hidden rounded-[40px] bg-[#060E20] border border-white/5 p-8 md:p-12 shadow-2xl">
