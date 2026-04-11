@@ -48,7 +48,7 @@ export default function DigitalManifest({
   const addItem = () => {
     const newItem: ManifestItem = {
       id: Math.random().toString(36).substr(2, 9),
-      name: 'Nuevo Item ' + (items.length + 1),
+      name: 'Nuevo Item',
       quantity: 1,
       weightPerUnit: 5,
       status: 'pending',
@@ -57,7 +57,10 @@ export default function DigitalManifest({
     const newItems = [...items, newItem];
     setItems(newItems);
     onUpdate?.(newItems);
-    toast.info('Item añadido al manifiesto');
+    // Auto-open edge case for seamless UX
+    setActiveItem(newItem.id);
+    setEditFields({ quantity: 1, weightPerUnit: 5 });
+    toast.info('Item añadido al manifiesto. Modifica sus valores.');
   };
 
   const removeItem = (id: string) => {
@@ -101,7 +104,7 @@ export default function DigitalManifest({
     setItems(newItems);
     onUpdate?.(newItems);
     toast.success("Cambios guardados");
-    // Optionally close the accordion or stay open
+    setActiveItem(null); // Return to list view
   };
 
   const handleExpand = (item: ManifestItem) => {

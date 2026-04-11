@@ -140,7 +140,7 @@ export default function MapPicker({
 
         const lat = place.geometry.location.lat();
         const lng = place.geometry.location.lng();
-        const address = place.formatted_address || place.name;
+        const address = (place.name && !place.formatted_address?.startsWith(place.name)) ? `${place.name}, ${place.formatted_address}` : place.formatted_address || place.name;
 
         mapInstance.current.setZoom(16);
         mapInstance.current.panTo({ lat, lng });
