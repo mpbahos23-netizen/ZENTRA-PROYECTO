@@ -9,10 +9,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/lib/supabase";
 import { toast } from "sonner";
-import NotificationsPanel from "@/components/notifications/NotificationsPanel";
 import { useState, useEffect } from "react";
 import InstallPWA from "@/components/pwa/InstallPWA";
-import { Download } from "lucide-react";
+import RealtimeUpdateMonitor from "@/components/realtime/RealtimeUpdateMonitor";
+import { Download, RefreshCw } from "lucide-react";
 
 type NavItem = { label: string; href: string; icon: React.ElementType };
 
@@ -60,8 +60,6 @@ const DashboardLayout = ({ children, role: initialRole }: DashboardLayoutProps) 
         { label: "Operaciones", href: "/admin/operations", icon: Radio },
         { label: "Inventario", href: "/admin/inventory", icon: Package },
         { label: "Ganancias", href: "/carrier/earnings", icon: DollarSign },
-        { label: "Nuevo Envío", href: "/client/book", icon: PackagePlus },
-        { label: "Presupuesto", href: "/quote", icon: FileSignature },
         { label: "Facturas", href: "/client/invoices", icon: FileText },
       ]
     : role === 'carrier'
@@ -73,9 +71,7 @@ const DashboardLayout = ({ children, role: initialRole }: DashboardLayoutProps) 
       : role === 'client'
         ? [
             { label: "Mis Envíos", href: "/client", icon: LayoutDashboard },
-            { label: "Nuevo Envío", href: "/client/book", icon: PackagePlus },
             { label: "Facturas", href: "/client/invoices", icon: FileText },
-            { label: "Presupuesto", href: "/quote", icon: FileSignature },
           ]
         : [];
 
@@ -109,6 +105,7 @@ const DashboardLayout = ({ children, role: initialRole }: DashboardLayoutProps) 
 
   return (
     <div className="flex h-screen bg-black text-white font-sans overflow-hidden w-full relative">
+      <RealtimeUpdateMonitor />
 
       {/* ── Mobile Full-Screen Menu Overlay (for extra items / settings) ── */}
       {mobileMenuOpen && (
@@ -305,14 +302,14 @@ const DashboardLayout = ({ children, role: initialRole }: DashboardLayoutProps) 
         </header>
 
         {/* Page content - add bottom padding on mobile for the bottom nav */}
-        <main className="flex-1 overflow-auto p-4 md:p-8 pb-24 md:pb-8">
+        <main className="flex-1 overflow-x-hidden p-4 md:p-8 pb-32 md:pb-8">
           {children}
         </main>
       </div>
 
       {/* ── Mobile Bottom Navigation Bar ── */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-black/95 backdrop-blur-xl border-t border-white/5">
-        <div className="flex items-center justify-around h-16 px-1 safe-area-pb">
+      <nav className="md:hidden fixed bottom-6 left-6 right-6 z-40 bg-black/80 backdrop-blur-2xl border border-white/10 rounded-[24px] shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
+        <div className="flex items-center justify-around h-16 px-2">
           {bottomNavItems.map((item) => {
             const active = isActive(item.href);
             return (
@@ -320,37 +317,28 @@ const DashboardLayout = ({ children, role: initialRole }: DashboardLayoutProps) 
                 key={item.href}
                 to={item.href}
                 className={cn(
-                  "flex flex-col items-center justify-center gap-1 flex-1 h-full rounded-xl transition-all py-2",
-                  active ? "text-[#00e5ff]" : "text-zinc-600 active:text-zinc-400"
+                  "flex flex-col items-center justify-center gap-1 flex-1 h-full rounded-2xl transition-all py-2 relative",
+                  active ? "text-[#00e5ff]" : "text-zinc-600"
                 )}
               >
                 <item.icon
                   className={cn(
-                    "w-5 h-5 transition-all",
-                    active && "drop-shadow-[0_0_6px_rgba(0,229,255,0.7)]"
+                    "w-5 h-5 transition-all duration-300",
+                    active && "scale-110 drop-shadow-[0_0_8px_rgba(0,229,255,0.6)]"
                   )}
                 />
                 <span className={cn(
-                  "text-[9px] font-black uppercase tracking-wide leading-none",
-                  active ? "text-[#00e5ff]" : "text-zinc-700"
+                  "text-[8px] font-black uppercase tracking-tight",
+                  active ? "text-[#00e5ff]" : "text-zinc-700 font-bold"
                 )}>
                   {item.label.split(' ')[0]}
                 </span>
                 {active && (
-                  <div className="absolute bottom-0 w-6 h-0.5 bg-[#00e5ff] rounded-full" />
+                  <div className="absolute -bottom-1 w-5 h-1 bg-[#00e5ff] rounded-full blur-[2px]" />
                 )}
               </Link>
             );
           })}
-
-          {/* Logout button in bottom nav */}
-          <button
-            onClick={handleLogout}
-            className="flex flex-col items-center justify-center gap-1 flex-1 h-full rounded-xl text-zinc-700 active:text-red-400 transition-all py-2"
-          >
-            <LogOut className="w-5 h-5" />
-            <span className="text-[9px] font-black uppercase tracking-wide leading-none">Salir</span>
-          </button>
         </div>
       </nav>
 
