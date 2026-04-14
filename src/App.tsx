@@ -28,22 +28,46 @@ import CarrierEarnings from "./pages/CarrierEarnings";
 const queryClient = new QueryClient();
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
+  const [session, setSession] = useState<any>(null);
   const [status, setStatus] = useState<'loading' | 'auth' | 'unauth'>('loading');
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setStatus(session ? 'auth' : 'unauth');
+    let mounted = true;
+
+    async function checkAuth() {
+      try {
+        const { data: { session: currentSession } } = await supabase.auth.getSession();
+        if (mounted) {
+          setSession(currentSession);
+          setStatus(currentSession ? 'auth' : 'unauth');
+        }
+      } catch (err) {
+        if (mounted) setStatus('unauth');
+      }
+    }
+
+    checkAuth();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, currentSession) => {
+      if (mounted) {
+        setSession(currentSession);
+        setStatus(currentSession ? 'auth' : 'unauth');
+      }
     });
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_, session) => {
-      setStatus(session ? 'auth' : 'unauth');
-    });
-    return () => subscription.unsubscribe();
+
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
   }, []);
 
   if (status === 'loading') {
     return (
-      <div className="flex items-center justify-center h-screen bg-black w-full">
-        <div className="w-8 h-8 border-2 border-white/10 border-t-[#00e5ff] rounded-full animate-spin" />
+      <div className="flex items-center justify-center h-screen bg-[#060E20] w-full">
+        <div className="flex flex-col items-center gap-6">
+          <div className="w-12 h-12 border-2 border-white/5 border-t-blue-500 rounded-full animate-spin shadow-[0_0_20px_rgba(59,130,246,0.2)]" />
+          <p className="text-[10px] text-zinc-600 font-black uppercase tracking-[0.4em] animate-pulse">Autenticando Zentra...</p>
+        </div>
       </div>
     );
   }
