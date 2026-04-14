@@ -8,7 +8,7 @@ export const supabase = createClient(supabaseUrl, supabaseKey, {
     persistSession: true,
     autoRefreshToken: true,
     detectSessionInUrl: true,       // Captura tokens de recovery/magic links en la URL
-    storageKey: 'zentra-auth-token', // Key consistente para localStorage
+    storageKey: 'zentra-v2-token', // Cambiado de 'zentra-auth-token' para forzar sesión limpia
     flowType: 'implicit',           // Necesario para recovery links en SPA
   },
 });
