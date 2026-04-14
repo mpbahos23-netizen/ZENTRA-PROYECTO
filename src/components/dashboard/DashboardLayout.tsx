@@ -11,8 +11,7 @@ import { supabase } from "@/lib/supabase";
 import { toast } from "sonner";
 import { useState, useEffect } from "react";
 import InstallPWA from "@/components/pwa/InstallPWA";
-import RealtimeUpdateMonitor from "@/components/realtime/RealtimeUpdateMonitor";
-import { Download, RefreshCw } from "lucide-react";
+import { Download } from "lucide-react";
 
 type NavItem = { label: string; href: string; icon: React.ElementType };
 
@@ -105,7 +104,6 @@ const DashboardLayout = ({ children, role: initialRole }: DashboardLayoutProps) 
 
   return (
     <div className="flex h-screen bg-black text-white font-sans overflow-hidden w-full relative">
-      <RealtimeUpdateMonitor />
 
       {/* ── Mobile Full-Screen Menu Overlay (for extra items / settings) ── */}
       {mobileMenuOpen && (
