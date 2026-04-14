@@ -62,40 +62,47 @@ export default function CarrierDashboard() {
 
   useEffect(() => {
     const fetchData = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return;
 
-      const [shipmentsRes, allShipmentsRes] = await Promise.all([
-        supabase.from('shipments').select('id', { count: 'exact' }).eq('carrier_id', user.id).in('status', ['accepted', 'in_transit', 'carrier_selected']),
-        supabase.from('shipments').select('origin, status')
-      ]);
+        const [shipmentsRes, allShipmentsRes] = await Promise.all([
+          supabase.from('shipments').select('id', { count: 'exact' }).eq('carrier_id', user.id).in('status', ['accepted', 'in_transit', 'carrier_selected']),
+          supabase.from('shipments').select('origin, status')
+        ]);
 
-      setActiveShipments(shipmentsRes.count || 0);
-      setTotalEarnings(12450); 
+        setActiveShipments(shipmentsRes?.count || 0);
+        setTotalEarnings(12450); 
 
-      const zoneCounts: Record<string, number> = {};
-      (allShipmentsRes.data || []).forEach(s => {
-        if (s.status === 'searching' || s.status === 'bidding') {
-          const zone = s.origin.split(',')[0].trim();
-          zoneCounts[zone] = (zoneCounts[zone] || 0) + 1;
+        if (allShipmentsRes?.data) {
+          const zoneCounts: Record<string, number> = {};
+          allShipmentsRes.data.forEach(s => {
+            if (s.status === 'searching' || s.status === 'bidding') {
+              const zone = s.origin ? s.origin.split(',')[0].trim() : 'N/A';
+              zoneCounts[zone] = (zoneCounts[zone] || 0) + 1;
+            }
+          });
+
+          const processedZones = Object.entries(zoneCounts)
+            .map(([zone, count]) => ({ zone, count }))
+            .sort((a,b) => b.count - a.count)
+            .slice(0, 3);
+          setHotZones(processedZones);
         }
-      });
-
-      const processedZones = Object.entries(zoneCounts)
-        .map(([zone, count]) => ({ zone, count }))
-        .sort((a,b) => b.count - a.count)
-        .slice(0, 3);
-
-      setHotZones(processedZones);
-      
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('full_name')
-        .eq('id', user.id)
-        .single();
-      if (profile?.full_name) setProfileName(profile.full_name);
-      
-      setLoading(false);
+        
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('full_name')
+          .eq('id', user.id)
+          .single();
+        if (profile?.full_name) setProfileName(profile.full_name);
+        
+      } catch (err) {
+        console.error("Error en Dashboard de Transportista:", err);
+        // No dejamos de cargar para que la UI al menos se muestre
+      } finally {
+        setLoading(false);
+      }
     };
 
     fetchData();
