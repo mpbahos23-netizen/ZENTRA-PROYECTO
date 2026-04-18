@@ -100,7 +100,7 @@ const Login = () => {
 
   if (storageError && !email) {
     return (
-      <div className="min-h-screen bg-[#0B1120] flex items-center justify-center p-6 text-center">
+      <div className="min-h-screen bg-background flex items-center justify-center p-6 text-center">
         <div className="max-w-sm space-y-6">
           <div className="w-20 h-20 bg-amber-500/10 rounded-full flex items-center justify-center mx-auto border border-amber-500/20">
             <AlertTriangle className="w-10 h-10 text-amber-500" />
@@ -122,7 +122,7 @@ const Login = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#0B1120] flex items-center justify-center p-6 font-inter relative overflow-hidden">
+    <div className="min-h-screen bg-background flex items-center justify-center p-6 font-inter relative overflow-hidden">
       <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-blue-500/10 blur-[120px] rounded-full -mr-32 -mt-32" />
       <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-blue-500/5 blur-[120px] rounded-full -ml-32 -mb-32" />
 

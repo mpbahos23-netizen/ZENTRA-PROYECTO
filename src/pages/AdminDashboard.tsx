@@ -155,7 +155,7 @@ const AdminDashboard = () => {
         {/* Big Metrics Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {cards.map((card, i) => (
-            <Card key={card.label} className="bg-[#0a0a0a] border-white/5 rounded-[32px] p-8 relative overflow-hidden group hover:border-[#00e5ff]/30 transition-all shadow-3xl">
+            <Card key={card.label} className="bg-card border-white/5 rounded-[32px] p-8 relative overflow-hidden group hover:border-[#00e5ff]/30 transition-all shadow-3xl">
                <div className={`absolute -top-10 -right-10 w-32 h-32 rounded-full blur-3xl opacity-5 group-hover:opacity-20 transition-opacity ${card.bg}`} />
                <div className={`w-14 h-14 rounded-2xl ${card.bg} flex items-center justify-center mb-6 border border-white/5 shadow-inner`}>
                   <card.icon className={`w-7 h-7 ${card.color}`} />
@@ -169,7 +169,7 @@ const AdminDashboard = () => {
         {/* Charts & Actions */}
         <div className="grid lg:grid-cols-3 gap-8">
            {/* Main Activity Chart */}
-           <Card className="lg:col-span-2 bg-[#0a0a0a] border-white/5 rounded-[48px] p-10 shadow-3xl overflow-hidden relative border border-white/5">
+           <Card className="lg:col-span-2 bg-card border-white/5 rounded-[48px] p-10 shadow-3xl overflow-hidden relative border border-white/5">
               <div className="flex justify-between items-center mb-10">
                  <div>
                     <h3 className="text-2xl font-black text-white uppercase italic tracking-tighter">Crecimiento Logístico</h3>

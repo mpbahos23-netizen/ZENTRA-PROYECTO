@@ -86,7 +86,7 @@ const ClientDashboard = () => {
 
           <Link to="/client/quote" className="group relative w-full max-w-2xl block">
             <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-[32px] blur opacity-20 group-hover:opacity-40 transition duration-1000 group-hover:duration-200"></div>
-            <div className="relative bg-[#060E20] border border-white/5 h-24 rounded-[32px] flex items-center px-8 gap-6 shadow-2xl transition-all group-hover:border-white/10 group-active:scale-[0.98]">
+            <div className="relative bg-background border border-white/5 h-24 rounded-[32px] flex items-center px-8 gap-6 shadow-2xl transition-all group-hover:border-white/10 group-active:scale-[0.98]">
               <div className="w-14 h-14 rounded-2xl bg-blue-600 flex items-center justify-center shadow-[0_0_30px_rgba(59,130,246,0.3)]">
                 <Search className="w-6 h-6 text-white" />
               </div>
@@ -110,7 +110,7 @@ const ClientDashboard = () => {
             </div>
             
             {/* ACTIVE FILTERS (NOW WORKING) */}
-            <div className="flex gap-2 bg-[#060E20] p-1.5 rounded-2xl border border-white/5">
+            <div className="flex gap-2 bg-background p-1.5 rounded-2xl border border-white/5">
                 {[
                   { id: 'all', label: 'Todos' },
                   { id: 'on_route', label: 'En Línea' },
@@ -176,7 +176,7 @@ const ClientDashboard = () => {
             </div>
           )}
 
-          <Card className="bg-[#060E20]/50 border-white/5 rounded-[40px] overflow-hidden backdrop-blur-3xl shadow-2xl">
+          <Card className="bg-card border-white/5 rounded-[40px] overflow-hidden backdrop-blur-3xl shadow-2xl">
             <div className="overflow-x-auto text-nowrap">
               <table className="w-full text-left">
                 <thead>

@@ -63,7 +63,7 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 
   if (status === 'loading') {
     return (
-      <div className="flex items-center justify-center h-screen bg-[#060E20] w-full">
+      <div className="flex items-center justify-center h-screen bg-background w-full">
         <div className="flex flex-col items-center gap-6">
           <div className="w-12 h-12 border-2 border-white/5 border-t-blue-500 rounded-full animate-spin shadow-[0_0_20px_rgba(59,130,246,0.2)]" />
           <p className="text-[10px] text-zinc-600 font-black uppercase tracking-[0.4em] animate-pulse">Autenticando Zentra...</p>

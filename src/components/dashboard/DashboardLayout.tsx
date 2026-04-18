@@ -11,6 +11,7 @@ import { supabase } from "@/lib/supabase";
 import { toast } from "sonner";
 import { useState, useEffect } from "react";
 import InstallPWA from "@/components/pwa/InstallPWA";
+import NotificationsPanel from "../notifications/NotificationsPanel";
 import { Download } from "lucide-react";
 
 type NavItem = { label: string; href: string; icon: React.ElementType };
@@ -90,7 +91,7 @@ const DashboardLayout = ({ children, role: initialRole }: DashboardLayoutProps) 
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-screen bg-black w-full">
+      <div className="flex items-center justify-center h-screen bg-background w-full">
         <div className="flex flex-col items-center gap-4">
           <Loader2 className="w-8 h-8 animate-spin text-[#00e5ff]" />
           <p className="text-[10px] text-zinc-600 font-black uppercase tracking-[0.4em]">Sincronizando Zentra...</p>
@@ -103,7 +104,7 @@ const DashboardLayout = ({ children, role: initialRole }: DashboardLayoutProps) 
     location.pathname === href || (location.pathname.startsWith(href) && href !== '/');
 
   return (
-    <div className="flex h-screen bg-black text-white font-sans overflow-hidden w-full relative">
+    <div className="flex h-screen bg-background text-white font-sans overflow-hidden w-full relative">
 
       {/* ── Mobile Full-Screen Menu Overlay (for extra items / settings) ── */}
       {mobileMenuOpen && (
@@ -166,7 +167,7 @@ const DashboardLayout = ({ children, role: initialRole }: DashboardLayoutProps) 
       )}
 
       {/* ── Desktop Sidebar ── */}
-      <aside className="hidden md:flex w-[260px] flex-col bg-black border-r border-white/5">
+      <aside className="hidden md:flex w-[260px] flex-col bg-background border-r border-white/5">
         <div className="p-6">
           <Link to="/" className="flex items-center gap-3">
             <img src="/zentra-logo.jpg" alt="Zentra Logo" className="h-10 w-auto object-contain rounded-lg" />
@@ -236,9 +237,9 @@ const DashboardLayout = ({ children, role: initialRole }: DashboardLayoutProps) 
       </aside>
 
       {/* ── Main content ── */}
-      <div className="flex-1 flex flex-col overflow-hidden bg-black">
+      <div className="flex-1 flex flex-col overflow-hidden bg-background">
         {/* Topbar */}
-        <header className="h-[64px] md:h-[88px] border-b border-white/5 bg-black flex items-center px-4 md:px-8 justify-between gap-4 shrink-0">
+        <header className="h-[64px] md:h-[88px] border-b border-white/5 bg-background flex items-center px-4 md:px-8 justify-between gap-4 shrink-0">
           {/* Mobile: Logo left, actions right */}
           <div className="md:hidden flex items-center gap-3">
             <img src="/zentra-logo.jpg" alt="Zentra Logo" className="h-8 w-auto object-contain rounded-lg" />
@@ -306,7 +307,7 @@ const DashboardLayout = ({ children, role: initialRole }: DashboardLayoutProps) 
       </div>
 
       {/* ── Mobile Bottom Navigation Bar ── */}
-      <nav className="md:hidden fixed bottom-6 left-6 right-6 z-40 bg-black/80 backdrop-blur-2xl border border-white/10 rounded-[24px] shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
+      <nav className="md:hidden fixed bottom-6 left-6 right-6 z-40 bg-background/80 backdrop-blur-2xl border border-white/10 rounded-[24px] shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
         <div className="flex items-center justify-around h-16 px-2">
           {bottomNavItems.map((item) => {
             const active = isActive(item.href);
