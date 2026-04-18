@@ -10,7 +10,7 @@ import heroDashboard from "@/assets/hero-dashboard.jpg";
 
 const HeroSection = () => {
   return (
-    <section className="relative min-h-screen bg-[#060E20] flex items-center overflow-hidden font-inter">
+    <section className="relative min-h-screen bg-background flex items-center overflow-hidden font-inter transition-colors duration-500">
       {/* Background Ambience & Grid */}
       <div className="absolute inset-0 opacity-[0.05]" style={{
         backgroundImage: 'linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)',
