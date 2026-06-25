@@ -27,10 +27,9 @@ const AdminDashboard = () => {
       if (shipmentsRes.error) throw shipmentsRes.error;
       const shipments = shipmentsRes.data || [];
       const profiles = profilesRes.data || [];
-      const payments = paymentsRes.data || [];
 
-      const totalGMV = shipments.reduce((acc, s) => acc + (Number(s.price) || 0), 0);
-      const netRevenue = payments.reduce((acc, p) => acc + (Number(p.amount) * 0.15), 0);
+      const activeTransitCount = shipments.filter(s => s.status === 'in_transit' || s.status === 'on_route' || s.status === 'accepted').length;
+      const deliveredCount = shipments.filter(s => s.status === 'delivered').length;
       const carriers = profiles.filter(p => p.role === "carrier");
       const clients = profiles.filter(p => p.role === "client");
 
@@ -39,15 +38,14 @@ const AdminDashboard = () => {
       const chartData = days.map((day, i) => ({
         name: day,
         shipments: Math.floor(Math.random() * 20) + 5, // Mock historical for visuals
-        revenue: Math.floor(Math.random() * 5000) + 1200
       }));
 
       return {
-        totalGMV,
-        netRevenue,
         carrierCount: carriers.length,
         clientCount: clients.length,
         shipmentCount: shipments.length,
+        activeTransitCount,
+        deliveredCount,
         chartData
       };
     },
@@ -81,7 +79,7 @@ const AdminDashboard = () => {
          } catch(e) {}
 
          toast.success('¡NUEVA SOLICITUD DE SERVICIO! 🚨', {
-            description: `Se acaba de crear un envío: ${payload.new.tracking_id} por S/ ${payload.new.price}`,
+            description: `Se acaba de crear un envío: ${payload.new.tracking_id}`,
             duration: 10000,
             style: {
                background: '#10b981',
@@ -124,10 +122,10 @@ const AdminDashboard = () => {
   }
 
   const cards = [
-    { label: "Volumen Total (GMV)", value: `$${stats.totalGMV.toLocaleString()}`, icon: DollarSign, color: "text-[#00e5ff]", bg: "bg-[#00e5ff]/10" },
-    { label: "Ingresos Netos", value: `$${stats.netRevenue.toLocaleString()}`, icon: TrendingUp, color: "text-emerald-400", bg: "bg-emerald-500/10" },
-    { label: "Conductores Activos", value: stats.carrierCount, icon: Truck, color: "text-violet-400", bg: "bg-violet-500/10" },
-    { label: "Envíos Totales", value: stats.shipmentCount, icon: Package, color: "text-amber-400", bg: "bg-amber-500/10" },
+    { label: "Envíos Totales", value: stats.shipmentCount, icon: Package, color: "text-[#00e5ff]", bg: "bg-[#00e5ff]/10" },
+    { label: "En Tránsito", value: stats.activeTransitCount, icon: Activity, color: "text-emerald-400", bg: "bg-emerald-500/10" },
+    { label: "Entregados", value: stats.deliveredCount, icon: ShieldCheck, color: "text-violet-400", bg: "bg-violet-500/10" },
+    { label: "Choferes Activos", value: stats.carrierCount, icon: Truck, color: "text-amber-400", bg: "bg-amber-500/10" },
   ];
 
   return (
@@ -181,22 +179,22 @@ const AdminDashboard = () => {
               </div>
               <div className="h-[350px] w-full">
                  <ResponsiveContainer width="100%" height="100%">
-                    <AreaChart data={stats?.chartData}>
-                       <defs>
-                          <linearGradient id="colorRev" x1="0" y1="0" x2="0" y2="1">
-                             <stop offset="5%" stopColor="#00e5ff" stopOpacity={0.3}/>
-                             <stop offset="95%" stopColor="#00e5ff" stopOpacity={0}/>
-                          </linearGradient>
-                       </defs>
-                       <CartesianGrid strokeDasharray="5 5" stroke="rgba(255,255,255,0.03)" vertical={false} />
-                       <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#444', fontSize: 10, fontWeight: 900 }} />
-                       <YAxis axisLine={false} tickLine={false} tick={{ fill: '#444', fontSize: 10, fontWeight: 900 }} />
-                       <Tooltip 
-                          contentStyle={{ backgroundColor: '#000', border: '1px solid #1ed1e6', borderRadius: 24, padding: 20 }}
-                          itemStyle={{ color: '#00e5ff', fontWeight: 900 }}
-                       />
-                       <Area type="monotone" dataKey="revenue" stroke="#00e5ff" strokeWidth={6} fillOpacity={1} fill="url(#colorRev)" />
-                    </AreaChart>
+                     <AreaChart data={stats?.chartData}>
+                        <defs>
+                           <linearGradient id="colorRev" x1="0" y1="0" x2="0" y2="1">
+                              <stop offset="5%" stopColor="#00e5ff" stopOpacity={0.3}/>
+                              <stop offset="95%" stopColor="#00e5ff" stopOpacity={0}/>
+                           </linearGradient>
+                        </defs>
+                        <CartesianGrid strokeDasharray="5 5" stroke="rgba(255,255,255,0.03)" vertical={false} />
+                        <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#fffff', fontSize: 10, fontWeight: 900 }} />
+                        <YAxis axisLine={false} tickLine={false} tick={{ fill: '#fffff', fontSize: 10, fontWeight: 900 }} />
+                        <Tooltip 
+                           contentStyle={{ backgroundColor: '#000', border: '1px solid #1ed1e6', borderRadius: 24, padding: 20 }}
+                           itemStyle={{ color: '#00e5ff', fontWeight: 900 }}
+                        />
+                        <Area type="monotone" dataKey="shipments" stroke="#00e5ff" strokeWidth={6} fillOpacity={1} fill="url(#colorRev)" />
+                     </AreaChart>
                  </ResponsiveContainer>
               </div>
            </Card>
@@ -211,9 +209,9 @@ const AdminDashboard = () => {
                     <Button asChild variant="outline" className="h-16 rounded-3xl border-white/5 bg-white/5 text-[10px] font-black uppercase tracking-widest hover:bg-[#00e5ff] hover:text-black transition-all">
                        <Link to="/admin/operations"><Radio className="w-4 h-4 mr-3 animate-pulse" /> Radar de Flota Activo</Link>
                     </Button>
-                    <Button asChild variant="outline" className="h-16 rounded-3xl border-white/5 bg-white/5 text-[10px] font-black uppercase tracking-widest hover:bg-white hover:text-black transition-all">
-                       <Link to="/client/invoices"><BarChart3 className="w-4 h-4 mr-3" /> Reportes de Pago</Link>
-                    </Button>
+                     <Button asChild variant="outline" className="h-16 rounded-3xl border-white/5 bg-white/5 text-[10px] font-black uppercase tracking-widest hover:bg-white hover:text-black transition-all">
+                        <Link to="/admin/inventory"><BarChart3 className="w-4 h-4 mr-3" /> Inventario y Manifiestos</Link>
+                     </Button>
                     <Button variant="outline" className="h-16 rounded-3xl border-white/5 border-dashed bg-transparent text-zinc-500 text-[10px] font-black uppercase tracking-widest hover:border-white/20 hover:text-white transition-all">
                        Configurar API Zentra
                     </Button>

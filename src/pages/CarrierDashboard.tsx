@@ -43,18 +43,18 @@ const distributionData = [
   { name: 'Compartidos', value: 10, color: '#10B981' },
 ];
 
-const revenueData = [
-  { name: 'Lun', ingresos: 4500 }, { name: 'Mar', ingresos: 5200 },
-  { name: 'Mié', ingresos: 4800 }, { name: 'Jue', ingresos: 6100 },
-  { name: 'Vie', ingresos: 5900 }, { name: 'Sáb', ingresos: 3200 },
-  { name: 'Dom', ingresos: 2100 },
+const distanceData = [
+  { name: 'Lun', km: 120 }, { name: 'Mar', km: 210 },
+  { name: 'Mié', km: 150 }, { name: 'Jue', km: 310 },
+  { name: 'Vie', km: 280 }, { name: 'Sáb', km: 90 },
+  { name: 'Dom', km: 40 },
 ];
 
 import { CurrentShipmentControl } from '@/components/carrier/CurrentShipmentControl';
 
 export default function CarrierDashboard() {
   const [activeShipments, setActiveShipments] = useState(0);
-  const [totalEarnings, setTotalEarnings] = useState(0);
+  const [completedTrips, setCompletedTrips] = useState(0);
   const [hotZones, setHotZones] = useState<{zone: string, count: number}[]>([]);
   const [isOnline, setIsOnline] = useState(false);
   const [profileName, setProfileName] = useState("USUARIO");
@@ -66,13 +66,14 @@ export default function CarrierDashboard() {
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) return;
 
-        const [shipmentsRes, allShipmentsRes] = await Promise.all([
+        const [shipmentsRes, allShipmentsRes, completedRes] = await Promise.all([
           supabase.from('shipments').select('id', { count: 'exact' }).eq('carrier_id', user.id).in('status', ['accepted', 'in_transit', 'carrier_selected']),
-          supabase.from('shipments').select('origin, status')
+          supabase.from('shipments').select('origin, status'),
+          supabase.from('shipments').select('id', { count: 'exact' }).eq('carrier_id', user.id).eq('status', 'delivered')
         ]);
 
         setActiveShipments(shipmentsRes?.count || 0);
-        setTotalEarnings(12450); 
+        setCompletedTrips(completedRes?.count || 0); 
 
         if (allShipmentsRes?.data) {
           const zoneCounts: Record<string, number> = {};
@@ -203,10 +204,10 @@ export default function CarrierDashboard() {
             <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-500/5 blur-2xl rounded-full" />
             <div className="relative z-10">
               <div className="w-14 h-14 rounded-2xl bg-emerald-500/10 flex items-center justify-center border border-emerald-500/20 mb-6 group-hover:scale-110 transition-transform">
-                <DollarSign className="w-7 h-7 text-emerald-400" />
+                <ShieldCheck className="w-7 h-7 text-emerald-400" />
               </div>
-              <p className="text-xs text-zinc-500 font-black uppercase tracking-widest mb-2">Ganancias Netas</p>
-              <h3 className="text-5xl font-black text-white tracking-tighter">${totalEarnings.toLocaleString()}</h3>
+              <p className="text-xs text-zinc-500 font-black uppercase tracking-widest mb-2">Viajes Completados</p>
+              <h3 className="text-5xl font-black text-white tracking-tighter">{completedTrips}</h3>
               <div className="mt-4 flex items-center gap-2 text-emerald-400 text-[10px] font-bold">
                  <TrendingUp className="w-3 h-3" /> +12% VS SEMANA ANTERIOR
               </div>
@@ -239,7 +240,7 @@ export default function CarrierDashboard() {
                <div className="flex justify-between items-center mb-10">
                   <div>
                     <h2 className="text-2xl font-black text-white uppercase tracking-tighter">Gráfico de Tracción</h2>
-                    <p className="text-zinc-500 text-xs font-bold uppercase tracking-widest">Ingresos por Jornada Laboral</p>
+                    <p className="text-zinc-500 text-xs font-bold uppercase tracking-widest">Kilómetros Recorridos por Jornada Laboral</p>
                   </div>
                   <div className="bg-white/5 border border-white/10 rounded-2xl px-4 py-2 flex items-center gap-3">
                      <div className="w-2 h-2 rounded-full bg-blue-500 shadow-[0_0_10px_#3B82F6]" />
@@ -248,18 +249,20 @@ export default function CarrierDashboard() {
                </div>
                <div className="h-[320px] w-full">
                  <ResponsiveContainer width="100%" height="100%">
-                   <LineChart data={revenueData}>
+                   <LineChart data={distanceData}>
                      <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.02)" vertical={false} />
                      <XAxis 
                        dataKey="name" 
                        axisLine={false} 
                        tickLine={false} 
                        tick={{ fill: '#4b5563', fontSize: 10, fontWeight: '900' }} 
+                       className="font-inter"
                      />
                      <YAxis 
                        axisLine={false} 
                        tickLine={false} 
                        tick={{ fill: '#4b5563', fontSize: 10, fontWeight: '900' }} 
+                       className="font-inter"
                      />
                      <RechartsTooltip
                        contentStyle={{ 
@@ -273,7 +276,7 @@ export default function CarrierDashboard() {
                      />
                      <Line 
                        type="monotone" 
-                       dataKey="ingresos" 
+                       dataKey="km" 
                        stroke="#3B82F6" 
                        strokeWidth={6} 
                        dot={{ fill: '#3B82F6', r: 6, strokeWidth: 0 }} 

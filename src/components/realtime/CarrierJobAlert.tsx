@@ -1,19 +1,18 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import {
-  MapPin, Package, Clock, DollarSign, CheckCircle2,
+  MapPin, Package, Clock, CheckCircle2,
   XCircle, Truck, Weight, AlertTriangle, Send
 } from 'lucide-react';
-import { useCarrierJobRequests, useSubmitBid, useRejectJob } from '@/hooks/useJobRequests';
+import { useCarrierJobRequests, useRejectJob } from '@/hooks/useJobRequests';
 import type { JobRequest, Shipment } from '@/types/database';
 import { toast } from 'sonner';
+import { supabase } from '@/lib/supabase';
 
 // ============================================
 // CarrierJobAlert: Full-screen overlay with countdown
-// Modified for the new Auction System (Bidding)
+// Modified for Direct Assignment Acceptance (No bidding)
 // ============================================
 
 interface JobAlertCardProps {
@@ -24,9 +23,7 @@ interface JobAlertCardProps {
 
 function JobAlertCard({ job, onAccepted, onRejected }: JobAlertCardProps) {
   const [timeLeft, setTimeLeft] = useState(30);
-  const [bidAmount, setBidAmount] = useState<string>(job.shipment.price?.toString() || "");
-  const [bidMessage, setBidMessage] = useState("");
-  const { submitBid, submitting } = useSubmitBid();
+  const [accepting, setAccepting] = useState(false);
   const { rejectJob, rejecting } = useRejectJob();
 
   useEffect(() => {
@@ -45,19 +42,46 @@ function JobAlertCard({ job, onAccepted, onRejected }: JobAlertCardProps) {
     return () => clearInterval(interval);
   }, [job.expires_at, onRejected]);
 
-  const handleSubmitBid = useCallback(async () => {
-    const amount = parseFloat(bidAmount);
-    if (isNaN(amount) || amount <= 0) return;
-    
-    const success = await submitBid(job.id, job.shipment_id, amount, bidMessage);
-    if (success) {
-      onAccepted();
-      toast.success("¡Oferta Enviada!", {
-        description: "¡Vamos con toda! ¡Vamos por esa carga! Tu propuesta está en camino. 🚛🔥",
+  const handleAcceptJob = useCallback(async () => {
+    setAccepting(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('No autenticado');
+
+      // 1. Update job_request → accepted
+      const { error: jobError } = await supabase
+        .from('job_requests')
+        .update({ 
+          status: 'accepted',
+          responded_at: new Date().toISOString()
+        })
+        .eq('id', job.id);
+
+      if (jobError) throw jobError;
+
+      // 2. Update shipment → on_route & assign carrier
+      const { error: shipmentError } = await supabase
+        .from('shipments')
+        .update({
+          status: 'on_route',
+          carrier_id: user.id,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', job.shipment_id);
+
+      if (shipmentError) throw shipmentError;
+
+      toast.success("¡Viaje Aceptado!", {
+        description: "¡Viaje asignado con éxito! Dirígete al origen para recoger la carga. 🚛🔥",
         duration: 5000,
       });
+      onAccepted();
+    } catch (error: any) {
+      toast.error(error.message || "Error al aceptar el viaje");
+    } finally {
+      setAccepting(false);
     }
-  }, [submitBid, job.id, job.shipment_id, bidAmount, bidMessage, onAccepted]);
+  }, [job.id, job.shipment_id, onAccepted]);
 
   const handleReject = useCallback(async () => {
     const success = await rejectJob(job.id);
@@ -76,7 +100,7 @@ function JobAlertCard({ job, onAccepted, onRejected }: JobAlertCardProps) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-xl animate-in fade-in duration-300">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-xl animate-in fade-in duration-300 font-inter">
       <Card className="w-full max-w-lg mx-4 bg-[#0a0a0a] border-white/10 rounded-3xl overflow-hidden shadow-2xl">
         <div className="h-1.5 bg-white/5">
           <div
@@ -91,10 +115,10 @@ function JobAlertCard({ job, onAccepted, onRejected }: JobAlertCardProps) {
           <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-teal-gradient flex items-center justify-center shadow-lg shadow-teal-500/20">
             <Truck className="w-8 h-8 text-black" />
           </div>
-          <h2 className="text-xl font-bold text-white mb-1">Subasta de Carga en Vivo</h2>
+          <h2 className="text-xl font-bold text-white mb-1">Nueva Asignación de Carga</h2>
           <div className={`inline-flex items-center gap-2 text-sm font-bold ${urgencyColor}`}>
             <Clock className="w-4 h-4" />
-            <span>{timeLeft}s para enviar oferta</span>
+            <span>{timeLeft}s para aceptar viaje</span>
           </div>
         </div>
 
@@ -102,70 +126,45 @@ function JobAlertCard({ job, onAccepted, onRejected }: JobAlertCardProps) {
           {/* Route Info */}
           <div className="bg-white/5 rounded-2xl p-4 space-y-3">
              <div className="flex items-center gap-3">
-               <div className="w-2.5 h-2.5 rounded-full bg-[#00e5ff]" />
-               <p className="text-sm font-medium text-white">{shipment.origin}</p>
+                <div className="w-2.5 h-2.5 rounded-full bg-[#00e5ff]" />
+                <p className="text-sm font-medium text-white">{shipment.origin}</p>
              </div>
              <div className="w-px h-4 bg-white/20 ml-[5px]" />
              <div className="flex items-center gap-3">
-               <div className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
-               <p className="text-sm font-medium text-white">{shipment.destination}</p>
+                <div className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
+                <p className="text-sm font-medium text-white">{shipment.destination}</p>
              </div>
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div className="bg-white/5 rounded-xl p-3">
-              <p className="text-[10px] text-zinc-500 uppercase font-bold mb-1">Presupuesto Sugerido</p>
-              <p className="text-lg font-bold text-white">${shipment.price?.toFixed(0)}</p>
+              <p className="text-[10px] text-zinc-500 uppercase font-bold mb-1">Distancia</p>
+              <p className="text-lg font-bold text-white">{shipment.distance || 0} KM</p>
             </div>
             <div className="bg-white/5 rounded-xl p-3">
               <p className="text-[10px] text-zinc-500 uppercase font-bold mb-1">Carga</p>
               <p className="text-lg font-bold text-white">{shipment.weight}kg · {cargoLabels[shipment.cargo_type] || shipment.cargo_type}</p>
             </div>
           </div>
-
-          {/* Bid Form */}
-          <div className="space-y-4 border-t border-white/5 pt-4">
-            <div className="space-y-2">
-              <label className="text-xs font-bold text-zinc-500 uppercase">Tu Oferta de Precio ($)</label>
-              <div className="relative">
-                <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
-                <Input 
-                  type="number"
-                  className="bg-black border-white/10 pl-9 h-12 text-white font-bold"
-                  value={bidAmount}
-                  onChange={e => setBidAmount(e.target.value)}
-                />
-              </div>
-            </div>
-            <div className="space-y-2">
-              <label className="text-xs font-bold text-zinc-500 uppercase">Mensaje (Opcional)</label>
-              <Textarea 
-                placeholder="Ej: Camión disponible ahora mismo..."
-                className="bg-black border-white/10 text-white min-h-[80px]"
-                value={bidMessage}
-                onChange={e => setBidMessage(e.target.value)}
-              />
-            </div>
-          </div>
         </div>
 
         <div className="p-6 flex flex-col gap-3 bg-black/50">
           <Button
-            onClick={handleSubmitBid}
-            disabled={submitting || rejecting || !bidAmount}
-            className="w-full h-20 rounded-[32px] bg-emerald-500 hover:bg-emerald-400 text-black font-black text-2xl shadow-[0_20px_50px_rgba(16,185,129,0.3)] px-8 uppercase italic tracking-tighter animate-pulse"
+            onClick={handleAcceptJob}
+            disabled={accepting || rejecting}
+            className="w-full h-20 rounded-[32px] bg-[#00e5ff] hover:bg-cyan-400 text-black font-black text-2xl shadow-[0_20px_50px_rgba(0,229,255,0.3)] px-8 uppercase italic tracking-tighter"
           >
-            {submitting ? <Clock className="w-8 h-8 animate-spin" /> : <Zap className="w-8 h-8 mr-3 fill-black" />}
-            INICIAR (GO)
+            {accepting ? <Clock className="w-8 h-8 animate-spin" /> : <Truck className="w-8 h-8 mr-3" />}
+            ACEPTAR VIAJE (GO)
           </Button>
           
           <Button
             onClick={handleReject}
-            disabled={rejecting || submitting}
+            disabled={rejecting || accepting}
             variant="ghost"
             className="w-full h-12 rounded-xl text-zinc-500 hover:text-red-400 font-bold uppercase text-[10px] tracking-widest"
           >
-            IGNORAR SOLICITUD
+            RECHAZAR VIAJE
           </Button>
         </div>
       </Card>

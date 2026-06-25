@@ -454,14 +454,14 @@ const QuoteCalculator = () => {
                 <DigitalManifest items={inventory as any} onUpdate={setInventory as any} />
              </div>
 
-             {/* FINAL PRICE & ACTION */}
+             {/* CONFIRMATION ACTION (NO PRICES DISPLAYED) */}
              <div className="pt-10 flex flex-col items-center gap-8 text-center bg-gradient-to-t from-blue-600/10 to-transparent rounded-[64px] border border-blue-600/10 p-10">
                 <div className="space-y-1">
-                   <p className="text-[10px] text-zinc-500 font-black uppercase tracking-[0.4em]">Monto final a liquidar</p>
-                   <h2 className="text-7xl font-black text-white italic tracking-tighter leading-none">
-                      S/{totalPrice.toLocaleString()}
+                   <p className="text-[10px] text-zinc-500 font-black uppercase tracking-[0.4em]">Solicitud de Camión</p>
+                   <h2 className="text-4xl font-black text-white italic tracking-tighter leading-none uppercase">
+                      Confirmar Envío
                    </h2>
-                   <p className="text-[10px] text-zinc-600 font-bold uppercase tracking-widest">Soles Peruanos (PEN)</p>
+                   <p className="text-[10px] text-zinc-600 font-bold uppercase tracking-widest">Se notificará al administrador para asignar chofer</p>
                 </div>
 
                 <Button
@@ -473,8 +473,8 @@ const QuoteCalculator = () => {
                     <div className="w-6 h-6 border-4 border-white/20 border-t-white rounded-full animate-spin" />
                   ) : (
                     <>
-                      <CreditCard className="w-8 h-8" />
-                      Liquidar Servicio
+                      <Truck className="w-8 h-8" />
+                      Solicitar Camión
                     </>
                   )}
                 </Button>

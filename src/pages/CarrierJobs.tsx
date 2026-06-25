@@ -22,7 +22,7 @@ export default function CarrierJobs() {
         destination: 'Medellín, ANT', 
         weight: 1200, 
         cargo_type: 'Perecederos', 
-        price: 450000, 
+        distance: 420, 
         date: 'Hoy, 10:30 AM',
         volumen: '3.5 m³',
         prioridad: 'ALTA'
@@ -36,7 +36,7 @@ export default function CarrierJobs() {
         destination: 'Buenaventura, VAC', 
         weight: 5000, 
         cargo_type: 'Carga General', 
-        price: 1200000, 
+        distance: 120, 
         date: 'Hoy, 09:15 AM',
         volumen: '12.0 m³',
         prioridad: 'NORMAL'
@@ -49,7 +49,7 @@ export default function CarrierJobs() {
     <DashboardLayout role="carrier">
       <CarrierJobAlert />
 
-      <div className="max-w-6xl mx-auto space-y-10 pb-32 animate-in slide-in-from-bottom-5 duration-700">
+      <div className="max-w-6xl mx-auto space-y-10 pb-32 animate-in slide-in-from-bottom-5 duration-700 font-inter">
         
         {/* TERMINAL HEADER */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
@@ -142,8 +142,8 @@ export default function CarrierJobs() {
                       {/* Action Zone */}
                       <div className="flex flex-col justify-between items-end border-l border-white/5 pl-8 text-right min-w-[200px]">
                          <div>
-                            <p className="text-[10px] text-zinc-500 font-black uppercase tracking-widest mb-1">Pago Estimado</p>
-                            <h4 className="text-3xl font-black text-white tracking-tighter">${job.shipment?.price?.toLocaleString()}</h4>
+                            <p className="text-[10px] text-zinc-500 font-black uppercase tracking-widest mb-1">Distancia de Ruta</p>
+                            <h4 className="text-3xl font-black text-white tracking-tighter">{job.shipment?.distance || 15} KM</h4>
                          </div>
                          
                          <div className="space-y-3 w-full">

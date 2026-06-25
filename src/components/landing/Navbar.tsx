@@ -23,7 +23,6 @@ const Navbar = () => {
         <div className="hidden md:flex items-center gap-10">
           <a href="#how-it-works" className="text-xs font-medium text-zinc-400 hover:text-white tracking-widest transition-all">Sistemas</a>
           <a href="#features" className="text-xs font-medium text-zinc-400 hover:text-white tracking-widest transition-all">Tecnología</a>
-          <a href="#pricing" className="text-xs font-medium text-zinc-400 hover:text-white tracking-widest transition-all">Red</a>
         </div>
 
         {/* Auth Actions */}
@@ -46,7 +45,6 @@ const Navbar = () => {
         <div className="md:hidden bg-[#060E20] border-b border-white/5 p-8 space-y-6 animate-in fade-in slide-in-from-top-10 duration-500">
           <a href="#how-it-works" className="block text-sm font-black text-zinc-500 hover:text-white uppercase tracking-widest py-2" onClick={() => setMobileOpen(false)}>Sistemas</a>
           <a href="#features" className="block text-sm font-black text-zinc-500 hover:text-white uppercase tracking-widest py-2" onClick={() => setMobileOpen(false)}>Tecnología</a>
-          <a href="#pricing" className="block text-sm font-black text-zinc-500 hover:text-white uppercase tracking-widest py-2" onClick={() => setMobileOpen(false)}>Red</a>
           <div className="flex flex-col gap-4 pt-4">
             <Button asChild className="h-14 bg-white text-black font-bold tracking-widest rounded-2xl shadow-xl shadow-white/5">
                <Link to="/login" onClick={() => setMobileOpen(false)}>Acceso Cliente</Link>

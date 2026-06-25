@@ -153,10 +153,6 @@ const ClientDashboard = () => {
                    </div>
                    
                    <div className="flex items-center gap-4 w-full md:w-auto">
-                      <div className="text-right">
-                         <p className="text-[8px] text-zinc-500 font-black uppercase tracking-widest">Oferta del Conductor</p>
-                         <p className="text-2xl font-black text-white italic tracking-tighter">S/ {shipments.find(s => s.status === 'pending')?.price.toLocaleString()} PEN</p>
-                      </div>
                       <Button 
                         onClick={async () => {
                            const target = shipments.find(s => s.status === 'pending');
@@ -164,12 +160,12 @@ const ClientDashboard = () => {
                            const { error } = await supabase.from('shipments').update({ status: 'on_route' }).eq('id', target.id);
                            if(!error) {
                              setShipments(shipments.map(s => s.id === target.id ? { ...s, status: 'on_route' } : s));
-                             toast.success("¡Oferta Aceptada y Cobrada! El conductor va en camino.");
+                             toast.success("¡Confirmado! El conductor va en camino.");
                            }
                         }}
                         className="h-14 px-8 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white font-black uppercase tracking-[0.2em] shadow-[0_10px_20px_rgba(59,130,246,0.3)] hover:scale-105 active:scale-95 transition-all text-[10px]"
                       >
-                         Aceptar
+                         Confirmar Recojo
                       </Button>
                    </div>
                 </div>
@@ -185,7 +181,6 @@ const ClientDashboard = () => {
                     <th className="px-8 py-6 text-[9px] font-black text-zinc-600 uppercase tracking-[0.2em]">Ruta</th>
                     <th className="px-8 py-6 text-[9px] font-black text-zinc-600 uppercase tracking-[0.2em]">Estado</th>
                     <th className="px-8 py-6 text-[9px] font-black text-zinc-600 uppercase tracking-[0.2em]">Fecha/Hora</th>
-                    <th className="px-8 py-6 text-[9px] font-black text-zinc-600 uppercase tracking-[0.2em]">Total PEN</th>
                     <th className="px-8 py-6 text-right"></th>
                   </tr>
                 </thead>
@@ -258,9 +253,6 @@ const ClientDashboard = () => {
                             <p className="text-xs font-black text-zinc-200 tracking-tighter uppercase italic">{new Date(shipment.created_at).toLocaleDateString('es-PE', { day:'2-digit', month:'short', year: 'numeric' })}</p>
                             <p className="text-[9px] text-zinc-600 font-black uppercase tracking-widest">{new Date(shipment.created_at).toLocaleTimeString('es-PE', { hour: '2-digit', minute:'2-digit' })}</p>
                           </div>
-                        </td>
-                        <td className="px-8 py-8">
-                          <p className="text-xl font-black text-white italic tracking-tighter">S/ {shipment.price.toLocaleString()}</p>
                         </td>
                         <td className="px-8 py-8 text-right">
                           <div className="flex justify-end pr-4">

@@ -152,9 +152,9 @@ export function CurrentShipmentControl({ isOnline }: { isOnline: boolean }) {
            <h2 className="text-2xl font-black text-white uppercase">{shipment.cargo_type}</h2>
            <p className="text-sm font-bold text-zinc-400 mt-1 uppercase">Tracking: {shipment.tracking_id.split('-')[0]}</p>
         </div>
-        <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-2xl px-4 py-2">
-            <p className="text-[10px] text-emerald-500 font-black uppercase tracking-widest text-center">Tarifa Zentra</p>
-            <p className="text-xl font-black text-emerald-400">S/{shipment.price}</p>
+        <div className="bg-blue-500/10 border border-blue-500/20 rounded-2xl px-4 py-2">
+            <p className="text-[10px] text-blue-500 font-black uppercase tracking-widest text-center font-inter">Distancia</p>
+            <p className="text-xl font-black text-blue-400 text-center">{shipment.distance || 0} KM</p>
         </div>
       </div>
 

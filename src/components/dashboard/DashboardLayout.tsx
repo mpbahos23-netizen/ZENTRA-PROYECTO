@@ -59,19 +59,15 @@ const DashboardLayout = ({ children, role: initialRole }: DashboardLayoutProps) 
         { label: "Panel Admin", href: "/admin", icon: LayoutDashboard },
         { label: "Operaciones", href: "/admin/operations", icon: Radio },
         { label: "Inventario", href: "/admin/inventory", icon: Package },
-        { label: "Ganancias", href: "/carrier/earnings", icon: DollarSign },
-        { label: "Facturas", href: "/client/invoices", icon: FileText },
       ]
     : role === 'carrier'
       ? [
           { label: "Dashboard", href: "/carrier", icon: LayoutDashboard },
           { label: "Solicitudes", href: "/carrier/jobs", icon: Radio },
-          { label: "Ganancias", href: "/carrier/earnings", icon: DollarSign },
         ]
       : role === 'client'
         ? [
             { label: "Mis Envíos", href: "/client", icon: LayoutDashboard },
-            { label: "Facturas", href: "/client/invoices", icon: FileText },
           ]
         : [];
 
@@ -199,15 +195,6 @@ const DashboardLayout = ({ children, role: initialRole }: DashboardLayoutProps) 
         </nav>
 
         <div className="p-4 space-y-4">
-          <div className="bg-[#111111] border border-white/5 rounded-2xl p-4 flex flex-col gap-3">
-            <span className="text-xs font-medium text-zinc-400">Cuenta Premium</span>
-            <Button
-              className="w-full bg-[#00e5ff] hover:bg-[#00cce6] text-black font-semibold rounded-xl"
-              size="sm"
-            >
-              <Zap className="w-4 h-4 mr-2" fill="currentColor" /> Mejorar Plan
-            </Button>
-          </div>
 
           <div className="flex items-center justify-between px-2 pt-2 pb-4">
             <div className="flex items-center gap-3">

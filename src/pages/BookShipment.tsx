@@ -228,17 +228,17 @@ export default function BookShipment() {
             />
         </div>
 
-        {/* FINAL PRICING & PAYMENT: Fixed Symbol & Calculation */}
+        {/* CONFIRMATION ACTION (NO PRICES DISPLAYED) */}
         <div className="space-y-8 pt-10">
            <div className="flex items-center justify-between px-6 border border-white/5 bg-white/[0.01] p-8 rounded-[40px] shadow-2xl relative overflow-hidden">
               <div className="absolute top-0 right-0 w-32 h-32 bg-blue-600/5 blur-3xl -mr-10 -mt-10" />
               <div className="space-y-1">
-                 <p className="text-[9px] text-zinc-600 font-black uppercase tracking-widest">Monto Final a Liquidar</p>
-                 <h2 className="text-5xl font-black text-white tracking-tighter italic font-inter leading-none">S/{total.toLocaleString()}</h2>
-                 <p className="text-[8px] text-zinc-800 font-black uppercase tracking-widest pt-1">Soles Peruanos (PEN)</p>
+                 <p className="text-[9px] text-zinc-600 font-black uppercase tracking-widest">Solicitud de Camión</p>
+                 <h2 className="text-3xl font-black text-white tracking-tighter italic font-inter leading-none uppercase">Confirmar Solicitud</h2>
+                 <p className="text-[8px] text-zinc-500 font-black uppercase tracking-widest pt-1">Se notificará al administrador de inmediato</p>
               </div>
               <div className="bg-blue-600 w-16 h-16 rounded-[28px] flex items-center justify-center shadow-[0_15px_40px_rgba(59,130,246,0.4)]">
-                 <CreditCard className="w-8 h-8 text-white" />
+                 <Truck className="w-8 h-8 text-white" />
               </div>
            </div>
 
@@ -252,12 +252,12 @@ export default function BookShipment() {
                     <>
                       <div className="absolute inset-0 bg-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
                       <Sparkles className="w-5 h-5 mr-3 animate-pulse text-blue-600" />
-                      LIQUIDAR Y CONFIRMAR
+                      SOLICITAR CAMIÓN
                     </>
                  )}
               </Button>
-              <p className="text-[8px] text-zinc-800 font-black uppercase text-center mt-8 tracking-[0.2em] leading-relaxed px-10 italic">
-                 Confirmación Segura vía ZENTRA Secure Pay Protocol v2.5.1
+              <p className="text-[8px] text-zinc-850 font-black uppercase text-center mt-8 tracking-[0.2em] leading-relaxed px-10 italic">
+                 Confirmación Segura vía ZENTRA Protocol v3.0
               </p>
            </div>
         </div>

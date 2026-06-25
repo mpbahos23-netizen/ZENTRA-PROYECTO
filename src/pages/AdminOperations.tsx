@@ -161,9 +161,6 @@ export default function AdminOperations() {
     const { error } = await supabase.from('shipments').update({ status }).eq('id', id);
     if (error) toast.error("Error al actualizar despacho");
     else {
-      if (status === 'cancelled') {
-        toast.warning("Cargo por cancelación aplicado: $50.00 (Sin previo aviso)");
-      }
       toast.success(`Despacho ${status === 'cancelled' ? 'cancelado' : 'confirmado'}`);
       fetchData();
     }
@@ -181,14 +178,13 @@ export default function AdminOperations() {
   const handleExportCSV = () => {
     if (shipments.length === 0) return toast.error("No hay datos para exportar");
     
-    const headers = ["ID", "Cliente", "Origen", "Destino", "Estado", "Precio", "Fecha"];
+    const headers = ["ID", "Cliente", "Origen", "Destino", "Estado", "Fecha"];
     const rows = shipments.map(s => [
       s.id,
       s.client?.full_name || "N/A",
       s.origin,
       s.destination,
       s.status,
-      s.price,
       new Date(s.created_at).toLocaleDateString()
     ]);
 
@@ -207,7 +203,7 @@ export default function AdminOperations() {
 
   const statCards = [
     { label: 'Viajes del Día', value: shipments.filter(s => new Date(s.created_at) >= new Date(new Date().setHours(0,0,0,0))).length, icon: Package, color: 'text-[#00e5ff]', bgColor: 'bg-[#00e5ff]/10' },
-    { label: 'Ingresos Hoy', value: `$${stats.dailyRevenue.toLocaleString()}`, icon: DollarSign, color: 'text-emerald-400', bgColor: 'bg-emerald-500/10' },
+    { label: 'En Tránsito', value: stats.activeShipments, icon: Radio, color: 'text-emerald-400', bgColor: 'bg-emerald-500/10' },
     { label: 'Conductores Activos', value: stats.activeDrivers, icon: Users, color: 'text-violet-400', bgColor: 'bg-violet-500/10' },
     { label: 'Clientes Registrados', value: stats.activeClients, icon: Shield, color: 'text-amber-400', bgColor: 'bg-amber-500/10' },
   ];
@@ -256,7 +252,6 @@ export default function AdminOperations() {
             { key: 'shipments', label: 'Gestión Viajes', icon: Package },
             { key: 'live_fleet', label: 'Flota en Vivo', icon: Radio },
             { key: 'carriers', label: 'Conductores', icon: Truck },
-            { key: 'payments', label: 'Precios y Pagos', icon: DollarSign },
             { key: 'demand', label: 'Zonas Activas', icon: Flame },
           ].map(tab => (
             <button
@@ -355,7 +350,7 @@ export default function AdminOperations() {
                     <TableHead className="text-zinc-600 font-black uppercase text-[9px] h-14 pl-10">Cliente</TableHead>
                     <TableHead className="text-zinc-600 font-black uppercase text-[9px]">Ruta</TableHead>
                     <TableHead className="text-zinc-600 font-black uppercase text-[9px]">Estado</TableHead>
-                    <TableHead className="text-zinc-600 font-black uppercase text-[9px]">Precio</TableHead>
+                    <TableHead className="text-zinc-600 font-black uppercase text-[9px]">Carga</TableHead>
                     <TableHead className="text-zinc-600 font-black uppercase text-[9px] text-right pr-10">Acciones</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -382,7 +377,7 @@ export default function AdminOperations() {
                             {s.status}
                          </Badge>
                       </TableCell>
-                      <TableCell className="text-white font-black text-sm tracking-tighter">${s.price?.toLocaleString()}</TableCell>
+                      <TableCell className="text-[#00e5ff] font-bold text-xs uppercase tracking-tight">{s.cargo_type || "Estándar"}</TableCell>
                       <TableCell className="text-right pr-10">
                          <div className="flex justify-end gap-2">
                             {s.status === 'pending' && (
