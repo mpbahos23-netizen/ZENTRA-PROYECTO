@@ -149,23 +149,23 @@ function JobAlertCard({ job, onAccepted, onRejected }: JobAlertCardProps) {
           </div>
         </div>
 
-        <div className="p-6 flex gap-3 bg-black/50">
-          <Button
-            onClick={handleReject}
-            disabled={rejecting || submitting}
-            variant="outline"
-            className="flex-1 h-14 rounded-xl border-white/10 bg-white/5 text-zinc-300 hover:bg-red-500/10 hover:text-red-400 font-bold"
-          >
-            <XCircle className="w-5 h-5 mr-2" />
-            Pasar
-          </Button>
+        <div className="p-6 flex flex-col gap-3 bg-black/50">
           <Button
             onClick={handleSubmitBid}
             disabled={submitting || rejecting || !bidAmount}
-            className="flex-2 h-14 rounded-xl bg-teal-gradient hover:opacity-90 text-black font-bold text-base shadow-lg shadow-teal-500/20 px-8"
+            className="w-full h-20 rounded-[32px] bg-emerald-500 hover:bg-emerald-400 text-black font-black text-2xl shadow-[0_20px_50px_rgba(16,185,129,0.3)] px-8 uppercase italic tracking-tighter animate-pulse"
           >
-            {submitting ? <Clock className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5 mr-2" />}
-            Enviar Oferta
+            {submitting ? <Clock className="w-8 h-8 animate-spin" /> : <Zap className="w-8 h-8 mr-3 fill-black" />}
+            INICIAR (GO)
+          </Button>
+          
+          <Button
+            onClick={handleReject}
+            disabled={rejecting || submitting}
+            variant="ghost"
+            className="w-full h-12 rounded-xl text-zinc-500 hover:text-red-400 font-bold uppercase text-[10px] tracking-widest"
+          >
+            IGNORAR SOLICITUD
           </Button>
         </div>
       </Card>
@@ -178,6 +178,13 @@ export default function CarrierJobAlert() {
   const [dismissed, setDismissed] = useState<Set<string>>(new Set());
 
   const activeJob = pendingJobs.find(j => !dismissed.has(j.id));
+  
+  useEffect(() => {
+    if (activeJob && navigator.vibrate) {
+       navigator.vibrate([200, 100, 200, 100, 400]);
+    }
+  }, [activeJob]);
+
   if (!activeJob) return null;
 
   return (

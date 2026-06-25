@@ -23,22 +23,29 @@
   <body>
     <div id="root"></div>
     <script>
-      // Parche de Limpieza Crítica para Zentra
-      if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.getRegistrations().then(function(registrations) {
-          for(let registration of registrations) {
-            registration.unregister().then(() => {
-              console.log('Zentra: Cache antiguo purgado.');
-            });
+      // Zentra v3: Versión limpia — No destruir SW, solo limpiar cache viejo
+      (function() {
+        var CURRENT_VERSION = '3.0';
+        var stored = null;
+        try { stored = localStorage.getItem('zentra-cache-bust'); } catch(e) {}
+        if (stored !== CURRENT_VERSION) {
+          try {
+            // Solo limpiar keys de zentra, no todo localStorage
+            var keysToRemove = [];
+            for (var i = 0; i < localStorage.length; i++) {
+              var key = localStorage.key(i);
+              if (key && (key.indexOf('zentra') !== -1 || key.indexOf('sb-') !== -1)) {
+                keysToRemove.push(key);
+              }
+            }
+            keysToRemove.forEach(function(k) { localStorage.removeItem(k); });
+            localStorage.setItem('zentra-cache-bust', CURRENT_VERSION);
+            console.log('Zentra: Cache actualizado a v' + CURRENT_VERSION);
+          } catch(e) {
+            console.warn('Zentra: Storage no disponible (incógnito)');
           }
-        });
-      }
-      // Limpiar rastro de versiones con error
-      if (localStorage.getItem('zentra-cache-bust') !== '2.1') {
-        localStorage.clear();
-        localStorage.setItem('zentra-cache-bust', '2.1');
-        console.log('Zentra: LocalStorage reseteado.');
-      }
+        }
+      })();
     </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>

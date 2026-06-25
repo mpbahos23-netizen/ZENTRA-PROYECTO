@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Play, MapPin, Package, CheckCircle2, Loader2, Navigation, ShieldCheck, Clock } from 'lucide-react';
 import { useCarrierGPS, useUpdateShipmentStatus, useUpdateShipmentETA } from '@/hooks/useLocationTracking';
+import { useTripSimulation } from '@/hooks/useTripSimulation';
 import { toast } from 'sonner';
 
 // ============================================
@@ -44,6 +45,7 @@ export default function CarrierTripControls({
   const [etaTime, setEtaTime] = useState('');
   const { updateStatus, updating } = useUpdateShipmentStatus();
   const { updateETA, updating: updatingETA } = useUpdateShipmentETA();
+  const { startSimulation, stopSimulation, isSimulating } = useTripSimulation();
 
   const isGpsActive = phase !== 'ready' && phase !== 'delivered';
   const { currentPosition, sending } = useCarrierGPS(shipmentId, isGpsActive);
@@ -284,6 +286,31 @@ export default function CarrierTripControls({
             <h3 className="text-lg font-bold text-white">¡Entrega Completada!</h3>
             <p className="text-sm text-zinc-400 mt-1">Gracias por tu servicio profesional.</p>
           </div>
+        )}
+
+        {/* REALITY SIMULATION TOOL (Demo Only) */}
+        {phase === 'in_transit' && (
+           <div className="mt-8 pt-6 border-t border-white/5">
+              <p className="text-[9px] text-zinc-600 font-black uppercase tracking-[0.2em] mb-4 text-center">Protocolo de Simulación Maestro</p>
+              <Button
+                 variant="outline"
+                 onClick={() => {
+                    if (isSimulating) stopSimulation();
+                    else startSimulation(
+                       shipmentId,
+                       -12.0464, -77.0428, // Lima Center
+                       -12.1227, -77.0274, // Miraflores
+                       30
+                    );
+                 }}
+                 className={cn(
+                    "w-full h-12 rounded-2xl border-blue-500/20 text-[10px] font-black uppercase tracking-widest transition-all",
+                    isSimulating ? "bg-red-500/10 border-red-500/40 text-red-500" : "bg-blue-500/5 text-blue-400 hover:bg-blue-500 hover:text-white"
+                 )}
+              >
+                 {isSimulating ? "DETENER SIMULACIÓN" : "SIMULAR RUTA EN TIEMPO REAL"}
+              </Button>
+           </div>
         )}
       </div>
     </Card>

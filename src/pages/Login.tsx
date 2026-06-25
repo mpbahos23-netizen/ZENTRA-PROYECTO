@@ -16,16 +16,7 @@ const Login = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // 1. Mecanismo Anti-Caché para Login
-    const hasRefreshed = sessionStorage.getItem('zentra_login_refreshed');
-    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-    
-    if (isMobile && !hasRefreshed) {
-      sessionStorage.setItem('zentra_login_refreshed', 'true');
-      window.location.reload();
-    }
-
-    // 2. Verificación de Storage (Modo Incógnito)
+    // Verificación de Storage (Modo Incógnito)
     try {
       const testKey = "__storage_test__";
       localStorage.setItem(testKey, testKey);

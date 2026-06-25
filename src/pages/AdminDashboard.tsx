@@ -228,6 +228,39 @@ const AdminDashboard = () => {
                     Sistemas de cifrado y RLS activos. Monitoreo constante de integridad de datos para la expansión de la red.
                  </p>
               </Card>
+
+              {/* REALITY FLOW: DESIGNATED ASSIGNMENT */}
+              <Card className="bg-[#1a1a1a] border-emerald-500/20 border rounded-[40px] p-10 shadow-3xl relative overflow-hidden">
+                 <div className="absolute top-0 left-0 w-full h-1 bg-emerald-500/50" />
+                 <h3 className="text-white font-black text-xs uppercase tracking-[0.2em] mb-6 flex items-center gap-3 italic">
+                    <Truck className="w-5 h-5 text-emerald-400" /> Reality Orchestrator
+                 </h3>
+                 <p className="text-zinc-500 text-[9px] font-bold uppercase mb-8 leading-relaxed">
+                    Enviar solicitud directa a transportista designado: <span className="text-emerald-400">brycebueno15@gmail.com</span>
+                 </p>
+                 <Button 
+                    onClick={async () => {
+                        const { data: shipments } = await supabase.from('shipments').select('id').eq('status', 'searching').limit(1);
+                        if (!shipments?.length) return toast.error("No hay envíos buscando transporte");
+                        
+                        const { data: profile } = await supabase.from('profiles').select('id').eq('email', 'brycebueno15@gmail.com').maybeSingle();
+                        if (!profile) return toast.error("Transportista brycebueno15 no encontrado");
+
+                        const { error } = await supabase.from('job_requests').insert({
+                            shipment_id: shipments[0].id,
+                            carrier_id: profile.id,
+                            status: 'pending',
+                            expires_at: new Date(Date.now() + 3600000).toISOString()
+                        });
+
+                        if (error) toast.error("Error al asignar: " + error.message);
+                        else toast.success("NOTIFICACIÓN 'GO' ENVIADA A BRYCE");
+                    }}
+                    className="w-full h-14 bg-emerald-600 hover:bg-emerald-500 text-white font-black uppercase text-[10px] tracking-widest rounded-3xl transition-all shadow-[0_10px_30px_rgba(16,185,129,0.2)]"
+                 >
+                    DESPACHAR AHORA
+                 </Button>
+              </Card>
            </div>
         </div>
       </div>
