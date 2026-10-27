@@ -57,6 +57,7 @@ const DashboardLayout = ({ children, role: initialRole }: DashboardLayoutProps) 
   const navItems: NavItem[] = role === 'admin'
     ? [
         { label: "Panel Admin", href: "/admin", icon: LayoutDashboard },
+        { label: "Camiones en vivo", href: "/admin/camiones", icon: Truck },
         { label: "Operaciones", href: "/admin/operations", icon: Radio },
         { label: "Inventario", href: "/admin/inventory", icon: Package },
       ]

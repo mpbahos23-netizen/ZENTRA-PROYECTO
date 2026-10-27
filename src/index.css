@@ -111,3 +111,64 @@
     box-shadow: 0 10px 25px -5px rgb(0 0 0 / 0.08), 0 8px 10px -6px rgb(0 0 0 / 0.04);
   }
 }
+
+/* ── Camión 3D del alquiler (src/components/alquiler/CamionMarcador.tsx) ── */
+.camion3d {
+  position: relative;
+  width: 64px;
+  height: 64px;
+  perspective: 320px;
+  pointer-events: auto;
+}
+.camion3d-sombra {
+  position: absolute;
+  left: 50%;
+  top: 56%;
+  width: 34px;
+  height: 46px;
+  transform: translate(-50%, -50%) rotate(var(--rumbo, 0deg));
+  background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.45), transparent 70%);
+  filter: blur(3px);
+}
+.camion3d-escena {
+  position: absolute;
+  left: 23px;
+  top: 7px;
+  width: 18px;
+  height: 50px;
+  transform-style: preserve-3d;
+  transform: rotateX(48deg) rotateZ(var(--rumbo, 0deg));
+  transition: transform 0.8s ease-out;
+}
+.camion3d-escena div {
+  position: absolute;
+  transform-style: preserve-3d;
+  backface-visibility: visible;
+}
+.camion3d-pulso {
+  position: absolute;
+  inset: 4px;
+  border-radius: 9999px;
+  border: 2px solid rgba(59, 130, 246, 0.7);
+  animation: camion3d-pulso 1.8s ease-out infinite;
+}
+.camion3d.apagado .camion3d-pulso { display: none; }
+.camion3d.apagado .camion3d-escena > div { filter: grayscale(0.9) brightness(0.8); }
+.camion3d-etiqueta {
+  position: absolute;
+  left: 50%;
+  top: -18px;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  font: 800 10px/1 system-ui, sans-serif;
+  letter-spacing: 0.04em;
+  color: #fff;
+  background: rgba(6, 14, 32, 0.9);
+  border: 1px solid rgba(59, 130, 246, 0.5);
+  padding: 3px 6px;
+  border-radius: 6px;
+}
+@keyframes camion3d-pulso {
+  from { transform: scale(0.5); opacity: 1; }
+  to { transform: scale(1.4); opacity: 0; }
+}

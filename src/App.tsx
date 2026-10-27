@@ -24,6 +24,8 @@ import Inventory from "./pages/Inventory";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import CarrierEarnings from "./pages/CarrierEarnings";
+import AlquilerConductor, { CLAVE_CODIGO } from "./pages/AlquilerConductor";
+import AdminCamiones from "./pages/AdminCamiones";
 
 const queryClient = new QueryClient();
 
@@ -76,6 +78,19 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
+/** La app instalada abre en "/": si en este celular hay un alquiler de camión, vuelve directo a él. */
+function InicioOAlquiler() {
+  const instalada = window.matchMedia?.('(display-mode: standalone)').matches;
+  let codigo: string | null = null;
+  try {
+    codigo = localStorage.getItem(CLAVE_CODIGO);
+  } catch {
+    codigo = null;
+  }
+  if (instalada && codigo) return <Navigate to={`/camion/${codigo}`} replace />;
+  return <Landing />;
+}
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
@@ -84,7 +99,8 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           {/* Public routes */}
-          <Route path="/" element={<Landing />} />
+          <Route path="/" element={<InicioOAlquiler />} />
+          <Route path="/camion/:codigo" element={<AlquilerConductor />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
@@ -98,6 +114,7 @@ const App = () => (
           <Route path="/client/quote" element={<ProtectedRoute><QuoteCalculator /></ProtectedRoute>} />
           <Route path="/client/track/:id" element={<ProtectedRoute><ShipmentTracking /></ProtectedRoute>} />
           <Route path="/admin" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
+          <Route path="/admin/camiones" element={<ProtectedRoute><AdminCamiones /></ProtectedRoute>} />
           <Route path="/admin/operations" element={<ProtectedRoute><AdminOperations /></ProtectedRoute>} />
           <Route path="/admin/inventory" element={<ProtectedRoute><Inventory /></ProtectedRoute>} />
           <Route path="/client/book" element={<ProtectedRoute><BookShipment /></ProtectedRoute>} />
